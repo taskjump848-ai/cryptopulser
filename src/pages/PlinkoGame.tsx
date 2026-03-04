@@ -196,7 +196,7 @@ const PlinkoGame: React.FC = () => {
               {lastResult.mult}×
             </p>
             {lastResult.mult >= 1 && (
-              <p className="text-sm text-accent">+₹{(betAmount * lastResult.mult - betAmount).toFixed(0)}</p>
+              <p className="text-sm text-accent">+${(betAmount * lastResult.mult - betAmount).toFixed(0)}</p>
             )}
           </div>
         )}

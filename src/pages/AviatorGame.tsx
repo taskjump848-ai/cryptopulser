@@ -153,7 +153,7 @@ const AviatorGame: React.FC = () => {
           <div className="glass-elevated rounded-xl p-4 text-center">
             <p className="text-xs text-muted-foreground">You cashed out!</p>
             <p className="text-2xl font-black neon-text-green">{currentMult.toFixed(2)}×</p>
-            <p className="text-sm text-accent">+₹{(betAmount * currentMult - betAmount).toFixed(0)}</p>
+            <p className="text-sm text-accent">+${(betAmount * currentMult - betAmount).toFixed(0)}</p>
           </div>
         )}
         {gameState === 'crashed' && (

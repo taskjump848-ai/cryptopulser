@@ -8,6 +8,7 @@ import MinesGame from "./pages/MinesGame";
 import AviatorGame from "./pages/AviatorGame";
 import PlinkoGame from "./pages/PlinkoGame";
 import TowerGame from "./pages/TowerGame";
+import GameLibrary from "./pages/GameLibrary";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -20,7 +21,8 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<CasinoLayout />}>
-            <Route index element={<Navigate to="/mines" replace />} />
+            <Route index element={<Navigate to="/library" replace />} />
+            <Route path="library" element={<GameLibrary />} />
             <Route path="mines" element={<MinesGame />} />
             <Route path="aviator" element={<AviatorGame />} />
             <Route path="plinko" element={<PlinkoGame />} />

@@ -153,6 +153,19 @@
   .font-mono-console {
     font-family: 'JetBrains Mono', monospace;
   }
+
+  .breathing-glow {
+    animation: breathing 3s ease-in-out infinite;
+  }
+
+  @keyframes breathing {
+    0%, 100% {
+      box-shadow: 0 0 5px hsl(var(--neon-green) / 0.05);
+    }
+    50% {
+      box-shadow: 0 0 15px hsl(var(--neon-green) / 0.15), 0 0 30px hsl(var(--neon-green) / 0.05);
+    }
+  }
 }
 
 @layer utilities {
