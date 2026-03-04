@@ -85,7 +85,7 @@ const TowerGame: React.FC = () => {
           betAmount={betAmount}
           onBetChange={setBetAmount}
           onAction={gameActive ? cashout : startGame}
-          actionLabel={gameActive && currentRow > 0 ? `Cashout ₹${(betAmount * currentMult).toFixed(0)}` : gameActive ? 'Pick a tile' : 'Start Climbing'}
+          actionLabel={gameActive && currentRow > 0 ? `Cashout $${(betAmount * currentMult).toFixed(0)}` : gameActive ? 'Pick a tile' : 'Start Climbing'}
           disabled={gameActive ? currentRow === 0 : (betAmount > balance || betAmount <= 0)}
           maxBet={balance}
         />

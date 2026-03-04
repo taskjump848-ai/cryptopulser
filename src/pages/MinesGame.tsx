@@ -71,7 +71,7 @@ const MinesGame: React.FC = () => {
           betAmount={betAmount}
           onBetChange={setBetAmount}
           onAction={gameActive ? cashout : startGame}
-          actionLabel={gameActive ? `Cashout ₹${(betAmount * currentMult).toFixed(0)}` : 'Start Game'}
+          actionLabel={gameActive ? `Cashout $${(betAmount * currentMult).toFixed(0)}` : 'Start Game'}
           disabled={!gameActive && (betAmount > balance || betAmount <= 0)}
           maxBet={balance}
         />

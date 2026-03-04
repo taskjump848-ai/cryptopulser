@@ -1,8 +1,9 @@
 import React from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
-import { Grid3X3, Plane, Circle, Building2 } from 'lucide-react';
+import { Grid3X3, Plane, Circle, Building2, LayoutGrid } from 'lucide-react';
 
 const games = [
+  { name: 'Library', path: '/library', icon: LayoutGrid },
   { name: 'Mines', path: '/mines', icon: Grid3X3 },
   { name: 'Aviator', path: '/aviator', icon: Plane },
   { name: 'Plinko', path: '/plinko', icon: Circle },
