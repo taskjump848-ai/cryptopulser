@@ -23,14 +23,14 @@ const BetControls: React.FC<Props> = ({ betAmount, onBetChange, onAction, action
           max={maxBet}
           value={betAmount}
           onChange={e => onBetChange(Number(e.target.value))}
-          className="flex-1 bg-secondary rounded-lg px-3 py-2 text-center font-bold text-foreground text-sm outline-none focus:ring-1 focus:ring-gold"
+          className="flex-1 bg-secondary rounded-lg px-3 py-2 text-center font-bold text-foreground text-sm outline-none focus:ring-1 focus:ring-primary"
         />
         <button onClick={() => onBetChange(Math.min(maxBet, betAmount * 2))} className="px-3 py-2 rounded-lg bg-secondary text-secondary-foreground text-sm font-medium click-glow">2×</button>
       </div>
       <div className="flex gap-2">
         {presets.map(p => (
           <button key={p} onClick={() => onBetChange(p)} className={`flex-1 py-1.5 rounded-lg text-xs font-medium click-glow ${betAmount === p ? 'bg-primary/20 text-primary border border-primary/30' : 'bg-secondary text-muted-foreground'}`}>
-            ₹{p}
+            ${p}
           </button>
         ))}
       </div>

@@ -71,10 +71,16 @@ export function useGameState() {
     notify();
   }, []);
 
+  const setBalance = useCallback((amount: number) => {
+    globalState = { ...globalState, balance: amount };
+    notify();
+  }, []);
+
   return {
     balance: globalState.balance,
     history: globalState.history,
     placeBet,
     resetBalance,
+    setBalance,
   };
 }
