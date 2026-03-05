@@ -15,7 +15,7 @@ const CasinoSidebar: React.FC = () => {
 
   return (
     <aside className="w-20 hover:w-56 transition-all duration-300 ease-in-out group flex flex-col items-center py-6 gap-2 border-r border-border/30"
-      style={{ background: 'hsl(220 20% 7%)' }}>
+      style={{ background: 'hsl(220 20% 7% / 0.75)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)' }}>
       {/* Logo */}
       <div className="w-12 h-12 rounded-xl flex items-center justify-center mb-8 neon-glow-gold">
         <span className="text-2xl font-black neon-text-gold">N</span>

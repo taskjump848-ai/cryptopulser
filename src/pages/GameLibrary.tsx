@@ -45,21 +45,18 @@ const GameLibrary: React.FC = () => {
   const slots = games.filter(g => g.category === 'slot');
 
   return (
-    <div className="space-y-8 max-w-6xl mx-auto">
+    <div className="space-y-8 w-full max-w-6xl mx-auto px-2">
       <div>
-        <h2 className="text-xl font-black neon-text-gold tracking-wider mb-4">🎮 NEXUS ORIGINALS</h2>
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3" style={{ perspective: '800px' }}>
+        <h2 className="text-xl font-black neon-text-gold tracking-wider mb-4 text-center">🎮 NEXUS ORIGINALS</h2>
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 justify-items-center">
           {originals.map((game, i) => (
             <button
               key={game.name}
               onClick={() => game.available && navigate(game.path)}
-              className={`group relative flex flex-col items-center gap-2 p-5 rounded-xl mine-cell click-glow transition-all duration-300 breathing-glow
+              className={`group relative flex flex-col items-center justify-center gap-2 p-5 rounded-xl mine-cell click-glow transition-all duration-300 breathing-glow w-full
                 ${game.available ? 'hover:border-accent/60 hover:neon-glow-green cursor-pointer' : 'opacity-50 cursor-not-allowed'}
               `}
-              style={{
-                transform: `rotateY(${(i % 5 - 2) * 2}deg) rotateX(${Math.floor(i / 5) * -1}deg)`,
-                animationDelay: `${i * 100}ms`,
-              }}
+              style={{ animationDelay: `${i * 100}ms` }}
             >
               <game.icon className={`w-8 h-8 transition-all duration-300 ${game.available ? 'text-accent group-hover:drop-shadow-[0_0_12px_hsl(136,100%,50%,0.6)]' : 'text-muted-foreground'}`} />
               <span className={`text-xs font-bold ${game.available ? 'text-foreground' : 'text-muted-foreground'}`}>{game.name}</span>
@@ -72,17 +69,14 @@ const GameLibrary: React.FC = () => {
       </div>
 
       <div>
-        <h2 className="text-xl font-black neon-text-gold tracking-wider mb-4">🎰 PREMIUM SLOTS</h2>
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3" style={{ perspective: '800px' }}>
+        <h2 className="text-xl font-black neon-text-gold tracking-wider mb-4 text-center">🎰 PREMIUM SLOTS</h2>
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3 justify-items-center">
           {slots.map((game, i) => (
             <button
               key={game.name}
               onClick={() => navigate(game.path)}
-              className="group relative flex flex-col items-center gap-2 p-5 rounded-xl mine-cell hover:border-accent/60 hover:neon-glow-green cursor-pointer breathing-glow click-glow"
-              style={{
-                transform: `rotateY(${(i % 5 - 2) * 2}deg)`,
-                animationDelay: `${i * 150}ms`,
-              }}
+              className="group relative flex flex-col items-center justify-center gap-2 p-5 rounded-xl mine-cell hover:border-accent/60 hover:neon-glow-green cursor-pointer breathing-glow click-glow w-full"
+              style={{ animationDelay: `${i * 150}ms` }}
             >
               <game.icon className="w-8 h-8 text-accent group-hover:drop-shadow-[0_0_12px_hsl(136,100%,50%,0.6)]" />
               <span className="text-xs font-bold text-foreground">{game.name}</span>

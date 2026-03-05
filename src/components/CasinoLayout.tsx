@@ -48,8 +48,10 @@ const CasinoLayout: React.FC = () => {
           </div>
         </header>
 
-        <main className="flex-1 p-6 overflow-auto">
-          <Outlet />
+        <main className="flex-1 p-6 overflow-auto flex flex-col items-center">
+          <div className="w-full max-w-7xl">
+            <Outlet />
+          </div>
         </main>
       </div>
 

@@ -201,4 +201,16 @@
     0%, 100% { box-shadow: 0 0 5px hsl(var(--neon-green) / 0.3); }
     50% { box-shadow: 0 0 20px hsl(var(--neon-green) / 0.6), 0 0 40px hsl(var(--neon-green) / 0.2); }
   }
+
+  .animate-verify-progress {
+    animation: verify-progress 4s ease-in-out forwards;
+  }
+
+  @keyframes verify-progress {
+    0% { width: 0%; }
+    30% { width: 40%; }
+    60% { width: 70%; }
+    90% { width: 90%; }
+    100% { width: 100%; }
+  }
 }
