@@ -12,33 +12,30 @@ interface GameCard {
 }
 
 const games: GameCard[] = [
-  // Available originals
   { name: 'Mines', path: '/mines', icon: Grid3X3, category: 'original', available: true, color: 'accent' },
   { name: 'Aviator', path: '/aviator', icon: Plane, category: 'original', available: true, color: 'accent' },
   { name: 'Plinko', path: '/plinko', icon: Circle, category: 'original', available: true, color: 'accent' },
   { name: 'Tower', path: '/tower', icon: Building2, category: 'original', available: true, color: 'accent' },
-  // New originals
-  { name: 'Dice', path: '/dice', icon: Dice1, category: 'original', available: false, color: 'primary' },
-  { name: 'Limbo', path: '/limbo', icon: TrendingDown, category: 'original', available: false, color: 'primary' },
-  { name: 'HiLo', path: '/hilo', icon: ArrowUpDown, category: 'original', available: false, color: 'primary' },
-  { name: 'Keno', path: '/keno', icon: Hash, category: 'original', available: false, color: 'primary' },
-  { name: 'Wheel', path: '/wheel', icon: RotateCcw, category: 'original', available: false, color: 'primary' },
-  { name: 'Diamonds', path: '/diamonds', icon: Diamond, category: 'original', available: false, color: 'primary' },
-  { name: 'Slide', path: '/slide', icon: Layers, category: 'original', available: false, color: 'primary' },
-  { name: 'Crash', path: '/crash', icon: Zap, category: 'original', available: false, color: 'primary' },
-  { name: 'Roulette', path: '/roulette', icon: Target, category: 'original', available: false, color: 'primary' },
-  { name: 'Baccarat', path: '/baccarat', icon: Sparkles, category: 'original', available: false, color: 'primary' },
-  { name: 'Dragon Tower', path: '/dragon-tower', icon: Flame, category: 'original', available: false, color: 'primary' },
-  { name: 'Blue Samurai', path: '/blue-samurai', icon: Star, category: 'original', available: false, color: 'primary' },
-  { name: 'Scarab Spin', path: '/scarab-spin', icon: RotateCcw, category: 'original', available: false, color: 'primary' },
-  { name: 'Video Poker', path: '/video-poker', icon: Layers, category: 'original', available: false, color: 'primary' },
-  { name: 'Cup & Ball', path: '/cup-ball', icon: Target, category: 'original', available: false, color: 'primary' },
-  // Premium slots
-  { name: 'Gates of Olympus', path: '/olympus', icon: Crown, category: 'slot', available: false, color: 'primary' },
-  { name: 'Sweet Bonanza', path: '/sweet-bonanza', icon: Cherry, category: 'slot', available: false, color: 'primary' },
-  { name: 'Starlight Princess', path: '/starlight', icon: Sparkles, category: 'slot', available: false, color: 'primary' },
-  { name: 'Sugar Rush', path: '/sugar-rush', icon: Gem, category: 'slot', available: false, color: 'primary' },
-  { name: 'Wanted Dead', path: '/wanted', icon: Trophy, category: 'slot', available: false, color: 'primary' },
+  { name: 'Dice', path: '/dice', icon: Dice1, category: 'original', available: true, color: 'accent' },
+  { name: 'Limbo', path: '/limbo', icon: TrendingDown, category: 'original', available: true, color: 'accent' },
+  { name: 'HiLo', path: '/hilo', icon: ArrowUpDown, category: 'original', available: true, color: 'accent' },
+  { name: 'Keno', path: '/keno', icon: Hash, category: 'original', available: true, color: 'accent' },
+  { name: 'Wheel', path: '/wheel', icon: RotateCcw, category: 'original', available: true, color: 'accent' },
+  { name: 'Diamonds', path: '/diamonds', icon: Diamond, category: 'original', available: true, color: 'accent' },
+  { name: 'Slide', path: '/slide', icon: Layers, category: 'original', available: true, color: 'accent' },
+  { name: 'Crash', path: '/crash', icon: Zap, category: 'original', available: true, color: 'accent' },
+  { name: 'Roulette', path: '/roulette', icon: Target, category: 'original', available: true, color: 'accent' },
+  { name: 'Baccarat', path: '/baccarat', icon: Sparkles, category: 'original', available: true, color: 'accent' },
+  { name: 'Dragon Tower', path: '/dragon-tower', icon: Flame, category: 'original', available: true, color: 'accent' },
+  { name: 'Blue Samurai', path: '/blue-samurai', icon: Star, category: 'original', available: true, color: 'accent' },
+  { name: 'Scarab Spin', path: '/scarab-spin', icon: RotateCcw, category: 'original', available: true, color: 'accent' },
+  { name: 'Video Poker', path: '/video-poker', icon: Layers, category: 'original', available: true, color: 'accent' },
+  { name: 'Cup & Ball', path: '/cup-ball', icon: Target, category: 'original', available: true, color: 'accent' },
+  { name: 'Gates of Olympus', path: '/olympus', icon: Crown, category: 'slot', available: true, color: 'accent' },
+  { name: 'Sweet Bonanza', path: '/sweet-bonanza', icon: Cherry, category: 'slot', available: true, color: 'accent' },
+  { name: 'Starlight Princess', path: '/starlight', icon: Sparkles, category: 'slot', available: true, color: 'accent' },
+  { name: 'Sugar Rush', path: '/sugar-rush', icon: Gem, category: 'slot', available: true, color: 'accent' },
+  { name: 'Wanted Dead', path: '/wanted', icon: Trophy, category: 'slot', available: true, color: 'accent' },
 ];
 
 const GameLibrary: React.FC = () => {
@@ -80,15 +77,15 @@ const GameLibrary: React.FC = () => {
           {slots.map((game, i) => (
             <button
               key={game.name}
-              className="group relative flex flex-col items-center gap-2 p-5 rounded-xl mine-cell opacity-50 cursor-not-allowed breathing-glow"
+              onClick={() => navigate(game.path)}
+              className="group relative flex flex-col items-center gap-2 p-5 rounded-xl mine-cell hover:border-accent/60 hover:neon-glow-green cursor-pointer breathing-glow click-glow"
               style={{
                 transform: `rotateY(${(i % 5 - 2) * 2}deg)`,
                 animationDelay: `${i * 150}ms`,
               }}
             >
-              <game.icon className="w-8 h-8 text-muted-foreground" />
-              <span className="text-xs font-bold text-muted-foreground">{game.name}</span>
-              <span className="absolute top-2 right-2 text-[9px] px-1.5 py-0.5 rounded bg-primary/20 text-primary font-bold">SOON</span>
+              <game.icon className="w-8 h-8 text-accent group-hover:drop-shadow-[0_0_12px_hsl(136,100%,50%,0.6)]" />
+              <span className="text-xs font-bold text-foreground">{game.name}</span>
             </button>
           ))}
         </div>
