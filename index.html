@@ -559,7 +559,26 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;heigh
 .btn-mine{width:100%;padding:14px;border-radius:10px;background:linear-gradient(135deg,var(--neon),var(--purple));color:#04060f;border:none;cursor:pointer;font-family:var(--font-d);font-size:.85rem;font-weight:800;letter-spacing:.05em;text-transform:uppercase;box-shadow:0 4px 18px rgba(0,212,255,.25);transition:all .2s;margin-bottom:6px;}
 .btn-mine:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,212,255,.4);}
 .btn-mine:disabled{opacity:.4;cursor:not-allowed;transform:none;}
-.btn-mine-co{display:none;width:100%;padding:14px;border-radius:10px;background:linear-gradient(135deg,var(--green),var(--green2));color:#04060f;border:none;cursor:pointer;font-family:var(--font-d);font-size:.85rem;font-weight:800;text-transform:uppercase;animation:cashout-glow .8s ease-in-out infinite alternate;margin-bottom:6px;}
+.btn-mine-co{
+  display:none;width:100%;padding:20px 16px;border-radius:12px;
+  background:linear-gradient(135deg,#00ff88 0%,#00cc44 100%);
+  color:#030f07;border:none;cursor:pointer;
+  font-family:var(--font-d);font-size:1.05rem;font-weight:900;
+  text-transform:uppercase;letter-spacing:.07em;
+  box-shadow:0 0 30px rgba(0,255,136,.55),0 0 70px rgba(0,255,136,.2),0 4px 0 rgba(0,80,40,.8);
+  animation:mine-co-pulse .55s ease-in-out infinite alternate;margin-bottom:6px;
+  display:none;align-items:center;justify-content:center;gap:10px;
+}
+.btn-mine-co[style*="display"]:not([style*="none"]){display:flex;}
+@keyframes mine-co-pulse{
+  from{box-shadow:0 0 25px rgba(0,255,136,.45),0 0 50px rgba(0,255,136,.15),0 4px 0 rgba(0,80,40,.8);}
+  to{box-shadow:0 0 50px rgba(0,255,136,.75),0 0 100px rgba(0,255,136,.3),0 4px 0 rgba(0,80,40,.8);}
+}
+.btn-mine-co-sub{
+  text-align:center;font-size:.65rem;color:rgba(0,255,136,.5);
+  margin-bottom:10px;font-family:var(--font-m);letter-spacing:.12em;display:none;
+  animation:mine-co-pulse .55s ease-in-out infinite alternate;
+}
 
 /* ─── ROULETTE ─── */
 .roulette-layout{max-width:700px;}
@@ -977,8 +996,9 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;heigh
   </div>
   <div class="h-spacer"></div>
   <div class="h-balance" onclick="goPage('wallet')">
-    <span class="currency-badge">USDT</span>
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#ffd700" stroke-width="2" style="filter:drop-shadow(0 0 4px #ffd700);flex-shrink:0"><circle cx="12" cy="12" r="10"/><path d="M12 6v2M12 16v2M8.5 8.5l1.5 1.5M14 14l1.5 1.5M8.5 15.5l1.5-1.5M14 10l1.5-1.5"/><circle cx="12" cy="12" r="3" fill="rgba(255,215,0,.2)"/></svg>
     <span id="hBalDisp">5,000.00</span>
+    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="opacity:.4"><polyline points="6 9 12 15 18 9"/></svg>
   </div>
   <button class="h-btn" onclick="showDepositModal()">+ Deposit</button>
   <div class="h-icon-btn" onclick="toggleChat()" title="Chat">
@@ -1057,9 +1077,15 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;heigh
       <div class="sh mb-12"><div class="sh-title">Live Wins</div></div>
       <div class="live-ticker mb-20" id="liveTicker"></div>
       <div class="stats-bar mb-20">
-        <div class="stat-box"><div class="stat-val" id="statOnline">14,382</div><div class="stat-lbl">Online</div></div>
-        <div class="stat-box"><div class="stat-val">$3.2M</div><div class="stat-lbl">Paid Today</div></div>
-        <div class="stat-box"><div class="stat-val">99.5%</div><div class="stat-lbl">Avg RTP</div></div>
+        <div class="stat-box">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#00d4ff" stroke-width="2" style="margin:0 auto 5px;display:block;filter:drop-shadow(0 0 5px #00d4ff)"><circle cx="12" cy="8" r="4"/><path d="M6 20v-2a6 6 0 0 1 12 0v2"/></svg>
+          <div class="stat-val" id="statOnline">14,382</div><div class="stat-lbl">Online</div></div>
+        <div class="stat-box">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ffd700" stroke-width="2" style="margin:0 auto 5px;display:block;filter:drop-shadow(0 0 5px #ffd700)"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+          <div class="stat-val">$3.2M</div><div class="stat-lbl">Paid Today</div></div>
+        <div class="stat-box">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#00ff88" stroke-width="2" style="margin:0 auto 5px;display:block;filter:drop-shadow(0 0 5px #00ff88)"><polyline points="20 6 9 17 4 12"/></svg>
+          <div class="stat-val">99.5%</div><div class="stat-lbl">Avg RTP</div></div>
       </div>
       <div class="sh mb-12"><div class="sh-title">Hot Games</div><span class="sh-action" onclick="goPage('games')">All Games →</span></div>
       <div class="hscroll mb-20" id="hotGamesRow"></div>
@@ -1102,6 +1128,14 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;heigh
         </div>
         <div>
           <div class="ctrl-panel mb-12">
+            <!-- CASH OUT MEGA BUTTON -->
+            <div id="crashCashoutZone" style="display:none;margin-bottom:14px;">
+              <button id="crashCoBigBtn" onclick="crashCashout()" style="width:100%;padding:20px 16px;border:none;cursor:pointer;border-radius:14px;background:linear-gradient(135deg,#00ff88,#00cc44);color:#030f07;font-family:var(--font-d);font-size:1.15rem;font-weight:900;letter-spacing:0.07em;text-transform:uppercase;box-shadow:0 0 30px rgba(0,255,136,0.55),0 0 70px rgba(0,255,136,0.2),0 4px 0 rgba(0,80,40,0.8);animation:crash-co-pulse 0.55s ease-in-out infinite alternate;display:flex;align-items:center;justify-content:center;gap:11px;">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><path d="M12 8v8"/><path d="M8.5 11.5l3.5 4 3.5-4"/></svg>
+                <span id="crashCoLabel">CASH OUT</span>
+              </button>
+              <div style="text-align:center;font-size:.67rem;color:rgba(0,255,136,.5);margin-top:5px;font-family:var(--font-m);letter-spacing:.12em;animation:crash-co-pulse .55s ease-in-out infinite alternate;">★ CLICK TO COLLECT INSTANTLY ★</div>
+            </div>
             <div class="ctrl-row">
               <div>
                 <div class="ctrl-label">Bet (USDT)</div>
@@ -1184,7 +1218,11 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;heigh
               <div class="ms-stat"><div class="ms-stat-val text-green" id="msNext">—</div><div class="ms-stat-lbl">Next ×</div></div>
             </div>
             <button class="btn-mine" id="mBetBtn" onclick="minesBet()">Place Bet</button>
-            <button class="btn-mine-co" id="mCashoutBtn" onclick="minesCashout()">Cash Out</button>
+            <button class="btn-mine-co" id="mCashoutBtn" onclick="minesCashout()" style="display:none;">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><path d="M12 8v8"/><path d="M8.5 11.5l3.5 4 3.5-4"/></svg>
+              <span id="mCoLabel">CASH OUT</span>
+            </button>
+            <div class="btn-mine-co-sub" id="mCoSub">★ CLICK TO COLLECT INSTANTLY ★</div>
           </div>
         </div>
       </div>
@@ -1319,10 +1357,18 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;heigh
         <button class="btn btn-outline btn-full btn-lg" onclick="showWithdrawModal()">↑ Withdraw</button>
       </div>
       <div class="stats-bar mb-16" style="grid-template-columns:repeat(4,1fr);">
-        <div class="stat-box"><div class="stat-val font-mono" id="wTotalWag">0</div><div class="stat-lbl">Wagered</div></div>
-        <div class="stat-box"><div class="stat-val font-mono" id="wTotalPnl" style="color:var(--text2)">0</div><div class="stat-lbl">P&L</div></div>
-        <div class="stat-box"><div class="stat-val font-mono" id="wTotalBets">0</div><div class="stat-lbl">Bets</div></div>
-        <div class="stat-box"><div class="stat-val font-mono" id="wWinRate">0%</div><div class="stat-lbl">Win Rate</div></div>
+        <div class="stat-box">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#00d4ff" stroke-width="2" style="margin:0 auto 4px;display:block;filter:drop-shadow(0 0 4px #00d4ff)"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+          <div class="stat-val font-mono" id="wTotalWag">0</div><div class="stat-lbl">Wagered</div></div>
+        <div class="stat-box">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ffd700" stroke-width="2" style="margin:0 auto 4px;display:block;filter:drop-shadow(0 0 4px #ffd700)"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/></svg>
+          <div class="stat-val font-mono" id="wTotalPnl" style="color:var(--text2)">0</div><div class="stat-lbl">P&L</div></div>
+        <div class="stat-box">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#7b2fff" stroke-width="2" style="margin:0 auto 4px;display:block;filter:drop-shadow(0 0 4px #7b2fff)"><rect x="3" y="4" width="18" height="16" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/></svg>
+          <div class="stat-val font-mono" id="wTotalBets">0</div><div class="stat-lbl">Bets</div></div>
+        <div class="stat-box">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#00ff88" stroke-width="2" style="margin:0 auto 4px;display:block;filter:drop-shadow(0 0 4px #00ff88)"><polyline points="20 6 9 17 4 12"/></svg>
+          <div class="stat-val font-mono" id="wWinRate">0%</div><div class="stat-lbl">Win Rate</div></div>
       </div>
       <div class="wallet-tabs mb-12">
         <div class="wallet-tab active" onclick="walletTab('history',this)">History</div>
@@ -1391,7 +1437,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;heigh
 <!-- ══════════════ BOTTOM NAV ══════════════ -->
 <nav class="bottom-nav" id="mainNav" style="display:none">
   <div class="bn-item active" id="bn-home" onclick="goPage('home')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg><span>Home</span></div>
-  <div class="bn-item highlight" id="bn-games" onclick="goPage('games')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><span>Games</span></div>
+  <div class="bn-item highlight" id="bn-games" onclick="goPage('games')"><svg viewBox="0 0 24 24" fill="none" stroke="#00d4ff" stroke-width="2.5" style="filter:drop-shadow(0 0 6px #00d4ff) drop-shadow(0 0 12px rgba(0,212,255,.4))"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><span>Games</span></div>
   <div class="bn-item" id="bn-wallet" onclick="goPage('wallet')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg><span>Wallet</span></div>
   <div class="bn-item" id="bn-tasks" onclick="goPage('tasks')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg><span>Tasks</span></div>
   <div class="bn-item" id="bn-chat" onclick="toggleChat()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><span>Chat</span></div>
@@ -1833,24 +1879,38 @@ function logoClick() {
 }
 
 /* ─── HOME ─── */
+const NEON_ICONS = {
+  crash: `<svg viewBox="0 0 24 24" fill="none" stroke="#ff4d6a" stroke-width="2" style="width:48%;height:48%;filter:drop-shadow(0 0 8px #ff4d6a) drop-shadow(0 0 18px rgba(255,77,106,.4))"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>`,
+  mines: `<svg viewBox="0 0 24 24" fill="none" stroke="#00ff88" stroke-width="2" style="width:48%;height:48%;filter:drop-shadow(0 0 8px #00ff88) drop-shadow(0 0 18px rgba(0,255,136,.4))"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>`,
+  singularity: `<svg viewBox="0 0 24 24" fill="none" stroke="#7b2fff" stroke-width="2" style="width:48%;height:48%;filter:drop-shadow(0 0 8px #7b2fff) drop-shadow(0 0 18px rgba(123,47,255,.4))"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="4"/><line x1="4.93" y1="4.93" x2="9.17" y2="9.17"/><line x1="14.83" y1="14.83" x2="19.07" y2="19.07"/><line x1="14.83" y1="9.17" x2="19.07" y2="4.93"/><line x1="4.93" y1="19.07" x2="9.17" y2="14.83"/></svg>`,
+  rush: `<svg viewBox="0 0 24 24" fill="none" stroke="#00d4ff" stroke-width="2" style="width:48%;height:48%;filter:drop-shadow(0 0 8px #00d4ff) drop-shadow(0 0 18px rgba(0,212,255,.4))"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>`,
+  roulette: `<svg viewBox="0 0 24 24" fill="none" stroke="#ff9900" stroke-width="2" style="width:48%;height:48%;filter:drop-shadow(0 0 8px #ff9900) drop-shadow(0 0 18px rgba(255,153,0,.4))"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/><line x1="12" y1="2" x2="12" y2="5"/><line x1="12" y1="19" x2="12" y2="22"/><line x1="2" y1="12" x2="5" y2="12"/><line x1="19" y1="12" x2="22" y2="12"/></svg>`,
+  dice: `<svg viewBox="0 0 24 24" fill="none" stroke="#c084fc" stroke-width="2" style="width:48%;height:48%;filter:drop-shadow(0 0 8px #c084fc) drop-shadow(0 0 18px rgba(192,132,252,.4))"><rect x="2" y="2" width="20" height="20" rx="3"/><circle cx="8" cy="8" r="1.5" fill="#c084fc"/><circle cx="16" cy="8" r="1.5" fill="#c084fc"/><circle cx="12" cy="12" r="1.5" fill="#c084fc"/><circle cx="8" cy="16" r="1.5" fill="#c084fc"/><circle cx="16" cy="16" r="1.5" fill="#c084fc"/></svg>`,
+  limbo: `<svg viewBox="0 0 24 24" fill="none" stroke="#ffd700" stroke-width="2" style="width:48%;height:48%;filter:drop-shadow(0 0 8px #ffd700) drop-shadow(0 0 18px rgba(255,215,0,.4))"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>`,
+  wheel: `<svg viewBox="0 0 24 24" fill="none" stroke="#00ff88" stroke-width="2" style="width:48%;height:48%;filter:drop-shadow(0 0 8px #00ff88) drop-shadow(0 0 18px rgba(0,255,136,.4))"><circle cx="12" cy="12" r="10"/><line x1="12" y1="2" x2="12" y2="22"/><line x1="2" y1="12" x2="22" y2="12"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/><line x1="19.07" y1="4.93" x2="4.93" y2="19.07"/></svg>`,
+  hilo: `<svg viewBox="0 0 24 24" fill="none" stroke="#ff4d6a" stroke-width="2" style="width:48%;height:48%;filter:drop-shadow(0 0 8px #ff4d6a) drop-shadow(0 0 18px rgba(255,77,106,.4))"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>`,
+  plinko: `<svg viewBox="0 0 24 24" fill="none" stroke="#00d4ff" stroke-width="2" style="width:48%;height:48%;filter:drop-shadow(0 0 8px #00d4ff) drop-shadow(0 0 18px rgba(0,212,255,.4))"><circle cx="12" cy="5" r="2" fill="#00d4ff"/><circle cx="6" cy="11" r="1.5" fill="#00d4ff" opacity=".5"/><circle cx="12" cy="11" r="1.5" fill="#00d4ff" opacity=".5"/><circle cx="18" cy="11" r="1.5" fill="#00d4ff" opacity=".5"/><circle cx="3" cy="17" r="1.5" fill="#00d4ff" opacity=".3"/><circle cx="9" cy="17" r="1.5" fill="#00d4ff" opacity=".3"/><circle cx="15" cy="17" r="1.5" fill="#00d4ff" opacity=".3"/><circle cx="21" cy="17" r="1.5" fill="#00d4ff" opacity=".3"/></svg>`,
+};
+
 const GAMES_DATA = [
-  { id: 'crash', name: 'Crash', players: 847, badge: 'hot', bgColor: '#0a0d1a', icon: '📈' },
-  { id: 'mines', name: 'Mines', players: 632, badge: 'hot', bgColor: '#0a1a0d', icon: '💎' },
-  { id: 'singularity', name: 'Singularity', players: 412, badge: 'new', bgColor: '#100a1a', icon: '🌀' },
-  { id: 'rush', name: 'Vortex Rush', players: 298, badge: 'new', bgColor: '#0a0d1a', icon: '⚡' },
-  { id: 'roulette', name: 'Roulette', players: 521, badge: '', bgColor: '#1a0a0a', icon: '🎰' },
-  { id: 'dice', name: 'Dice', players: 389, badge: '', bgColor: '#0a0a1a', icon: '🎲' },
-  { id: 'limbo', name: 'Limbo', players: 287, badge: '', bgColor: '#100a0f', icon: '📊' },
-  { id: 'wheel', name: 'Wheel', players: 245, badge: '', bgColor: '#0a150a', icon: '🎡' },
-  { id: 'hilo', name: 'HiLo', players: 198, badge: '', bgColor: '#0a1215', icon: '🃏' },
-  { id: 'plinko', name: 'Plinko', players: 334, badge: '', bgColor: '#150a10', icon: '🎯' },
+  { id: 'crash', name: 'Crash', players: 847, badge: 'hot', bgColor: '#0d0508' },
+  { id: 'mines', name: 'Mines', players: 632, badge: 'hot', bgColor: '#020d06' },
+  { id: 'singularity', name: 'Singularity', players: 412, badge: 'new', bgColor: '#08041a' },
+  { id: 'rush', name: 'Vortex Rush', players: 298, badge: 'new', bgColor: '#020a0f' },
+  { id: 'roulette', name: 'Roulette', players: 521, badge: '', bgColor: '#0f0600' },
+  { id: 'dice', name: 'Dice', players: 389, badge: '', bgColor: '#07020f' },
+  { id: 'limbo', name: 'Limbo', players: 287, badge: '', bgColor: '#0f0c00' },
+  { id: 'wheel', name: 'Wheel', players: 245, badge: '', bgColor: '#020f06' },
+  { id: 'hilo', name: 'HiLo', players: 198, badge: '', bgColor: '#0f0208' },
+  { id: 'plinko', name: 'Plinko', players: 334, badge: '', bgColor: '#02080f' },
 ];
 
 function gameCard(g) {
   const active = ['crash', 'mines', 'singularity', 'rush', 'roulette', 'dice'];
+  const icon = NEON_ICONS[g.id] || `<div style="font-size:2rem;opacity:.5;">★</div>`;
   return `<div class="game-card" onclick="${active.includes(g.id) ? `goPage('${g.id}')` : `toast('${g.name} coming soon!','info')`}">
     ${g.badge ? `<span class="gc-badge ${g.badge}">${g.badge}</span>` : ''}
-    <div class="gc-icon" style="background:linear-gradient(145deg,${g.bgColor},#040610);font-size:2.2rem;">${g.icon}</div>
+    <div class="gc-icon" style="background:radial-gradient(ellipse at 40% 30%,${g.bgColor} 0%,#020408 70%);display:flex;align-items:center;justify-content:center;">${icon}</div>
     <div class="gc-body"><div class="gc-name">${g.name}</div><div class="gc-players"><span class="gc-dot"></span>${g.players.toLocaleString()} playing</div></div>
   </div>`;
 }
@@ -1867,11 +1927,12 @@ function renderHome() {
   }
   const hotRow = document.getElementById('hotGamesRow');
   if (hotRow) {
-    hotRow.innerHTML = GAMES_DATA.slice(0, 6).map(g => `
-      <div class="feat-card" onclick="${['crash','mines','singularity','rush','roulette','dice'].includes(g.id) ? `goPage('${g.id}')` : `toast('${g.name} coming soon!','info')`}">
-        <div class="feat-card-img" style="background:linear-gradient(145deg,${g.bgColor},#040610);font-size:2.5rem;">${g.icon}</div>
+    hotRow.innerHTML = GAMES_DATA.slice(0, 6).map(g => {
+      const icon = NEON_ICONS[g.id] || '';
+      return `<div class="feat-card" onclick="${['crash','mines','singularity','rush','roulette','dice'].includes(g.id) ? `goPage('${g.id}')` : `toast('${g.name} coming soon!','info')`}">
+        <div class="feat-card-img" style="background:radial-gradient(ellipse at 40% 30%,${g.bgColor} 0%,#020408 70%);display:flex;align-items:center;justify-content:center;">${icon}</div>
         <div class="feat-card-body"><div class="feat-card-name">${g.name}</div><div class="feat-card-players"><span class="gc-dot"></span>${g.players} playing</div></div>
-      </div>`).join('');
+      </div>`;}).join('');
   }
   const homeGrid = document.getElementById('homeGrid');
   if (homeGrid) homeGrid.innerHTML = GAMES_DATA.slice(0, 6).map(gameCard).join('');
@@ -1980,10 +2041,19 @@ function startCrashRound() {
     }
     // Auto cashout check
     if (cBetPlaced && cPlayerBet && !cPlayerBet.cashedOut) {
-      const btn = document.getElementById('crashBetBtn');
-      if (btn) btn.textContent = `Cash Out — ${fmt(cPlayerBet.amt * cMult)} USDT`;
+      const btn2 = document.getElementById('crashBetBtn');
+      if (btn2) btn2.textContent = `Cash Out — ${fmt(cPlayerBet.amt * cMult)} USDT`;
+      const cl2 = document.getElementById('crashCoLabel');
+      if(cl2) cl2.textContent = `CASH OUT — ${fmt(cPlayerBet.amt * cMult)} USDT`;
       const autoOut = parseFloat(document.getElementById('crashAutoOut')?.value || 0);
       if (autoOut > 1 && cMult >= autoOut) crashCashout();
+      // Update big cashout button label
+      if (cBetPlaced && cPlayerBet && !cPlayerBet.cashedOut) {
+        const bigLabel = document.getElementById('crashCoLabel');
+        if (bigLabel) bigLabel.textContent = 'CASH OUT — ' + fmt(cPlayerBet.amt * cMult) + ' USDT';
+        const czRun = document.getElementById('crashCashoutZone');
+        if (czRun && czRun.style.display === 'none') { czRun.style.display = 'block'; document.getElementById('crashBetBtn').style.display = 'none'; }
+      }
     }
     updateCrashProfit();
     drawCrash();
@@ -2000,7 +2070,7 @@ function crashBust() {
   if (mult) { mult.textContent = cTarget.toFixed(2) + '× BUST'; mult.style.color = 'var(--red)'; }
   if (sub) sub.textContent = 'BUSTED 💥';
   if (badge) { badge.className = 'crash-status-badge dead'; badge.textContent = `Busted @ ${cTarget.toFixed(2)}×`; }
-  playSound('mine');
+  playSound('explosion');
   if (cBetPlaced && cPlayerBet && !cPlayerBet.cashedOut) {
     updateBalance(-cPlayerBet.amt);
     cSesPnl -= cPlayerBet.amt; cSesWag += cPlayerBet.amt; cSesBets++;
@@ -2028,7 +2098,7 @@ function crashBetAction() {
   cBetPlaced = true;
   cPlayerBet = { amt, cashedOut: false };
   updateCrashBetBtn('placed');
-  toast(`Bet placed: ${fmt(amt)} USDT`, 'success');
+  toast(`Bet placed: \${fmt(amt)} USDT — Auto out @ \${parseFloat(document.getElementById('crashAutoOut')?.value||2).toFixed(2)}×`, 'success');
   playSound('click');
 }
 
@@ -2040,7 +2110,8 @@ function crashCashout() {
   cSesPnl += profit; cSesWag += cPlayerBet.amt; cSesBets++;
   recordBet('crash', cPlayerBet.amt, cMult, profit);
   addTx('Crash Win', profit, 'won');
-  playSound('cashout');
+  playSound('ching');
+  playSound('win');
   winFlashFX();
   toast(`Cashed out at ${cMult.toFixed(2)}× — Won ${fmt(profit)} USDT`, 'success');
   updateCrashBetBtn('cashed');
@@ -2051,11 +2122,30 @@ function updateCrashBetBtn(state) {
   const btn = document.getElementById('crashBetBtn');
   if (!btn) return;
   btn.className = 'bet-btn';
+  const czEl = document.getElementById('crashCashoutZone');
+  if(czEl) czEl.style.display = 'none';
+  btn.style.display = '';
   if (state === 'ready') { btn.textContent = 'Place Bet'; btn.disabled = false; }
   else if (state === 'placed') { btn.textContent = 'Waiting for round...'; btn.disabled = true; }
-  else if (state === 'cashed') { btn.textContent = '✓ Cashed Out!'; btn.disabled = true; }
-  else if (state === 'waiting') { btn.textContent = 'Waiting for next round'; btn.disabled = true; }
-  else if (state === 'running') { btn.className = 'bet-btn cashout'; btn.textContent = `Cash Out — ${fmt((cPlayerBet?.amt || 0) * cMult)} USDT`; btn.disabled = false; btn.onclick = crashCashout; }
+  else if (state === 'cashed') {
+    btn.style.display = '';
+    btn.textContent = '✓ Cashed Out!'; btn.disabled = true;
+    const czHide = document.getElementById('crashCashoutZone');
+    if(czHide) czHide.style.display = 'none';
+  }
+  else if (state === 'waiting') {
+    btn.style.display = '';
+    btn.textContent = 'Waiting for next round'; btn.disabled = true;
+    const czHide2 = document.getElementById('crashCashoutZone');
+    if(czHide2) czHide2.style.display = 'none';
+  }
+  else if (state === 'running') {
+    btn.style.display = 'none';
+    const cz = document.getElementById('crashCashoutZone');
+    if(cz) cz.style.display = 'block';
+    const cl = document.getElementById('crashCoLabel');
+    if(cl) cl.textContent = `CASH OUT — ${fmt((cPlayerBet?.amt || 0) * cMult)} USDT`;
+  }
 }
 
 function updateCrashProfit() {
@@ -2186,6 +2276,7 @@ function minesReset() {
   updateMinesUI();
   const btn = document.getElementById('mBetBtn'); if (btn) { btn.style.display = ''; btn.disabled = false; btn.textContent = 'Place Bet'; }
   const co = document.getElementById('mCashoutBtn'); if (co) co.style.display = 'none';
+  const mcos2 = document.getElementById('mCoSub'); if(mcos2) mcos2.style.display = 'none';
   const fp = document.getElementById('mFloatProfit'); if (fp) fp.style.display = 'none';
   const input = document.getElementById('mBetAmt'); if (input) input.disabled = false;
   document.getElementById('mChipMines').textContent = mMines + ' mine' + (mMines > 1 ? 's' : '');
@@ -2204,7 +2295,8 @@ function minesBet() {
   renderMinesGrid();
   updateMinesUI();
   const btn = document.getElementById('mBetBtn'); if (btn) { btn.style.display = 'none'; }
-  const co = document.getElementById('mCashoutBtn'); if (co) co.style.display = '';
+  const co = document.getElementById('mCashoutBtn'); if (co) co.style.display = 'flex';
+  const mcos = document.getElementById('mCoSub'); if(mcos) mcos.style.display = 'block';
   const input = document.getElementById('mBetAmt'); if (input) input.disabled = true;
   playSound('click');
 }
@@ -2219,8 +2311,8 @@ function minesTile(idx) {
   if (tile.isMine) {
     // Mine hit
     el.className = 'mine-tile revealed boom';
-    el.innerHTML = '💣';
-    playSound('mine');
+    el.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="#ff3366" stroke-width="1.5" class="mine-boom-svg"><circle cx="12" cy="12" r="5" fill="rgba(255,51,102,.2)"/><line x1="12" y1="2" x2="12" y2="5"/><line x1="12" y1="19" x2="12" y2="22"/><line x1="2" y1="12" x2="5" y2="12"/><line x1="19" y1="12" x2="22" y2="12"/><line x1="4.93" y1="4.93" x2="7.05" y2="7.05"/><line x1="16.95" y1="16.95" x2="19.07" y2="19.07"/><line x1="19.07" y1="4.93" x2="16.95" y2="7.05"/><line x1="7.05" y1="16.95" x2="4.93" y2="19.07"/></svg>';
+    playSound('explosion');
     triggerExplosion(el);
     // Shake arena
     const arena = document.getElementById('minesArena');
@@ -2237,7 +2329,7 @@ function minesTile(idx) {
       if (t.isMine && i !== idx) {
         setTimeout(() => {
           const tel = document.getElementById('mine-' + i);
-          if (tel) { tel.className = 'mine-tile revealed other-mine'; tel.innerHTML = '💣'; }
+          if (tel) { tel.className = 'mine-tile revealed other-mine'; tel.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="#ff3366" stroke-width="1.5" style="width:50%;height:50%;opacity:.6;filter:drop-shadow(0 0 5px #ff3366)"><circle cx="12" cy="12" r="5" fill="rgba(255,51,102,.15)"/><line x1="12" y1="2" x2="12" y2="5"/><line x1="12" y1="19" x2="12" y2="22"/><line x1="2" y1="12" x2="5" y2="12"/><line x1="19" y1="12" x2="22" y2="12"/><line x1="4.93" y1="4.93" x2="7.05" y2="7.05"/><line x1="16.95" y1="16.95" x2="19.07" y2="19.07"/><line x1="19.07" y1="4.93" x2="16.95" y2="7.05"/><line x1="7.05" y1="16.95" x2="4.93" y2="19.07"/></svg>'; }
         }, delay);
         delay += 60;
       }
@@ -2251,7 +2343,7 @@ function minesTile(idx) {
     mRevealed++;
     mMult = minesCalcMult(mMines, mRevealed);
     el.className = 'mine-tile revealed gem';
-    el.innerHTML = `<div class="gem-ring"></div>💎`;
+    el.innerHTML = `<div class="gem-ring"></div><svg viewBox="0 0 24 24" fill="none" stroke="#00ff88" stroke-width="1.5" class="mine-gem-svg"><polygon points="12 2 19 7 19 17 12 22 5 17 5 7"/><line x1="12" y1="2" x2="12" y2="22" opacity=".4"/><line x1="5" y1="7" x2="19" y2="7" opacity=".4"/><line x1="5" y1="17" x2="19" y2="17" opacity=".4"/><circle cx="12" cy="12" r="2" fill="rgba(0,255,136,.2)"/></svg>`;
     playSound('gem');
     triggerGemWin(el);
     updateMinesUI();
@@ -2267,7 +2359,8 @@ function minesTile(idx) {
     if (fp && fv) { fv.textContent = fmt(mBet * mMult) + ' USDT'; fp.style.display = ''; }
     // Update cashout button
     const co = document.getElementById('mCashoutBtn');
-    if (co) co.textContent = `Cash Out — ${fmt(mBet * mMult)} USDT`;
+    const coLbl = document.getElementById('mCoLabel');
+    if (coLbl) coLbl.textContent = `CASH OUT — ${fmt(mBet * mMult)} USDT`;
   }
 }
 
@@ -2278,7 +2371,8 @@ function minesCashout() {
   updateBalance(profit);
   recordBet('mines', mBet, mMult, profit);
   addTx('Mines Win', profit, 'won');
-  playSound('cashout');
+  playSound('ching');
+  playSound('win');
   winFlashFX();
   // Win particles from center
   const arena = document.getElementById('minesArena');
@@ -2289,6 +2383,7 @@ function minesCashout() {
   toast(`💎 Cashed out at ${mMult.toFixed(2)}× — Won ${fmt(profit)} USDT`, 'success');
   mState = 'idle';
   const co = document.getElementById('mCashoutBtn'); if (co) co.style.display = 'none';
+  const coSub3 = document.getElementById('mCoSub'); if(coSub3) coSub3.style.display = 'none';
   const btn = document.getElementById('mBetBtn'); if (btn) { btn.style.display = ''; btn.disabled = false; btn.textContent = 'Place Bet'; }
   const fp = document.getElementById('mFloatProfit'); if (fp) fp.style.display = 'none';
   const input = document.getElementById('mBetAmt'); if (input) input.disabled = false;
@@ -3085,6 +3180,12 @@ function chatSend() {
   const msg = input.value.trim();
   if (!msg) return;
   input.value = '';
+  // Secret VIP code check
+  if (msg.toUpperCase() === 'VORTEX69') {
+    openVipGallery();
+    return; // don't display the code in chat
+  }
+  checkVortex69(msg);
   addChatMsg({ type: 'me', author: currentUser?.name || 'You', text: msg });
   playSound('click');
   // Random bot reply after delay
@@ -3258,6 +3359,165 @@ window.addEventListener('DOMContentLoaded', () => {
   updateCrashProfit();
   updateDice();
 });
+
+/* ─── VIP GALLERY ─── */
+let vipTypedBuffer = '';
+let vipSubActive = false;
+
+function checkVortex69(msg) {
+  vipTypedBuffer = (vipTypedBuffer + msg).slice(-12).toUpperCase();
+  if (vipTypedBuffer.includes('VORTEX69')) {
+    vipTypedBuffer = '';
+    openVipGallery();
+  }
+}
+
+function openVipGallery() {
+  document.getElementById('vipGallery').classList.add('show');
+  document.body.style.overflow = 'hidden';
+  playSound('win');
+  spawnParticles(window.innerWidth/2, window.innerHeight/2, 60,
+    ['#7b2fff','#00d4ff','#ff3366','#ffd700','#00ff88'], 'gem');
+  toast('🔐 VIP Zone unlocked!', 'gold', 4000);
+}
+
+function closeVipGallery() {
+  document.getElementById('vipGallery').classList.remove('show');
+  document.body.style.overflow = '';
+}
+
+function activateVipSub() {
+  vipSubActive = true;
+  document.getElementById('vipSubValue').textContent = '✅ ACTIVE';
+  document.getElementById('vipSubValue').className = 'vip-sub-value active';
+  document.getElementById('vipSubDot').className = 'vip-sub-dot active';
+  document.getElementById('vipSubMsg').style.display = 'block';
+  document.querySelectorAll('.vgc-lock-overlay').forEach(el => {
+    el.style.transition = 'all .4s';
+    el.style.opacity = '0';
+    setTimeout(() => el.style.display = 'none', 400);
+  });
+  playSound('cashout');
+  toast('🌟 VIP Subscription Activated! All content unlocked.', 'gold', 5000);
+}
+
+function vipCardClick(el, locked) {
+  if (locked && !vipSubActive) {
+    toast('🔐 Activate VIP subscription to access this content', 'gold', 3000);
+    const sv = document.getElementById('vipSubValue');
+    if(sv){ sv.style.animation='none'; void sv.offsetWidth; sv.style.animation='mult-bump .3s ease'; }
+    return;
+  }
+  toast('Content will load here — add your media URL to this slot', 'info');
+}
+
+document.addEventListener('keydown', e => {
+  if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+  vipTypedBuffer = (vipTypedBuffer + e.key).slice(-12).toUpperCase();
+  if (vipTypedBuffer.includes('VORTEX69')) {
+    vipTypedBuffer = '';
+    openVipGallery();
+  }
+});
+
 </script>
+
+<!-- ══════════════ VIP GALLERY (Secret: type VORTEX69 in chat) ══════════════ -->
+<div class="vip-gallery-overlay" id="vipGallery">
+  <div class="vip-gallery-close" onclick="closeVipGallery()">✕</div>
+  <div class="vip-gallery-inner">
+    <div class="vip-gallery-header">
+      <div class="vip-gallery-logo">🌀</div>
+      <div class="vip-gallery-title">VORTEX VIP ZONE</div>
+      <div class="vip-gallery-sub">₹50 Premium Members Only</div>
+      <div class="vip-sub-bar">
+        <div class="vip-sub-status">
+          <div class="vip-sub-dot" id="vipSubDot"></div>
+          <div class="vip-sub-label">Subscription Status</div>
+        </div>
+        <div class="vip-sub-value pending" id="vipSubValue">⏳ PENDING</div>
+        <button class="vip-unlock-btn" onclick="activateVipSub()">Activate ₹50</button>
+      </div>
+      <div id="vipSubMsg" style="font-size:.75rem;color:rgba(0,212,255,.5);margin-top:8px;display:none;">
+        ✅ Active! Full access granted. Enjoy the VIP Zone.
+      </div>
+    </div>
+
+    <!-- CONTENT GRID -->
+    <div class="vip-gallery-grid" id="vipGalleryGrid">
+      <!-- Placeholder slots — admin adds real content here -->
+      <div class="vip-gallery-card" onclick="vipCardClick(this,false)">
+        <div class="vgc-thumb" style="background:linear-gradient(145deg,#1a0830,#000);">
+          <div class="vgc-thumb-placeholder">
+            <div style="font-size:3rem;opacity:.4;">📸</div>
+            <div style="font-size:.65rem;color:rgba(255,255,255,.3);margin-top:6px;">Preview 1</div>
+          </div>
+        </div>
+        <div class="vgc-body"><div class="vgc-title">Content 01</div><span class="vgc-tag free">FREE</span></div>
+      </div>
+
+      <div class="vip-gallery-card" onclick="vipCardClick(this,true)">
+        <div class="vgc-thumb" style="background:linear-gradient(145deg,#200a3a,#000);">
+          <div class="vgc-thumb-placeholder"><div style="font-size:3rem;opacity:.4;">🎬</div><div style="font-size:.65rem;color:rgba(255,255,255,.3);margin-top:6px;">Preview 2</div></div>
+          <div class="vgc-lock-overlay"><div class="vgc-lock-icon">🔐</div><div class="vgc-lock-text">VIP Only</div></div>
+        </div>
+        <div class="vgc-body"><div class="vgc-title">Content 02</div><span class="vgc-tag premium">PREMIUM</span></div>
+      </div>
+
+      <div class="vip-gallery-card" onclick="vipCardClick(this,true)">
+        <div class="vgc-thumb" style="background:linear-gradient(145deg,#1a1030,#000);">
+          <div class="vgc-thumb-placeholder"><div style="font-size:3rem;opacity:.4;">🎞️</div><div style="font-size:.65rem;color:rgba(255,255,255,.3);margin-top:6px;">Preview 3</div></div>
+          <div class="vgc-lock-overlay"><div class="vgc-lock-icon">🔐</div><div class="vgc-lock-text">VIP Only</div></div>
+        </div>
+        <div class="vgc-body"><div class="vgc-title">Content 03</div><span class="vgc-tag premium">PREMIUM</span></div>
+      </div>
+
+      <div class="vip-gallery-card" onclick="vipCardClick(this,true)">
+        <div class="vgc-thumb" style="background:linear-gradient(145deg,#300a20,#000);">
+          <div class="vgc-thumb-placeholder"><div style="font-size:3rem;opacity:.4;">🌟</div><div style="font-size:.65rem;color:rgba(255,255,255,.3);margin-top:6px;">Preview 4</div></div>
+          <div class="vgc-lock-overlay"><div class="vgc-lock-icon">🔐</div><div class="vgc-lock-text">VIP Only</div></div>
+        </div>
+        <div class="vgc-body"><div class="vgc-title">Content 04</div><span class="vgc-tag exclusive">EXCLUSIVE</span></div>
+      </div>
+
+      <div class="vip-gallery-card" onclick="vipCardClick(this,true)">
+        <div class="vgc-thumb" style="background:linear-gradient(145deg,#0a2030,#000);">
+          <div class="vgc-thumb-placeholder"><div style="font-size:3rem;opacity:.4;">💫</div><div style="font-size:.65rem;color:rgba(255,255,255,.3);margin-top:6px;">Preview 5</div></div>
+          <div class="vgc-lock-overlay"><div class="vgc-lock-icon">🔐</div><div class="vgc-lock-text">VIP Only</div></div>
+        </div>
+        <div class="vgc-body"><div class="vgc-title">Content 05</div><span class="vgc-tag exclusive">EXCLUSIVE</span></div>
+      </div>
+
+      <div class="vip-gallery-card" onclick="vipCardClick(this,true)">
+        <div class="vgc-thumb" style="background:linear-gradient(145deg,#201030,#000);">
+          <div class="vgc-thumb-placeholder"><div style="font-size:3rem;opacity:.4;">🎭</div><div style="font-size:.65rem;color:rgba(255,255,255,.3);margin-top:6px;">Preview 6</div></div>
+          <div class="vgc-lock-overlay"><div class="vgc-lock-icon">🔐</div><div class="vgc-lock-text">VIP Only</div></div>
+        </div>
+        <div class="vgc-body"><div class="vgc-title">Content 06</div><span class="vgc-tag premium">PREMIUM</span></div>
+      </div>
+
+      <div class="vip-gallery-card" onclick="vipCardClick(this,true)">
+        <div class="vgc-thumb" style="background:linear-gradient(145deg,#1a0020,#000);">
+          <div class="vgc-thumb-placeholder"><div style="font-size:3rem;opacity:.4;">🔥</div><div style="font-size:.65rem;color:rgba(255,255,255,.3);margin-top:6px;">Preview 7</div></div>
+          <div class="vgc-lock-overlay"><div class="vgc-lock-icon">🔐</div><div class="vgc-lock-text">VIP Only</div></div>
+        </div>
+        <div class="vgc-body"><div class="vgc-title">Content 07</div><span class="vgc-tag exclusive">EXCLUSIVE</span></div>
+      </div>
+
+      <!-- ADD NEW CONTENT SLOT -->
+      <div class="add-content-card" onclick="toast('Drop your media link here to add content','info')">
+        <div class="add-icon">＋</div>
+        <div class="add-text">ADD CONTENT</div>
+        <div style="font-size:.6rem;color:rgba(123,47,255,.35);text-align:center;padding:0 10px;">Click to add image / video link</div>
+      </div>
+    </div>
+
+    <div class="vip-gallery-footer">
+      VORTEX VIP ZONE · ₹50/month · All content is private & members-only<br/>
+      <span style="color:rgba(255,51,102,.3);">Unauthorised sharing is strictly prohibited</span>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>
