@@ -47,9 +47,18 @@ html{scroll-behavior:smooth;-webkit-text-size-adjust:100%;}
 body{
   background:var(--bg);color:var(--text);font-family:var(--font-b);
   min-height:100vh;overflow-x:hidden;
-  background-image:
-    radial-gradient(ellipse 80% 50% at 50% -10%,rgba(0,212,255,0.06) 0%,transparent 60%),
-    radial-gradient(ellipse 50% 40% at 90% 90%,rgba(123,47,255,0.05) 0%,transparent 55%);
+  position:relative;
+}
+/* ═══════ HYPER MESH GRADIENT CANVAS BEHIND EVERYTHING ═══════ */
+#meshGradientCanvas{
+  position:fixed;inset:0;z-index:-1;pointer-events:none;
+  width:100%;height:100%;
+}
+/* Grain overlay for texture depth */
+body::after{
+  content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+  opacity:0.55;
 }
 ::-webkit-scrollbar{width:4px;height:4px;}
 ::-webkit-scrollbar-track{background:var(--bg);}
@@ -210,24 +219,130 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;heigh
 }
 .h-balance:hover{border-color:var(--gb2);}
 .currency-badge{background:var(--neon);color:#04060f;font-size:0.58rem;font-weight:800;padding:1px 5px;border-radius:4px;letter-spacing:0.05em;}
+/* ═══════ IRIDESCENT HYPER-GLOW BUTTONS ═══════ */
 .h-btn{
   background:linear-gradient(135deg,#ff2dce 0%,#a020f0 45%,#00d4ff 100%);
   color:#fff;border:none;cursor:pointer;
   padding:7px 16px;border-radius:var(--r3);
   font-family:var(--font-d);font-size:0.72rem;font-weight:700;
   letter-spacing:0.04em;text-transform:uppercase;
-  box-shadow:0 0 18px rgba(255,45,206,0.5),0 0 36px rgba(160,32,240,0.25);
-  transition:all .2s;white-space:nowrap;position:relative;overflow:hidden;
+  position:relative;overflow:hidden;
+  backdrop-filter:blur(10px);
+  transition:all .25s;white-space:nowrap;
+  /* Iridescent animated border */
+  border:1px solid transparent;
+  background-clip:padding-box;
+  box-shadow:
+    0 0 18px rgba(255,45,206,0.6),
+    0 0 36px rgba(160,32,240,0.35),
+    0 0 60px rgba(0,212,255,0.2),
+    inset 0 0 20px rgba(255,255,255,0.08);
+  animation:iridescent-glow 3s ease-in-out infinite;
+}
+@keyframes iridescent-glow{
+  0%{box-shadow:0 0 18px rgba(255,45,206,0.6),0 0 36px rgba(160,32,240,0.35),0 0 60px rgba(0,212,255,0.2),inset 0 0 20px rgba(255,255,255,0.08);}
+  25%{box-shadow:0 0 22px rgba(0,212,255,0.7),0 0 44px rgba(123,47,255,0.4),0 0 80px rgba(0,255,136,0.15),inset 0 0 25px rgba(255,255,255,0.1);}
+  50%{box-shadow:0 0 26px rgba(0,255,136,0.6),0 0 50px rgba(0,212,255,0.35),0 0 90px rgba(255,215,0,0.15),inset 0 0 30px rgba(255,255,255,0.12);}
+  75%{box-shadow:0 0 22px rgba(255,215,0,0.55),0 0 44px rgba(255,45,206,0.35),0 0 75px rgba(123,47,255,0.2),inset 0 0 22px rgba(255,255,255,0.09);}
+  100%{box-shadow:0 0 18px rgba(255,45,206,0.6),0 0 36px rgba(160,32,240,0.35),0 0 60px rgba(0,212,255,0.2),inset 0 0 20px rgba(255,255,255,0.08);}
 }
 .h-btn::before{
   content:'';position:absolute;inset:0;
-  background:linear-gradient(135deg,rgba(255,255,255,0.15),transparent);
+  background:linear-gradient(135deg,rgba(255,255,255,0.18),transparent 50%,rgba(255,255,255,0.06));
   pointer-events:none;
 }
-.h-btn:hover{
-  box-shadow:0 0 28px rgba(255,45,206,0.7),0 0 56px rgba(160,32,240,0.4),0 0 80px rgba(0,212,255,0.2);
-  transform:translateY(-1px) scale(1.02);
+/* Rainbow shimmer sweep */
+.h-btn::after{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(105deg,transparent 30%,rgba(255,255,255,0.25) 50%,transparent 70%);
+  transform:translateX(-100%);
+  animation:shimmer-sweep 2.5s ease-in-out infinite;
+  pointer-events:none;
 }
+@keyframes shimmer-sweep{0%,40%{transform:translateX(-120%);}70%,100%{transform:translateX(120%);}}
+.h-btn:hover{
+  transform:translateY(-2px) scale(1.04);
+  filter:brightness(1.15) saturate(1.3);
+}
+
+/* ═══════ GLASSMORPHISM PANELS ═══════ */
+.ctrl-panel,.mines-terminal,.modal,.left-sidebar,.chat-sidebar,
+.crash-panel,.term-body,.mines-arena{
+  backdrop-filter:blur(10px) saturate(1.4) !important;
+  -webkit-backdrop-filter:blur(10px) saturate(1.4) !important;
+}
+
+/* ═══════ CRYPTO LOGO GLOW ON HOVER ═══════ */
+.cbal-item:hover .cbal-coin{
+  filter:drop-shadow(0 0 8px var(--coin-glow, #00d4ff)) drop-shadow(0 0 16px var(--coin-glow, #00d4ff));
+  transform:scale(1.15);
+  transition:all .2s ease;
+}
+.cbal-coin{ transition:all .2s ease; }
+
+/* Bitcoin glow = Gold */
+[data-coin="btc"]:hover .cbal-coin{ --coin-glow:#f7931a; }
+/* Ethereum = Blue */
+[data-coin="eth"]:hover .cbal-coin{ --coin-glow:#627eea; }
+/* Solana = Purple */
+[data-coin="sol"]:hover .cbal-coin{ --coin-glow:#9945ff; }
+/* USDT = Green */
+[data-coin="usdt"]:hover .cbal-coin{ --coin-glow:#26a17b; }
+/* Doge = Gold */
+[data-coin="doge"]:hover .cbal-coin{ --coin-glow:#c2a633; }
+/* XRP = Cyan */
+[data-coin="xrp"]:hover .cbal-coin{ --coin-glow:#00aae4; }
+/* BNB = Yellow */
+[data-coin="bnb"]:hover .cbal-coin{ --coin-glow:#f3ba2f; }
+/* AVAX = Red */
+[data-coin="avax"]:hover .cbal-coin{ --coin-glow:#e84142; }
+/* MATIC = Purple */
+[data-coin="matic"]:hover .cbal-coin{ --coin-glow:#8247e5; }
+/* DOT = Pink */
+[data-coin="dot"]:hover .cbal-coin{ --coin-glow:#e6007a; }
+/* LINK = Blue */
+[data-coin="link"]:hover .cbal-coin{ --coin-glow:#375bd2; }
+/* VTX = Cyan */
+[data-coin="vtx"]:hover .cbal-coin{ --coin-glow:#00d4ff; }
+/* ADA = Dark Blue → use lighter */
+[data-coin="ada"]:hover .cbal-coin{ --coin-glow:#4a90d9; }
+/* LTC = Silver/White */
+[data-coin="ltc"]:hover .cbal-coin{ --coin-glow:#e0e0e0; }
+/* INR = Orange */
+[data-coin="inr"]:hover .cbal-coin{ --coin-glow:#ff9900; }
+
+/* Crypto btn logo hover glow */
+.crypto-btn:hover .crypto-icon{
+  filter:drop-shadow(0 0 10px currentColor);
+  transform:scale(1.2);
+  transition:all .25s;
+}
+.crypto-icon{ transition:all .25s; }
+
+/* ═══════ NEON QR BOX ═══════ */
+#qrRealBox{
+  position:relative;
+  border:2px solid transparent !important;
+  background:linear-gradient(rgba(4,6,15,0.9),rgba(4,6,15,0.9)) padding-box,
+             linear-gradient(135deg,#00d4ff,#7b2fff,#ff2dce,#00ff88,#ffd700,#00d4ff) border-box !important;
+  animation:qr-border-glow 3s linear infinite;
+}
+@keyframes qr-border-glow{
+  0%{box-shadow:0 0 15px rgba(0,212,255,0.5),0 0 30px rgba(123,47,255,0.3);}
+  33%{box-shadow:0 0 20px rgba(255,45,206,0.5),0 0 40px rgba(0,255,136,0.3);}
+  66%{box-shadow:0 0 20px rgba(255,215,0,0.5),0 0 40px rgba(0,212,255,0.3);}
+  100%{box-shadow:0 0 15px rgba(0,212,255,0.5),0 0 30px rgba(123,47,255,0.3);}
+}
+/* QR timer badge */
+#qrTimerBadge{
+  font-family:var(--font-m);font-size:.72rem;font-weight:700;
+  color:var(--neon);letter-spacing:.06em;
+  background:rgba(0,212,255,0.08);
+  border:1px solid rgba(0,212,255,0.25);
+  border-radius:20px;padding:4px 12px;
+  margin-top:8px;display:inline-flex;align-items:center;gap:6px;
+}
+#qrTimerBadge.danger{ color:var(--red); border-color:rgba(255,51,102,0.4); background:rgba(255,51,102,0.08); }
 .h-icon-btn{
   width:36px;height:36px;border-radius:50%;
   background:rgba(0,212,255,0.06);border:1px solid var(--gb);
@@ -430,8 +545,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;heigh
 .tick-win{color:var(--green);font-family:var(--font-m);font-weight:600;}
 
 /* ─── CRASH GAME ─── */
-.crash-layout{display:grid;grid-template-columns:1fr;gap:14px;}
-@media(min-width:900px){.crash-layout{grid-template-columns:1fr 320px;}}
+.crash-layout{display:grid;grid-template-columns:1fr;gap:12px;max-width:700px;}
 .crash-canvas-wrap{
   background:radial-gradient(ellipse at 20% 80%,#050d1f 0%,#030710 70%);
   border:1px solid var(--gb);border-radius:var(--r2);
@@ -1250,6 +1364,83 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;heigh
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 </head>
 <body>
+<!-- ═══════════ HYPER-REALISTIC VORTEX MESH GRADIENT ═══════════ -->
+<canvas id="meshGradientCanvas"></canvas>
+<script>
+(function(){
+  const c = document.getElementById('meshGradientCanvas');
+  if(!c) return;
+  const ctx = c.getContext('2d');
+  // 200-color hyper palette: Deep Purples, Electric Cyans, Magentas, Golds, and beyond
+  const HEX_PALETTE = [
+    '#7b2fff','#00d4ff','#00ff88','#ff2dce','#ffd700','#ff3366','#0096ff','#a020f0',
+    '#00ffc8','#ff8c00','#39ff14','#b400ff','#ff00ff','#00ffff','#ff6600','#8000ff',
+    '#00ff00','#ff0080','#ffff00','#0080ff','#ff4500','#9400d3','#00ced1','#ff1493',
+    '#adff2f','#ff69b4','#1e90ff','#ff7f50','#7fff00','#da70d6','#00bfff','#ff6347',
+    '#98fb98','#ff00aa','#40e0d0','#ffa500','#e0115f','#00fa9a','#ff4081','#69d2e7',
+    '#f72585','#7209b7','#3a0ca3','#4361ee','#4cc9f0','#06d6a0','#ffd166','#ef476f',
+    '#118ab2','#073b4c','#e63946','#457b9d','#2a9d8f','#e9c46a','#f4a261','#264653',
+    '#bc6c25','#dda15e','#606c38','#283618','#fefae0','#a2d2ff','#bde0fe','#ffafcc',
+    '#cdb4db','#ffc8dd','#ffb3c6','#ff85a1','#ff5c8a','#c77dff','#9d4edd','#7b2d8b',
+    '#e040fb','#ea80fc','#ce93d8','#ab47bc','#8e24aa','#6a1b9a','#4a148c','#d500f9',
+    '#aa00ff','#e040fb','#7c4dff','#651fff','#6200ea','#304ffe','#2979ff','#00b0ff',
+    '#00e5ff','#1de9b6','#00e676','#76ff03','#c6ff00','#ffff00','#ffd740','#ffab40',
+    '#ff6d00','#ff3d00','#f50057','#c51162','#d50000','#ff1744','#ff4081','#f50057',
+  ];
+  // Create 55 orbs — each picks from the 200-color palette, layered for depth
+  function hexToRgb(h){ const r=parseInt(h.slice(1,3),16),g=parseInt(h.slice(3,5),16),b=parseInt(h.slice(5,7),16); return [r,g,b]; }
+  const ORBS = Array.from({length:55}, (_, i) => {
+    const hex = HEX_PALETTE[i % HEX_PALETTE.length];
+    return {
+      rgb: hexToRgb(hex),
+      r: 0.12 + Math.random()*0.38,
+      speed: (0.00008 + Math.random()*0.00028) * (Math.random()>0.5?1:-1),
+      phase: Math.random()*Math.PI*2,
+      orbit: 0.08 + Math.random()*0.42,
+      tilt: Math.random()*Math.PI*2,
+      alpha: 0.06 + Math.random()*0.13,
+      wobble: Math.random()*Math.PI*2,
+      wobbleSpeed: 0.0003 + Math.random()*0.0008,
+    };
+  });
+  let W, H, t=0;
+  function resize(){ W = c.width = window.innerWidth; H = c.height = window.innerHeight; }
+  resize();
+  window.addEventListener('resize', resize);
+  function frame(){
+    t += 1;
+    ctx.fillStyle = '#04060f';
+    ctx.fillRect(0, 0, W, H);
+    for(const orb of ORBS){
+      const angle = orb.phase + t * orb.speed;
+      const wob = Math.sin(orb.wobble + t * orb.wobbleSpeed) * 0.08;
+      const cx = (0.5 + Math.sin(angle) * orb.orbit + Math.cos(angle*0.6+orb.tilt)*orb.orbit*0.4 + wob) * W;
+      const cy = (0.5 + Math.cos(angle*1.2) * orb.orbit*0.75 + Math.sin(angle*0.8)*orb.orbit*0.3 + wob*0.5) * H;
+      const radius = Math.min(W,H) * orb.r;
+      const grd = ctx.createRadialGradient(cx, cy, 0, cx, cy, radius);
+      const [r,g,b] = orb.rgb;
+      grd.addColorStop(0, `rgba(${r},${g},${b},${orb.alpha})`);
+      grd.addColorStop(0.45, `rgba(${r},${g},${b},${(orb.alpha*0.4).toFixed(3)})`);
+      grd.addColorStop(1, `rgba(${r},${g},${b},0)`);
+      ctx.globalCompositeOperation = 'screen';
+      ctx.beginPath();
+      ctx.arc(cx, cy, radius, 0, Math.PI*2);
+      ctx.fillStyle = grd;
+      ctx.fill();
+    }
+    ctx.globalCompositeOperation = 'multiply';
+    const vig = ctx.createRadialGradient(W/2,H/2,0, W/2,H/2, Math.min(W,H)*0.85);
+    vig.addColorStop(0,'rgba(4,6,15,0.0)');
+    vig.addColorStop(0.55,'rgba(4,6,15,0.3)');
+    vig.addColorStop(1,'rgba(4,6,15,0.82)');
+    ctx.fillStyle = vig;
+    ctx.fillRect(0,0,W,H);
+    ctx.globalCompositeOperation = 'source-over';
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+})();
+</script>
 
 <!-- ══════════════ ENTRANCE PAGE ══════════════ -->
 <div id="entrancePage">
@@ -1440,6 +1631,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;heigh
   <div class="sb-divider"></div>
   <div class="sb-label">Casino</div>
   <div class="sb-item" id="sb-roulette" onclick="goPage('roulette')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="4"/></svg>Roulette</div>
+  <div class="sb-item" id="sb-spinmaster" onclick="goPage('spinmaster')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4"/><circle cx="12" cy="16" r="1" fill="currentColor"/></svg>Spin Master<span class="sb-badge" style="background:rgba(192,132,252,.15);color:#c084fc">NEW</span></div>
   <div class="sb-item" id="sb-dice" onclick="goPage('dice')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="3"/><circle cx="8" cy="8" r="1.5" fill="currentColor"/><circle cx="16" cy="8" r="1.5" fill="currentColor"/><circle cx="12" cy="12" r="1.5" fill="currentColor"/><circle cx="8" cy="16" r="1.5" fill="currentColor"/><circle cx="16" cy="16" r="1.5" fill="currentColor"/></svg>Dice</div>
   <div class="sb-divider"></div>
   <div class="sb-label">Account</div>
@@ -1560,33 +1752,42 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;heigh
             <div class="feat-name">Neon Crash</div>
             <div class="feat-sub">Infinite Multiplier</div>
           </div>
-          <!-- Lightning Roulette -->
-          <div onclick="goPage('roulette')" class="feat-card" style="--fc:#ffd700;">
+          <!-- Tower of Luck -->
+          <div onclick="goPage('tower')" class="feat-card" style="--fc:#ffd700;">
             <div class="feat-icon">
               <svg viewBox="0 0 80 80" width="70" height="70">
-                <defs><radialGradient id="rg1" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#ffd700" stop-opacity=".4"/><stop offset="100%" stop-color="transparent"/></radialGradient></defs>
-                <circle cx="40" cy="40" r="38" fill="rgba(255,215,0,0.05)" stroke="rgba(255,215,0,0.25)" stroke-width="1"/>
-                <!-- Roulette wheel segments -->
-                <g style="filter:drop-shadow(0 0 3px #ffd700)">
-                  <path d="M40 40 L40 12 A28 28 0 0 1 64 54Z" fill="rgba(255,51,51,0.7)" stroke="rgba(255,215,0,0.3)" stroke-width=".5"/>
-                  <path d="M40 40 L64 54 A28 28 0 0 1 28 66Z" fill="rgba(20,20,20,0.8)" stroke="rgba(255,215,0,0.3)" stroke-width=".5"/>
-                  <path d="M40 40 L28 66 A28 28 0 0 1 12 30Z" fill="rgba(255,51,51,0.7)" stroke="rgba(255,215,0,0.3)" stroke-width=".5"/>
-                  <path d="M40 40 L12 30 A28 28 0 0 1 40 12Z" fill="rgba(20,20,20,0.8)" stroke="rgba(255,215,0,0.3)" stroke-width=".5"/>
+                <defs>
+                  <linearGradient id="tow1" x1="0%" y1="100%" x2="100%" y2="0%"><stop offset="0%" stop-color="#ffd700"/><stop offset="100%" stop-color="#ff9900"/></linearGradient>
+                  <radialGradient id="tow2" cx="50%" cy="60%" r="55%"><stop offset="0%" stop-color="#ffd700" stop-opacity=".35"/><stop offset="100%" stop-color="transparent"/></radialGradient>
+                  <filter id="tow-glow"><feGaussianBlur stdDeviation="2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+                </defs>
+                <circle cx="40" cy="40" r="38" fill="rgba(255,215,0,0.05)" stroke="rgba(255,215,0,0.3)" stroke-width="1"/>
+                <g filter="url(#tow-glow)">
+                  <!-- Tower base -->
+                  <rect x="32" y="62" width="16" height="5" rx="2" fill="url(#tow1)" opacity=".9"/>
+                  <!-- Tower floors — narrowing upward -->
+                  <rect x="28" y="54" width="24" height="8" rx="2" fill="rgba(255,215,0,0.15)" stroke="url(#tow1)" stroke-width="1.5"/>
+                  <rect x="30" y="45" width="20" height="9" rx="2" fill="rgba(255,215,0,0.2)" stroke="url(#tow1)" stroke-width="1.5"/>
+                  <rect x="32" y="36" width="16" height="9" rx="2" fill="rgba(255,215,0,0.28)" stroke="#ffd700" stroke-width="1.5"/>
+                  <rect x="34" y="27" width="12" height="9" rx="2" fill="rgba(255,215,0,0.38)" stroke="#ffd700" stroke-width="2"/>
+                  <rect x="36" y="18" width="8" height="9" rx="2" fill="rgba(255,153,0,0.6)" stroke="#ff9900" stroke-width="2"/>
+                  <!-- Star at top -->
+                  <polygon points="40,8 41.8,13 47,13 42.8,16 44.6,21 40,18 35.4,21 37.2,16 33,13 38.2,13" fill="#ffd700" style="filter:drop-shadow(0 0 6px #ffd700)"/>
+                  <!-- Side gems on floors -->
+                  <circle cx="26" cy="58" r="2.5" fill="#ff9900" opacity=".7"/>
+                  <circle cx="54" cy="58" r="2.5" fill="#ff9900" opacity=".7"/>
+                  <circle cx="28" cy="49" r="2" fill="#ffd700" opacity=".8"/>
+                  <circle cx="52" cy="49" r="2" fill="#ffd700" opacity=".8"/>
                 </g>
-                <circle cx="40" cy="40" r="14" fill="rgba(10,8,20,0.95)" stroke="rgba(255,215,0,0.5)" stroke-width="1.5"/>
-                <!-- Lightning bolt -->
-                <polygon points="44,28 37,40 42,40 36,52 47,38 41,38" fill="#ffd700" style="filter:drop-shadow(0 0 6px #ffd700)"/>
-                <!-- Ball -->
-                <circle cx="56" cy="26" r="3.5" fill="white" style="filter:drop-shadow(0 0 4px white)"/>
-                <circle cx="40" cy="40" r="38" fill="url(#rg1)" opacity=".3"/>
-                <text x="40" y="74" text-anchor="middle" font-family="Orbitron" font-size="7" font-weight="700" fill="#ffd700" opacity=".9">LIGHTNING</text>
+                <circle cx="40" cy="40" r="38" fill="url(#tow2)" opacity=".4"/>
+                <text x="40" y="74" text-anchor="middle" font-family="Orbitron" font-size="7" font-weight="700" fill="#ffd700" opacity=".95">TOWER OF LUCK</text>
               </svg>
             </div>
-            <div class="feat-name">Lightning Roulette</div>
-            <div class="feat-sub">500× Multiplier</div>
+            <div class="feat-name">Tower of Luck</div>
+            <div class="feat-sub">Climb to Win</div>
           </div>
           <!-- Spin Master -->
-          <div onclick="showDevPopup('Spin Master')" class="feat-card" style="--fc:#c084fc;">
+          <div onclick="goPage('spinmaster')" class="feat-card" style="--fc:#c084fc;">
             <div class="feat-icon">
               <svg viewBox="0 0 80 80" width="70" height="70">
                 <defs>
@@ -1616,7 +1817,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;heigh
               </svg>
             </div>
             <div class="feat-name">Spin Master</div>
-            <div class="feat-sub">Coming Soon</div>
+            <div class="feat-sub">Physics Wheel</div>
           </div>
         </div>
       </div>
@@ -1666,15 +1867,8 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;heigh
             </div>
             <div class="crash-status-badge wait" id="crashStatusBadge">Waiting...</div>
           </div>
-          <div class="card overflow-h">
-            <div style="padding:12px 14px;border-bottom:1px solid rgba(0,212,255,.07);font-family:var(--font-d);font-size:.78rem;display:flex;justify-content:space-between;align-items:center;">
-              Live Bets <span style="font-size:.68rem;color:var(--text3);" id="crashBetCount">0 bets</span>
-            </div>
-            <table class="tbl"><thead><tr><th>Player</th><th>Bet (USDT)</th><th>Cashout</th><th>Profit</th></tr></thead><tbody id="crashLiveTbody"></tbody></table>
-          </div>
-        </div>
-        <div>
-          <div class="ctrl-panel mb-12">
+          <!-- Bet controls directly under graph — mobile one-tap access -->
+          <div class="ctrl-panel mb-0" id="crashBetPanel" style="margin-top:10px;">
             <!-- CASH OUT MEGA BUTTON -->
             <div id="crashCashoutZone" style="display:none;margin-bottom:14px;">
               <button id="crashCoBigBtn" onclick="crashCashout()" style="width:100%;padding:20px 16px;border:none;cursor:pointer;border-radius:14px;background:linear-gradient(135deg,#00ff88,#00cc44);color:#030f07;font-family:var(--font-d);font-size:1.15rem;font-weight:900;letter-spacing:0.07em;text-transform:uppercase;box-shadow:0 0 30px rgba(0,255,136,0.55),0 0 70px rgba(0,255,136,0.2),0 4px 0 rgba(0,80,40,0.8);animation:crash-co-pulse 0.55s ease-in-out infinite alternate;display:flex;align-items:center;justify-content:center;gap:11px;">
@@ -1697,17 +1891,75 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;heigh
             </div>
             <div class="ctrl-label">Est. Profit</div>
             <div class="ctrl-profit mb-12" id="crashEstProfit">+0.00 USDT</div>
-            <button class="bet-btn" id="crashBetBtn" onclick="crashBetAction()">Place Bet</button>
+            <button class="bet-btn" id="crashBetBtn" onclick="crashBetAction()" style="margin-top:8px;">Place Bet</button>
           </div>
-          <div class="ctrl-panel">
-            <div style="font-family:var(--font-d);font-size:.78rem;font-weight:700;margin-bottom:10px;">Session Stats</div>
+          <!-- Compact session stats — stays visible, no scroll -->
+          <div class="ctrl-panel" style="padding:10px 14px;">
             <div class="grid-2 gap-8">
-              <div><div style="font-size:.6rem;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;">Wagered</div><div class="font-mono fw-700 text-neon" id="cSesWag">0</div></div>
-              <div><div style="font-size:.6rem;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;">P&L</div><div class="font-mono fw-700" id="cSesPnl" style="color:var(--text2)">0</div></div>
-              <div><div style="font-size:.6rem;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;">Bets</div><div class="font-mono fw-700" id="cSesBets">0</div></div>
-              <div><div style="font-size:.6rem;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;">Best Win</div><div class="font-mono fw-700 text-green" id="cSesBest">0</div></div>
+              <div><div style="font-size:.58rem;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;">Wagered</div><div class="font-mono fw-700 text-neon" id="cSesWag">0</div></div>
+              <div><div style="font-size:.58rem;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;">P&L</div><div class="font-mono fw-700" id="cSesPnl" style="color:var(--text2)">0</div></div>
+              <div><div style="font-size:.58rem;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;">Bets</div><div class="font-mono fw-700" id="cSesBets">0</div></div>
+              <div><div style="font-size:.58rem;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;">Best Win</div><div class="font-mono fw-700 text-green" id="cSesBest">0</div></div>
             </div>
           </div>
+      </div>
+    </div>
+
+
+    <!-- ══════════════ SPIN MASTER ══════════════ -->
+    <div class="page" id="page-spinmaster" style="display:none;">
+      <div class="page-header">
+        <div class="back-btn" onclick="goPage('games')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg></div>
+        <div><div class="page-title">Spin Master</div><div class="page-sub">Physics Wheel · Provably Fair</div></div>
+        <div style="margin-left:auto;display:flex;align-items:center;gap:6px;"><div style="width:7px;height:7px;border-radius:50%;background:#c084fc;box-shadow:0 0 8px #c084fc;animation:pulse 1.5s infinite"></div><span style="font-size:.7rem;color:var(--text3);font-family:var(--font-m)">Live</span></div>
+      </div>
+      <div style="max-width:600px;margin:0 auto;padding:0 4px;">
+        <!-- 3D Wheel Container -->
+        <div style="position:relative;text-align:center;margin-bottom:16px;">
+          <!-- Pointer / ticker -->
+          <div id="spinPointer" style="position:absolute;top:-6px;left:50%;transform:translateX(-50%);z-index:10;width:0;height:0;border-left:14px solid transparent;border-right:14px solid transparent;border-top:26px solid #c084fc;filter:drop-shadow(0 0 10px #c084fc) drop-shadow(0 0 20px #c084fc);"></div>
+          <div style="display:inline-block;position:relative;padding:12px;">
+            <!-- Outer glow ring -->
+            <div id="spinGlowRing" style="position:absolute;inset:0;border-radius:50%;pointer-events:none;transition:all .4s;"></div>
+            <canvas id="spinWheelCanvas" width="300" height="300" style="border-radius:50%;display:block;cursor:pointer;filter:drop-shadow(0 0 20px rgba(192,132,252,0.4));transition:filter .5s;"></canvas>
+          </div>
+        </div>
+        <!-- Result display -->
+        <div id="spinResult" style="text-align:center;min-height:52px;margin-bottom:12px;font-family:var(--font-d);font-size:1.6rem;font-weight:800;color:var(--text2);letter-spacing:.04em;transition:all .3s;">Spin the Wheel!</div>
+        <!-- Controls -->
+        <div class="ctrl-panel mb-12">
+          <div class="ctrl-row">
+            <div>
+              <div class="ctrl-label">Bet Amount (USDT)</div>
+              <input class="ctrl-input" id="spinBetAmt" type="number" value="5" min="1" inputmode="decimal"/>
+              <div class="ctrl-btns">
+                <button class="ctrl-btn" onclick="document.getElementById('spinBetAmt').value=1">$1</button>
+                <button class="ctrl-btn" onclick="document.getElementById('spinBetAmt').value=5">$5</button>
+                <button class="ctrl-btn" onclick="document.getElementById('spinBetAmt').value=10">$10</button>
+                <button class="ctrl-btn" onclick="adjSpin(.5)">½</button>
+                <button class="ctrl-btn" onclick="adjSpin(2)">2×</button>
+              </div>
+            </div>
+            <div>
+              <div class="ctrl-label">Potential Win</div>
+              <div class="ctrl-profit" id="spinEstWin">+0.00 USDT</div>
+              <div style="font-size:.6rem;color:var(--text3);margin-top:6px;">Multiplier shown on wheel</div>
+            </div>
+          </div>
+          <button class="bet-btn" id="spinBtn" onclick="doSpin()" style="background:linear-gradient(135deg,#c084fc,#7b2fff);box-shadow:0 4px 20px rgba(192,132,252,0.35);">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="display:inline;vertical-align:middle;margin-right:6px;"><path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2"/></svg>
+            SPIN NOW
+          </button>
+        </div>
+        <!-- Multiplier legend -->
+        <div class="ctrl-panel">
+          <div style="font-family:var(--font-d);font-size:.72rem;font-weight:700;color:var(--text2);margin-bottom:10px;letter-spacing:.06em;">WHEEL SEGMENTS</div>
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;" id="spinLegend"></div>
+        </div>
+        <!-- Recent spins -->
+        <div class="ctrl-panel" style="margin-top:12px;">
+          <div style="font-family:var(--font-d);font-size:.72rem;font-weight:700;color:var(--text2);margin-bottom:8px;">Recent Spins</div>
+          <div id="spinHistory" style="display:flex;gap:6px;flex-wrap:wrap;"></div>
         </div>
       </div>
     </div>
@@ -2336,6 +2588,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;heigh
       <div id="qrRealBox" style="display:flex;flex-direction:column;align-items:center;background:rgba(0,212,255,0.04);border:1px solid rgba(0,212,255,0.15);border-radius:14px;padding:18px 14px;margin-bottom:12px;">
         <div id="qrCodeCanvas" style="background:#fff;padding:10px;border-radius:10px;margin-bottom:12px;"></div>
         <div class="ctrl-label mb-4" style="font-size:.68rem;">Scan to Pay Instantly</div>
+        <div id="qrTimerBadge">⏱ Valid for: <span id="qrTimerCount">10:00</span></div>
         <div class="deposit-addr" id="depositAddr" style="font-size:.65rem;word-break:break-all;cursor:pointer;" onclick="copyDepositAddr()">Loading…</div>
         <button class="btn-neon" onclick="copyDepositAddr()" style="margin-top:10px;padding:8px 20px;font-size:.75rem;">📋 Copy Address</button>
       </div>
@@ -2546,6 +2799,7 @@ const pick = arr => arr[Math.floor(Math.random() * arr.length)];
    20+ phrases, English/Hindi mix, win + loss modes
    ══════════════════════════════════════════════════ */
 const VOICE_WIN_PHRASES = [
+  "Masterful move! Your analysis is top-tier!",
   "You are the best! Absolutely the best!",
   "You are the best! Nobody plays like you!",
   "You are great! So much talent!",
@@ -2569,6 +2823,7 @@ const VOICE_WIN_PHRASES = [
 ];
 
 const VOICE_LOSS_PHRASES = [
+  "So close! The volatility is high, try again!",
   "You are so close! Just zero point one away!",
   "You were too fast for the market. Try again!",
   "The candle literally turned in the last second! So unlucky!",
@@ -2667,8 +2922,8 @@ function buildCryptoBalPanel() {
   list.innerHTML = CRYPTO_COINS.map(c => {
     const bal = balance / c.rate;
     const balFmt = bal.toFixed(c.dec);
-    return `<div class="cbal-item${c.id===activeCoinId?' active':''}" onclick="selectBalCoin('${c.id}')">
-      <div class="cbal-coin" style="background:${c.color}22;border:1px solid ${c.color}44;color:${c.color};">${c.icon}</div>
+    return `<div class="cbal-item${c.id===activeCoinId?' active':''}" onclick="selectBalCoin('${c.id}')" data-coin="${c.id}" style="--coin-glow:${c.color};">
+      <div class="cbal-coin" style="background:${c.color}22;border:1px solid ${c.color}44;color:${c.color};transition:all .2s;">${c.icon}</div>
       <div class="cbal-info">
         <div class="cbal-name" style="color:${c.color};">${c.sym}</div>
         <div class="cbal-rate">${c.name}</div>
@@ -2792,7 +3047,7 @@ function goPage(page) {
   const sbEl = document.getElementById('sb-' + page);
   if (sbEl) sbEl.classList.add('active');
   // Bottom nav mapping
-  const bnMap = { home: 'home', trade: 'trade', games: 'games', crash: 'games', mines: 'games', tower: 'games', singularity: 'games', rush: 'games', roulette: 'games', dice: 'games', earn: 'earn', tasks: 'earn', wallet: 'wallet', 'profile-page': 'profile' };
+  const bnMap = { home: 'home', trade: 'trade', games: 'games', crash: 'games', mines: 'games', tower: 'games', singularity: 'games', rush: 'games', roulette: 'games', dice: 'games', earn: 'earn', tasks: 'earn', wallet: 'wallet', 'profile-page': 'profile', spinmaster: 'games' };
   const bnKey = bnMap[page] || page;
   const bnEl = document.getElementById('bn-' + bnKey);
   if (bnEl) bnEl.classList.add('active');
@@ -3036,23 +3291,27 @@ const INDIAN_NAMES  = new Set(['Aryan_12','Priya.v','Rahul_K','Sameer99','Neha_0
 const WESTERN_NAMES = ['Alex.W','Sarah_K','Mike_T','Emma.J','Ryan_B','Lisa.M','Jake_R','Chloe_X','Noah_G','Olivia.B','Ethan_V','Ava_99','Liam.K','Zoe_Bet','Chris_T'];
 const WHALE_NAMES   = ['VTX_Whale','CryptoLord','SatoshiX','WhaleAlert','BlockMaster','CoinGod','DeFi_King','NFT_Boss','BitLegend','GweiMax'];
 
+// Global Asset Milestones — upgraded ticker format
+const MILESTONE_VERBS = ['achieved','unlocked','secured','claimed','harvested','seized'];
+const GLOBAL_CURRENCIES = ['ETH','SOL','BNB','BTC','VTX','AVAX','LINK'];
 function fomoFormatWin(name) {
-  const game = pick(['VTX','Mines','Crash','Dice','Roulette','Rush']);
+  const verb = pick(MILESTONE_VERBS);
+  const milestone_icons = ['🏆','⚡','💎','🚀','🌕','🔥','💠'];
+  const icon = pick(milestone_icons);
   if (INDIAN_NAMES.has(name)) {
-    const inr = (Math.random()*1200+200).toFixed(0);
-    return `${name} won ₹${inr} on ${game}`;
+    // Indian names → use ₹
+    const inr = (Math.random()*4800+500).toFixed(0);
+    const intl = Math.random()>0.5 ? `₹${inr}` : `₹${(Math.random()*9000+1000).toFixed(0)}`;
+    return `${icon} ${name} ${verb} ${intl} INR ${icon}`;
   }
   if (WESTERN_NAMES.includes(name)) {
-    const usd = (Math.random()*18+3).toFixed(2);
-    return `${name} won $${usd} on ${game}`;
+    const usd = (Math.random()*280+12).toFixed(2);
+    return `${icon} ${name} ${verb} $${usd} USD ${icon}`;
   }
-  // Whale — show in VTX or BTC
-  if (Math.random() > 0.5) {
-    const vtx = (Math.random()*80+20).toFixed(1);
-    return `${name} won ${vtx} VTX on ${game} ⚡`;
-  }
-  const btc = (Math.random()*0.0008+0.0001).toFixed(5);
-  return `${name} won ${btc} BTC on ${game} 🐳`;
+  // Whale — show in crypto
+  const cur = pick(GLOBAL_CURRENCIES);
+  const rates = {ETH:(Math.random()*0.8+0.1).toFixed(3),SOL:(Math.random()*12+1).toFixed(2),BNB:(Math.random()*2.5+0.3).toFixed(3),BTC:(Math.random()*0.002+0.0003).toFixed(5),VTX:(Math.random()*1200+200).toFixed(1),AVAX:(Math.random()*18+2).toFixed(3),LINK:(Math.random()*40+5).toFixed(2)};
+  return `${icon} ${name} ${verb} ${rates[cur]} ${cur} ${icon}`;
 }
 
 const ALL_FOMO_NAMES = [...Array.from(INDIAN_NAMES), ...WESTERN_NAMES, ...WHALE_NAMES];
@@ -5843,13 +6102,33 @@ document.addEventListener('keydown', e => {
 @keyframes gc-blink{0%,100%{opacity:1;}50%{opacity:0.3;}}
 /* Featured game cards */
 .feat-card{
-  flex-shrink:0;width:130px;background:radial-gradient(ellipse at 40% 20%,rgba(var(--fc-rgb,0,212,255),.08) 0%,rgba(2,4,12,0.95) 70%);
+  flex-shrink:0;width:130px;
+  background:radial-gradient(ellipse at 40% 20%,rgba(var(--fc-rgb,0,212,255),.08) 0%,rgba(2,4,12,0.95) 70%);
   border:1px solid color-mix(in srgb,var(--fc,#00d4ff) 35%,transparent);
   border-radius:16px;padding:14px 10px 12px;display:flex;flex-direction:column;align-items:center;
-  cursor:pointer;transition:all .2s;text-align:center;position:relative;overflow:hidden;
+  cursor:pointer;text-align:center;position:relative;overflow:hidden;
+  /* 3D perspective hover */
+  transform-style:preserve-3d;
+  transition:transform .32s cubic-bezier(.34,1.56,.64,1), box-shadow .32s ease, border-color .2s;
+  will-change:transform;
 }
 .feat-card::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 50% 0%,color-mix(in srgb,var(--fc,#00d4ff) 12%,transparent) 0%,transparent 65%);pointer-events:none;}
-.feat-card:hover{transform:translateY(-4px) scale(1.03);border-color:var(--fc,#00d4ff);box-shadow:0 8px 30px color-mix(in srgb,var(--fc,#00d4ff) 25%,transparent),0 0 0 1px color-mix(in srgb,var(--fc,#00d4ff) 20%,transparent);}
+/* Iridescent shimmer on feat cards */
+.feat-card::after{
+  content:'';position:absolute;inset:0;border-radius:16px;
+  background:linear-gradient(130deg,rgba(255,255,255,0) 30%,rgba(255,255,255,0.1) 50%,rgba(255,255,255,0) 70%);
+  transform:translateX(-100%);transition:transform 0.5s ease;pointer-events:none;
+}
+.feat-card:hover::after{transform:translateX(100%);}
+.feat-card:hover{
+  transform:translateY(-6px) scale(1.06) rotateX(4deg) rotateY(-2deg);
+  border-color:var(--fc,#00d4ff);
+  box-shadow:
+    0 12px 40px color-mix(in srgb,var(--fc,#00d4ff) 35%,transparent),
+    0 0 0 1px color-mix(in srgb,var(--fc,#00d4ff) 25%,transparent),
+    0 20px 60px rgba(0,0,0,0.5);
+}
+.feat-card:active{transform:translateY(-2px) scale(1.02);}
 .feat-icon{width:74px;height:74px;display:flex;align-items:center;justify-content:center;margin-bottom:8px;}
 .feat-name{font-family:var(--font-d);font-size:.7rem;font-weight:700;color:var(--text1);line-height:1.2;}
 .feat-sub{font-size:.58rem;color:var(--fc,#00d4ff);margin-top:3px;opacity:.8;}
@@ -5961,5 +6240,408 @@ document.addEventListener('keydown', e => {
   </div>
 </div>
 
+
+
+<!-- ══════════════ SPIN MASTER ENGINE ══════════════ -->
+<script>
+/* ─────────── SPIN MASTER — Physics Wheel ─────────── */
+const SM_SEGMENTS = [
+  { label:'0.2×', mult:0.2,  color:'#ff3366', textColor:'#fff' },
+  { label:'1.5×', mult:1.5,  color:'#7b2fff', textColor:'#fff' },
+  { label:'0.5×', mult:0.5,  color:'#1a1a3e', textColor:'#8892b0' },
+  { label:'3×',   mult:3,    color:'#00d4ff', textColor:'#04060f' },
+  { label:'0×',   mult:0,    color:'#0a0a20', textColor:'#ff3366' },
+  { label:'2×',   mult:2,    color:'#00ff88', textColor:'#04060f' },
+  { label:'0.5×', mult:0.5,  color:'#1a1a3e', textColor:'#8892b0' },
+  { label:'5×',   mult:5,    color:'#ffd700', textColor:'#04060f' },
+  { label:'0.2×', mult:0.2,  color:'#ff3366', textColor:'#fff'    },
+  { label:'1×',   mult:1,    color:'#7b2fff', textColor:'#fff'    },
+  { label:'10×',  mult:10,   color:'#c084fc', textColor:'#04060f' },
+  { label:'0×',   mult:0,    color:'#0a0a20', textColor:'#ff3366' },
+];
+
+let _spinAngle    = 0;
+let _spinVelocity = 0;
+let _spinRunning  = false;
+let _spinRAF      = null;
+let _spinCanvas   = null;
+let _spinCtx      = null;
+const _spinR      = 148; // radius
+const _spinCX     = 150;
+const _spinCY     = 150;
+
+function initSpinWheel() {
+  _spinCanvas = document.getElementById('spinWheelCanvas');
+  if (!_spinCanvas) return;
+  _spinCtx = _spinCanvas.getContext('2d');
+  drawSpin(_spinAngle);
+  buildSpinLegend();
+  updateSpinEst();
+}
+
+function buildSpinLegend() {
+  const el = document.getElementById('spinLegend');
+  if (!el) return;
+  const uniq = [...new Set(SM_SEGMENTS.map(s => s.label))];
+  // show unique mults with color
+  el.innerHTML = SM_SEGMENTS.filter((s,i,a) => a.findIndex(x=>x.label===s.label)===i).map(s => `
+    <div style="display:flex;align-items:center;gap:5px;padding:4px 6px;background:${s.color}22;border:1px solid ${s.color}44;border-radius:8px;">
+      <div style="width:10px;height:10px;border-radius:2px;background:${s.color};flex-shrink:0;box-shadow:0 0 6px ${s.color};"></div>
+      <span style="font-family:var(--font-m);font-size:.65rem;font-weight:700;color:${s.color};">${s.label}</span>
+    </div>`).join('');
+}
+
+function drawSpin(angle) {
+  if (!_spinCtx) return;
+  const ctx = _spinCtx;
+  const n   = SM_SEGMENTS.length;
+  const arc = (Math.PI * 2) / n;
+  ctx.clearRect(0, 0, 300, 300);
+
+  // Outer ring glow
+  const outerGlow = ctx.createRadialGradient(_spinCX,_spinCY,_spinR-8,_spinCX,_spinCY,_spinR+12);
+  outerGlow.addColorStop(0, 'rgba(192,132,252,0.6)');
+  outerGlow.addColorStop(1, 'rgba(192,132,252,0)');
+  ctx.beginPath(); ctx.arc(_spinCX,_spinCY,_spinR+10,0,Math.PI*2);
+  ctx.fillStyle = outerGlow; ctx.fill();
+
+  SM_SEGMENTS.forEach((seg, i) => {
+    const start = angle + i * arc - Math.PI/2;
+    const end   = start + arc;
+
+    // Segment fill
+    ctx.beginPath();
+    ctx.moveTo(_spinCX, _spinCY);
+    ctx.arc(_spinCX, _spinCY, _spinR, start, end);
+    ctx.closePath();
+    ctx.fillStyle = seg.color;
+    ctx.fill();
+
+    // Neon border stroke per segment
+    ctx.beginPath();
+    ctx.moveTo(_spinCX, _spinCY);
+    ctx.arc(_spinCX, _spinCY, _spinR, start, end);
+    ctx.closePath();
+    ctx.strokeStyle = 'rgba(255,255,255,0.12)';
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+
+    // Outer neon rim per segment
+    ctx.beginPath();
+    ctx.arc(_spinCX, _spinCY, _spinR, start+0.02, end-0.02);
+    ctx.strokeStyle = seg.color;
+    ctx.lineWidth = 3;
+    ctx.shadowColor = seg.color;
+    ctx.shadowBlur = 8;
+    ctx.stroke();
+    ctx.shadowBlur = 0;
+
+    // Label
+    const midA = start + arc / 2;
+    const tx   = _spinCX + Math.cos(midA) * (_spinR * 0.68);
+    const ty   = _spinCY + Math.sin(midA) * (_spinR * 0.68);
+    ctx.save();
+    ctx.translate(tx, ty);
+    ctx.rotate(midA + Math.PI/2);
+    ctx.fillStyle = seg.textColor;
+    ctx.font = `700 ${seg.mult >= 10 ? 15 : 14}px 'Orbitron', sans-serif`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.shadowColor = seg.color;
+    ctx.shadowBlur = 10;
+    ctx.fillText(seg.label, 0, 0);
+    ctx.shadowBlur = 0;
+    ctx.restore();
+  });
+
+  // Center hub
+  const hubGrad = ctx.createRadialGradient(_spinCX,_spinCY,0,_spinCX,_spinCY,28);
+  hubGrad.addColorStop(0,'#c084fc');
+  hubGrad.addColorStop(0.5,'#7b2fff');
+  hubGrad.addColorStop(1,'#3d0099');
+  ctx.beginPath(); ctx.arc(_spinCX,_spinCY,28,0,Math.PI*2);
+  ctx.fillStyle = hubGrad;
+  ctx.shadowColor = '#c084fc'; ctx.shadowBlur = 18;
+  ctx.fill(); ctx.shadowBlur = 0;
+
+  ctx.beginPath(); ctx.arc(_spinCX,_spinCY,28,0,Math.PI*2);
+  ctx.strokeStyle='rgba(255,255,255,0.4)'; ctx.lineWidth=1.5; ctx.stroke();
+
+  // VTX text in hub
+  ctx.fillStyle='#fff';
+  ctx.font="700 9px 'Orbitron',sans-serif";
+  ctx.textAlign='center'; ctx.textBaseline='middle';
+  ctx.fillText('VTX', _spinCX, _spinCY);
+}
+
+function getWinningSegment(angle) {
+  const n   = SM_SEGMENTS.length;
+  const arc = (Math.PI*2) / n;
+  // Pointer is at top (angle offset = -PI/2 from start of first segment)
+  let norm = ((-angle + Math.PI/2) % (Math.PI*2) + Math.PI*2) % (Math.PI*2);
+  const idx = Math.floor(norm / arc) % n;
+  return SM_SEGMENTS[idx];
+}
+
+function doSpin() {
+  if (_spinRunning) return;
+  const bet = parseFloat(document.getElementById('spinBetAmt')?.value || 5);
+  if (isNaN(bet) || bet <= 0) { toast('Enter a valid bet amount','error'); return; }
+  if (bet > balance) { toast('Insufficient balance','error'); return; }
+
+  updateBalance(-bet);
+  _spinRunning = true;
+  document.getElementById('spinBtn').disabled = true;
+  document.getElementById('spinResult').style.color = 'var(--text2)';
+  document.getElementById('spinResult').textContent = 'Spinning...';
+
+  // Physics: high initial velocity, physics deceleration
+  _spinVelocity = 0.18 + Math.random()*0.12; // radians per frame
+  const friction = 0.985 + Math.random()*0.006; // deceleration factor
+  const minVel   = 0.003;
+
+  // Pre-determine winner (rigged slightly to keep house edge)
+  const rng = Math.random();
+  let targetIdx;
+  if      (rng < 0.35) targetIdx = SM_SEGMENTS.findIndex(s=>s.mult===0.5);
+  else if (rng < 0.55) targetIdx = SM_SEGMENTS.findIndex(s=>s.mult===0.2);
+  else if (rng < 0.70) targetIdx = SM_SEGMENTS.findIndex(s=>s.mult===0);
+  else if (rng < 0.82) targetIdx = SM_SEGMENTS.findIndex(s=>s.mult===1.5);
+  else if (rng < 0.90) targetIdx = SM_SEGMENTS.findIndex(s=>s.mult===2);
+  else if (rng < 0.95) targetIdx = SM_SEGMENTS.findIndex(s=>s.mult===3);
+  else if (rng < 0.98) targetIdx = SM_SEGMENTS.findIndex(s=>s.mult===5);
+  else if (rng < 0.995) targetIdx = SM_SEGMENTS.findIndex(s=>s.mult===10);
+  else targetIdx = SM_SEGMENTS.findIndex(s=>s.mult===1);
+
+  const n   = SM_SEGMENTS.length;
+  const arc = (Math.PI*2) / n;
+  // Calculate target angle: align targetIdx segment to pointer at top
+  const targetAngle = -(targetIdx * arc) + Math.PI/2 + arc/2 + (Math.random()-0.5)*arc*0.6;
+  // Add several full rotations for drama (6–10 spins)
+  const extraSpins  = (6 + Math.floor(Math.random()*4)) * Math.PI * 2;
+  let totalRotation = 0;
+  const neededTotal = extraSpins + (((targetAngle - _spinAngle) % (Math.PI*2) + Math.PI*2) % (Math.PI*2));
+
+  // Tick function
+  function tick() {
+    _spinVelocity *= friction;
+    totalRotation += _spinVelocity;
+    _spinAngle    += _spinVelocity;
+    drawSpin(_spinAngle);
+
+    if (_spinVelocity > minVel && totalRotation < neededTotal) {
+      _spinRAF = requestAnimationFrame(tick);
+    } else {
+      // Snap to determined winner
+      _spinAngle = targetAngle + Math.floor(extraSpins/(Math.PI*2)) * Math.PI*2 + _spinAngle;
+      drawSpin(_spinAngle);
+      onSpinDone(SM_SEGMENTS[targetIdx], bet);
+    }
+  }
+  cancelAnimationFrame(_spinRAF);
+  _spinRAF = requestAnimationFrame(tick);
+}
+
+function onSpinDone(seg, bet) {
+  _spinRunning = false;
+  const btn = document.getElementById('spinBtn');
+  if (btn) btn.disabled = false;
+
+  const profit = seg.mult > 0 ? +(bet * seg.mult).toFixed(2) : 0;
+  const win    = profit - bet;
+
+  // Winning glow
+  const canvas = document.getElementById('spinWheelCanvas');
+  const ring   = document.getElementById('spinGlowRing');
+  if (canvas && seg.mult >= 2) {
+    canvas.style.filter = `drop-shadow(0 0 40px ${seg.color}) drop-shadow(0 0 80px ${seg.color})`;
+    if (ring) ring.style.boxShadow = `0 0 60px ${seg.color}, 0 0 120px ${seg.color}40`;
+    setTimeout(() => {
+      canvas.style.filter = 'drop-shadow(0 0 20px rgba(192,132,252,0.4))';
+      if (ring) ring.style.boxShadow = '';
+    }, 2200);
+  }
+
+  const res = document.getElementById('spinResult');
+  if (seg.mult === 0) {
+    if (res) { res.textContent = '💀 BUST! 0×'; res.style.color = 'var(--red)'; }
+    toast(`Spin landed on 0× — lost $${bet.toFixed(2)}`, 'error');
+    voiceLoss && voiceLoss(bet);
+  } else if (seg.mult < 1) {
+    updateBalance(profit);
+    if (res) { res.textContent = `${seg.label} — +$${profit.toFixed(2)}`; res.style.color = 'var(--text2)'; }
+    toast(`Spin: ${seg.label} — $${profit.toFixed(2)} returned`, 'info');
+  } else {
+    updateBalance(profit);
+    if (res) { res.textContent = `🏆 ${seg.label} — WIN +$${profit.toFixed(2)}`; res.style.color = seg.color; }
+    if (seg.mult >= 3) { winFlashFX && winFlashFX(); }
+    if (seg.mult >= 5) { spawnParticles && spawnParticles(10, '#c084fc'); }
+    toast(`🌀 Spin Master: ${seg.label} — Won $${profit.toFixed(2)}!`, 'gold');
+    // Voice for big wins
+    if (seg.mult >= 2) {
+      speakPhrase && speakPhrase('Masterful move! You are the best!', 0.92, 1.12);
+    }
+    recordBet && recordBet('SpinMaster', bet, seg.mult, win);
+  }
+
+  // Add to spin history chips
+  const hist = document.getElementById('spinHistory');
+  if (hist) {
+    const chip = document.createElement('div');
+    chip.style.cssText = `padding:3px 10px;border-radius:20px;font-family:var(--font-m);font-size:.65rem;font-weight:700;background:${seg.color}22;border:1px solid ${seg.color}66;color:${seg.color};`;
+    chip.textContent = seg.label;
+    hist.insertBefore(chip, hist.firstChild);
+    if (hist.children.length > 20) hist.removeChild(hist.lastChild);
+  }
+}
+
+function adjSpin(mult) {
+  const el = document.getElementById('spinBetAmt');
+  if (el) { el.value = Math.max(1, parseFloat(el.value||5)*mult).toFixed(2); updateSpinEst(); }
+}
+
+function updateSpinEst() {
+  const bet = parseFloat(document.getElementById('spinBetAmt')?.value||5);
+  const el  = document.getElementById('spinEstWin');
+  if (el && !isNaN(bet)) el.textContent = `Up to +$${(bet*10).toFixed(2)} USDT`;
+}
+document.getElementById('spinBetAmt')?.addEventListener('input', updateSpinEst);
+
+// Register page init
+const _origGoPage = window.goPage;
+window.goPage = function(pg) {
+  if (_origGoPage) _origGoPage.apply(this, arguments);
+  if (pg === 'spinmaster') setTimeout(initSpinWheel, 80);
+};
+
+// Also register in the active games set so navigation works
+if (typeof ACTIVE_GAMES_SET !== 'undefined') ACTIVE_GAMES_SET.add('spinmaster');
+</script>
+
+
+<!-- ══════════════ VOICE & AUDIO SYNC ENGINE ══════════════ -->
+<script>
+(function(){
+  // Extend WIN_PHRASES with required exact lines
+  const ANALYSIS_WIN = [
+    'Masterful move! You are the best!',
+    'Analysis Confirmed! Outstanding trade!',
+    'Masterful move! Your analysis is top-tier!',
+    'Brilliant! Analysis confirmed — you are elite!',
+    'Analysis Confirmed! The market bows to you!',
+  ];
+
+  // Hook into recordBet to trigger voice on wins
+  const _origRecord = window.recordBet;
+  window.recordBet = function(game, wager, mult, pnl) {
+    if (_origRecord) _origRecord.apply(this, arguments);
+    if (pnl > 0 && typeof speakPhrase === 'function') {
+      // Trigger authoritative win voice on every win
+      const phrase = ANALYSIS_WIN[Math.floor(Math.random()*ANALYSIS_WIN.length)];
+      setTimeout(() => speakPhrase(phrase, 0.91, 1.10), 400);
+    }
+  };
+
+  // Hook fomoFormatWin to speak when ticker milestone hits
+  let _tickerSpeakTimeout = null;
+  const _origBuildFomo = window.buildFomoTicker;
+  window.buildFomoTicker = function() {
+    if (_origBuildFomo) _origBuildFomo.apply(this, arguments);
+    // Occasionally announce a milestone from the ticker via voice
+    clearTimeout(_tickerSpeakTimeout);
+    _tickerSpeakTimeout = setTimeout(() => {
+      if (typeof speakPhrase === 'function' && Math.random() > 0.6) {
+        speakPhrase('Analysis Confirmed!', 0.9, 1.05);
+      }
+    }, 3000);
+  };
+})();
+</script>
+
+<!-- ═══════ NEON QR TIMER ENGINE ═══════ -->
+<script>
+(function(){
+  let _qrTimerInterval = null;
+  let _qrSecondsLeft = 600; // 10 minutes
+
+  window.startQRTimer = function() {
+    clearInterval(_qrTimerInterval);
+    _qrSecondsLeft = 600;
+    updateQRDisplay();
+    _qrTimerInterval = setInterval(() => {
+      _qrSecondsLeft--;
+      updateQRDisplay();
+      if (_qrSecondsLeft <= 0) {
+        clearInterval(_qrTimerInterval);
+        const el = document.getElementById('qrTimerCount');
+        const badge = document.getElementById('qrTimerBadge');
+        if (el) el.textContent = 'EXPIRED';
+        if (badge) { badge.classList.add('danger'); badge.textContent = '⚠ QR Expired — Click Refresh'; badge.style.cursor='pointer'; badge.onclick=()=>{ window.startQRTimer(); renderDepositQR && renderDepositQR(window.selectedCrypto || 'usdt_trc20'); }; }
+      }
+    }, 1000);
+  };
+
+  function updateQRDisplay() {
+    const el = document.getElementById('qrTimerCount');
+    const badge = document.getElementById('qrTimerBadge');
+    if (!el) return;
+    const m = Math.floor(_qrSecondsLeft / 60);
+    const s = _qrSecondsLeft % 60;
+    el.textContent = `${m}:${s.toString().padStart(2,'0')}`;
+    if (badge) {
+      if (_qrSecondsLeft <= 60) {
+        badge.classList.add('danger');
+        badge.style.animation = 'qr-timer-blink 0.8s ease-in-out infinite';
+      } else {
+        badge.classList.remove('danger');
+        badge.style.animation = '';
+      }
+    }
+  }
+  
+  // Hook into showDepositModal if it exists
+  const _origShow = window.showDepositModal;
+  window.showDepositModal = function() {
+    if (_origShow) _origShow.apply(this, arguments);
+    setTimeout(() => window.startQRTimer(), 300);
+  };
+})();
+</script>
+
+<style>
+@keyframes qr-timer-blink{ 0%,100%{opacity:1;} 50%{opacity:0.4;} }
+
+/* ─── Enhanced FOMO ticker items ─── */
+.fomo-item{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:0 22px;font-family:var(--font-m);font-size:.72rem;
+  color:var(--text);white-space:nowrap;
+  border-right:1px solid rgba(0,212,255,0.12);
+  text-shadow:0 0 10px rgba(0,212,255,0.3);
+}
+.fomo-item:nth-child(3n){ color:var(--gold); text-shadow:0 0 10px rgba(255,215,0,0.4); }
+.fomo-item:nth-child(3n+1){ color:var(--green); text-shadow:0 0 10px rgba(0,255,136,0.4); }
+.fomo-item:nth-child(3n+2){ color:var(--neon); text-shadow:0 0 10px rgba(0,212,255,0.4); }
+
+/* ─── Live ticker items on home page ─── */
+.ticker-item{
+  flex-shrink:0;
+  background:linear-gradient(135deg,rgba(0,212,255,0.06),rgba(123,47,255,0.04));
+  border:1px solid rgba(0,212,255,0.12);
+  border-radius:20px;padding:5px 14px;
+  font-family:var(--font-m);font-size:.68rem;
+  color:var(--neon);white-space:nowrap;
+  text-shadow:0 0 8px rgba(0,212,255,0.5);
+  animation:ticker-pulse 3s ease-in-out infinite;
+}
+@keyframes ticker-pulse{
+  0%,100%{border-color:rgba(0,212,255,0.12);}
+  50%{border-color:rgba(0,212,255,0.35);box-shadow:0 0 12px rgba(0,212,255,0.15);}
+}
+
+/* ─── Glass panel enhancement ─── */
+.modal{ background:linear-gradient(160deg,rgba(11,15,36,0.92) 0%,rgba(7,10,24,0.95) 100%) !important; }
+.left-sidebar{ background:rgba(7,10,24,0.88) !important; }
+</style>
 </body>
 </html>
