@@ -233,13 +233,44 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;heigh
 }
 
 /* ─── LEFT SIDEBAR ─── */
+/* ─── SIDEBAR BACKDROP (mobile) ─── */
+.sidebar-backdrop{
+  display:none;position:fixed;inset:0;z-index:99;
+  background:rgba(0,0,0,0.55);backdrop-filter:blur(4px);
+}
+.sidebar-backdrop.show{display:block;}
+
 .left-sidebar{
   position:fixed;top:var(--header);left:0;bottom:0;z-index:100;
-  width:var(--sidebar);overflow-y:auto;
-  background:rgba(7,10,24,0.8);border-right:1px solid rgba(0,212,255,0.06);
-  padding:12px 8px;display:none;flex-direction:column;gap:2px;
+  width:var(--sidebar);overflow-y:auto;overflow-x:hidden;
+  background:rgba(7,10,24,0.97);border-right:1px solid rgba(0,212,255,0.1);
+  padding:12px 8px;display:flex;flex-direction:column;gap:2px;
+  /* Slide in/out on mobile */
+  transform:translateX(-100%);
+  transition:transform .28s cubic-bezier(.4,0,.2,1);
+  backdrop-filter:blur(20px);
 }
-@media(min-width:1024px){.left-sidebar{display:flex;}}
+.left-sidebar.mobile-open{transform:translateX(0);}
+/* Sidebar close button — visible on mobile only */
+.sb-close-btn{
+  display:flex;align-items:center;justify-content:flex-end;
+  padding:4px 4px 8px;
+}
+.sb-close-btn button{
+  width:32px;height:32px;border-radius:50%;
+  background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);
+  color:var(--text2);font-size:16px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  transition:all .2s;line-height:1;
+}
+.sb-close-btn button:hover{background:rgba(255,51,102,.15);color:var(--red);border-color:rgba(255,51,102,.3);}
+@media(min-width:768px){
+  .sb-close-btn{display:none;}
+  .left-sidebar{
+    transform:translateX(0) !important;
+    /* Always visible on tablet+ */
+  }
+}
 .sb-label{font-size:0.6rem;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.12em;padding:8px 10px 4px;}
 .sb-item{
   display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:var(--r);
@@ -268,26 +299,27 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;heigh
   backdrop-filter:blur(24px);border-top:1px solid rgba(0,212,255,0.08);
   display:flex;align-items:center;
 }
-@media(min-width:1024px){.bottom-nav{display:none;}}
+@media(min-width:768px){.bottom-nav{display:none;}}
 .bn-item{
   flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
-  gap:3px;padding:6px 4px;cursor:pointer;color:var(--text3);transition:color .2s;
+  gap:3px;padding:6px 2px;cursor:pointer;color:var(--text3);transition:color .2s;min-width:0;
 }
-.bn-item svg{width:22px;height:22px;}
-.bn-item span{font-size:0.6rem;font-weight:600;letter-spacing:0.03em;text-transform:uppercase;}
+.bn-item svg{width:20px;height:20px;flex-shrink:0;}
+.bn-item span{font-size:0.55rem;font-weight:600;letter-spacing:0.02em;text-transform:uppercase;white-space:nowrap;}
 .bn-item.active{color:var(--neon);}
 .bn-item.highlight{
   background:rgba(0,212,255,0.08);border:1px solid rgba(0,212,255,0.15);
-  border-radius:var(--r);margin:4px;color:var(--neon);
+  border-radius:var(--r);margin:4px 2px;color:var(--neon);
 }
 
 /* ─── LAYOUT ─── */
 .app-layout{display:flex;padding-top:var(--header);min-height:100vh;}
-.main-area{flex:1;min-width:0;padding-bottom:80px;}
-@media(min-width:1024px){.main-area{margin-left:var(--sidebar);padding-bottom:20px;}}
-.page{display:none;padding:16px;max-width:1200px;margin:0 auto;}
+.main-area{flex:1;min-width:0;padding-bottom:calc(var(--nav-h) + 8px);}
+@media(min-width:768px){.main-area{margin-left:var(--sidebar);padding-bottom:24px;}}
+.page{display:none;padding:14px;max-width:1200px;margin:0 auto;}
 .page.active{display:block;animation:pg-in .25s ease;}
 @keyframes pg-in{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+@media(min-width:768px){.page{padding:22px 24px;}}
 @media(min-width:1024px){.page{padding:28px 32px;}}
 
 /* ─── CARDS ─── */
@@ -346,13 +378,16 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;heigh
 .hero-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px;}
 
 /* ─── GAMES GRID ─── */
+/* ─── GAMES GRID — Responsive Columns ─── */
 .games-grid{
   display:grid;
-  grid-template-columns:repeat(auto-fill,minmax(130px,1fr));
-  gap:12px;
+  grid-template-columns:repeat(2,1fr); /* Mobile: 2 cols */
+  gap:10px;
 }
-@media(min-width:600px){.games-grid{grid-template-columns:repeat(auto-fill,minmax(155px,1fr));}}
-@media(min-width:1024px){.games-grid{grid-template-columns:repeat(5,1fr);}}
+@media(min-width:480px){.games-grid{grid-template-columns:repeat(3,1fr);gap:11px;}} /* Phablet: 3 cols */
+@media(min-width:700px){.games-grid{grid-template-columns:repeat(4,1fr);gap:12px;}} /* Tablet: 4 cols */
+@media(min-width:1024px){.games-grid{grid-template-columns:repeat(5,1fr);gap:14px;}} /* Desktop: 5 cols */
+@media(min-width:1280px){.games-grid{grid-template-columns:repeat(6,1fr);gap:14px;}} /* Wide: 6 cols */
 .game-card{
   background:rgba(0,212,255,0.03);border:1px solid var(--gb);
   border-radius:var(--r2);overflow:hidden;cursor:pointer;
@@ -902,6 +937,284 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;heigh
 .back-btn svg{width:16px;height:16px;}
 .page-title{font-family:var(--font-d);font-size:1.3rem;font-weight:800;}
 .page-sub{color:var(--text2);font-size:.8rem;margin-top:2px;}
+/* ─── HAMBURGER BUTTON ─── */
+.h-hamburger{
+  width:36px;height:36px;border-radius:var(--r);
+  background:rgba(0,212,255,0.06);border:1px solid rgba(0,212,255,0.15);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:5px;cursor:pointer;transition:all .2s;flex-shrink:0;
+}
+.h-hamburger:hover{background:rgba(0,212,255,0.12);border-color:rgba(0,212,255,0.3);}
+.h-hamburger span{
+  display:block;width:16px;height:2px;
+  background:var(--neon);border-radius:2px;
+  transition:all .25s cubic-bezier(.4,0,.2,1);
+  transform-origin:center;
+}
+.h-hamburger.open span:nth-child(1){transform:translateY(7px) rotate(45deg);}
+.h-hamburger.open span:nth-child(2){opacity:0;transform:scaleX(0);}
+.h-hamburger.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg);}
+/* Hide hamburger on desktop where sidebar is always visible */
+@media(min-width:768px){.h-hamburger{display:none;}}
+
+/* ─── GLOBAL RESPONSIVE FIXES ─── */
+
+/* Header: shrink balance + deposit on small screens */
+@media(max-width:479px){
+  .h-balance{padding:5px 8px;font-size:.72rem;}
+  .h-balance svg:last-child{display:none;}
+  .h-btn{padding:6px 10px;font-size:.65rem;}
+  .h-logo-text{font-size:.95rem;}
+  .currency-badge{display:none;}
+}
+
+/* Wallet hero balance text */
+@media(max-width:479px){
+  .wallet-bal{font-size:clamp(1.5rem,8vw,2.5rem);}
+}
+
+/* Stats bar — 2 cols on phone */
+@media(max-width:479px){
+  .stats-bar{grid-template-columns:repeat(2,1fr);}
+}
+
+/* Crypto buttons — 2 cols on phone */
+@media(max-width:479px){
+  .crypto-list{grid-template-columns:repeat(2,1fr);}
+}
+
+/* Calendar grid — scrollable on very small screens */
+@media(max-width:400px){
+  .calendar-grid{grid-template-columns:repeat(5,1fr);}
+}
+
+/* Leaderboard table — hide less important cols */
+@media(max-width:479px){
+  .lb-table th:nth-child(3),.lb-table td:nth-child(3),
+  .lb-table th:nth-child(4),.lb-table td:nth-child(4){display:none;}
+}
+
+/* Bets table — collapse on mobile */
+@media(max-width:479px){
+  .tbl th:nth-child(3),.tbl td:nth-child(3),
+  .tbl th:nth-child(5),.tbl td:nth-child(5){display:none;}
+}
+
+/* Featured cards row — sensible min width */
+.feat-card{flex-shrink:0;width:clamp(130px,38vw,165px);}
+
+/* Modal full-width on small screens */
+@media(max-width:479px){
+  .modal{max-width:100%;border-radius:16px 16px 0 0;}
+  .overlay{align-items:flex-end;padding:0;}
+}
+
+/* Admin panel scroll on mobile */
+@media(max-width:600px){
+  .admin-stats-grid{grid-template-columns:repeat(2,1fr);}
+  .admin-panel{border-radius:16px;}
+}
+
+/* Grid-2 fallback — single col on tiny screens */
+@media(max-width:360px){
+  .grid-2{grid-template-columns:1fr;}
+}
+
+/* Game card text truncation */
+.gc-name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.gc-players{overflow:hidden;}
+
+/* Chat sidebar — full width on very small screens */
+@media(max-width:400px){
+  .chat-sidebar{width:100%;right:-100%;}
+}
+
+/* Page headers don't overflow */
+.page-title{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+
+/* Mines game layout — stack on mobile */
+@media(max-width:600px){
+  .mines-layout{flex-direction:column !important;}
+  .mines-terminal{width:100% !important;}
+}
+
+/* Crash layout — stack on mobile */
+@media(max-width:600px){
+  .crash-layout,.roulette-layout,.rush-layout,.singularity-layout,.dice-layout{
+    flex-direction:column !important;
+  }
+  .ctrl-panel{width:100% !important;}
+}
+
+/* ─── GAME CARD ─── */
+.gc-icon{width:100%;aspect-ratio:16/13;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;}
+@media(max-width:479px){.gc-icon{aspect-ratio:1;}}
+/* Play Now hover overlay */
+.game-card .gc-play-overlay{
+  position:absolute;inset:0;background:rgba(0,212,255,0.13);
+  display:flex;align-items:center;justify-content:center;
+  opacity:0;transition:opacity .2s;pointer-events:none;z-index:3;
+  border-radius:var(--r2);
+}
+.game-card:hover .gc-play-overlay{opacity:1;}
+.gc-play-btn{
+  font-family:var(--font-d);font-size:.7rem;font-weight:800;
+  color:#04060f;background:var(--neon);
+  padding:7px 18px;border-radius:20px;
+  letter-spacing:.07em;text-transform:uppercase;
+  box-shadow:0 0 18px rgba(0,212,255,.55);
+  pointer-events:none;
+}
+
+/* ─── TRADING PRO CHART ─── */
+.trade-tabs{display:flex;gap:0;border-bottom:1px solid rgba(0,212,255,.1);margin-bottom:14px;}
+.trade-tab{padding:9px 18px;font-family:var(--font-d);font-size:.72rem;font-weight:700;letter-spacing:.06em;
+  color:var(--text3);cursor:pointer;border-bottom:2px solid transparent;transition:all .2s;text-transform:uppercase;}
+.trade-tab.active{color:var(--neon);border-bottom-color:var(--neon);}
+.trade-panel{display:none;}
+.trade-panel.active{display:block;}
+/* Price ticker bar */
+.trade-ticker-bar{
+  display:flex;align-items:center;gap:14px;flex-wrap:wrap;
+  padding:8px 12px;background:rgba(0,212,255,.03);
+  border:1px solid rgba(0,212,255,.08);border-radius:var(--r);margin-bottom:10px;
+}
+.ttb-pair{font-family:var(--font-d);font-size:.82rem;font-weight:800;color:var(--text);}
+.ttb-price{font-family:var(--font-m);font-size:1.05rem;font-weight:700;color:var(--green);transition:color .3s;}
+.ttb-change{font-size:.72rem;font-weight:700;padding:2px 8px;border-radius:10px;}
+.ttb-change.up{background:rgba(0,255,136,.1);color:var(--green);}
+.ttb-change.dn{background:rgba(255,51,102,.1);color:var(--red);}
+.ttb-stat{font-size:.65rem;color:var(--text3);}
+.ttb-stat span{color:var(--text);font-weight:600;}
+/* Chart canvas wrapper */
+.pro-chart-wrap{
+  position:relative;background:#020408;
+  border-radius:var(--r);overflow:hidden;
+  border:1px solid rgba(0,212,255,.07);
+}
+#proTradeCanvas{display:block;width:100%;cursor:crosshair;}
+/* Crosshair tooltip */
+.chart-tooltip{
+  position:absolute;pointer-events:none;
+  background:rgba(7,10,24,.95);border:1px solid rgba(0,212,255,.2);
+  border-radius:6px;padding:6px 10px;font-family:var(--font-m);font-size:.7rem;
+  color:var(--text);white-space:nowrap;z-index:10;display:none;
+}
+/* Timer badge */
+.trade-timer-badge{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:5px 14px;border-radius:20px;font-family:var(--font-m);font-size:.82rem;font-weight:700;
+  background:rgba(255,215,0,.08);border:1px solid rgba(255,215,0,.25);color:var(--gold);
+  transition:all .3s;
+}
+.trade-timer-badge.active{
+  background:rgba(0,255,136,.08);border-color:rgba(0,255,136,.3);color:var(--green);
+  animation:pulse-timer .8s ease infinite;
+}
+.trade-timer-badge.danger{
+  background:rgba(255,51,102,.12);border-color:rgba(255,51,102,.35);color:var(--red);
+}
+@keyframes pulse-timer{0%,100%{box-shadow:0 0 0 0 rgba(0,255,136,.3);}50%{box-shadow:0 0 0 6px rgba(0,255,136,0);}}
+/* UP / DOWN buttons */
+.trade-dir-btns{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px;}
+.trade-up-btn,.trade-dn-btn{
+  padding:18px 10px;border-radius:var(--r);
+  font-family:var(--font-d);font-size:.95rem;font-weight:800;cursor:pointer;
+  transition:all .2s;border:1px solid;letter-spacing:.04em;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+}
+.trade-up-btn{
+  background:linear-gradient(135deg,rgba(0,255,136,.18),rgba(0,255,136,.06));
+  border-color:rgba(0,255,136,.35);color:var(--green);
+}
+.trade-up-btn:hover{background:linear-gradient(135deg,rgba(0,255,136,.28),rgba(0,255,136,.1));box-shadow:0 0 20px rgba(0,255,136,.2);}
+.trade-dn-btn{
+  background:linear-gradient(135deg,rgba(255,51,102,.18),rgba(255,51,102,.06));
+  border-color:rgba(255,51,102,.35);color:var(--red);
+}
+.trade-dn-btn:hover{background:linear-gradient(135deg,rgba(255,51,102,.28),rgba(255,51,102,.1));box-shadow:0 0 20px rgba(255,51,102,.2);}
+.trade-up-btn:disabled,.trade-dn-btn:disabled{opacity:.4;cursor:not-allowed;box-shadow:none;}
+
+/* ─── SIGNAL BOT ─── */
+.signal-card{
+  border-radius:var(--r2);padding:14px 16px;margin-bottom:12px;
+  border:1px solid;position:relative;overflow:hidden;
+}
+.signal-card.buy{background:rgba(0,255,136,.04);border-color:rgba(0,255,136,.2);}
+.signal-card.sell{background:rgba(255,51,102,.04);border-color:rgba(255,51,102,.2);}
+.signal-type{
+  font-family:var(--font-d);font-size:.82rem;font-weight:900;
+  letter-spacing:.1em;padding:4px 14px;border-radius:20px;display:inline-block;margin-bottom:8px;
+}
+.signal-type.buy{background:rgba(0,255,136,.15);color:var(--green);}
+.signal-type.sell{background:rgba(255,51,102,.15);color:var(--red);}
+.signal-pair{font-family:var(--font-d);font-size:.9rem;font-weight:800;color:var(--text);margin-bottom:3px;}
+.signal-meta{font-size:.68rem;color:var(--text3);}
+.signal-win-bar{height:4px;border-radius:2px;background:rgba(255,255,255,.06);margin-top:10px;overflow:hidden;}
+.signal-win-fill{height:100%;border-radius:2px;background:linear-gradient(90deg,var(--green),#00d4a0);width:0%;transition:width 1.4s cubic-bezier(.4,0,.2,1);}
+.signal-win-lbl{font-size:.6rem;color:var(--text3);margin-top:4px;display:flex;justify-content:space-between;}
+.signal-lock-overlay{
+  position:absolute;inset:0;background:rgba(4,6,15,.82);backdrop-filter:blur(6px);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  border-radius:var(--r2);gap:6px;
+}
+.vip-signal-btn{
+  width:100%;padding:14px;border:none;border-radius:var(--r);cursor:pointer;
+  font-family:var(--font-d);font-size:.82rem;font-weight:800;letter-spacing:.06em;
+  background:linear-gradient(135deg,#7b2fff,#00d4ff);color:white;
+  box-shadow:0 4px 24px rgba(123,47,255,.35);transition:all .2s;
+}
+.vip-signal-btn:hover{transform:translateY(-1px);box-shadow:0 8px 32px rgba(123,47,255,.45);}
+
+/* ─── TRADE DEPOSIT POPUP ─── */
+#tradeDepositPopup{
+  position:fixed;inset:0;z-index:3000;background:rgba(0,0,0,.7);backdrop-filter:blur(14px);
+  display:none;align-items:center;justify-content:center;padding:20px;
+}
+#tradeDepositPopup.show{display:flex;}
+.tdp-card{
+  background:linear-gradient(135deg,#0a0515,#050a1a);
+  border:1px solid rgba(123,47,255,.35);border-radius:20px;
+  padding:32px 28px;max-width:380px;width:100%;text-align:center;
+  box-shadow:0 0 60px rgba(123,47,255,.25),0 20px 60px rgba(0,0,0,.6);
+  position:relative;
+}
+.tdp-close{position:absolute;top:14px;right:14px;width:30px;height:30px;
+  border-radius:50%;background:rgba(255,255,255,.06);border:none;color:var(--text3);
+  font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+.tdp-icon{font-size:3rem;margin-bottom:12px;}
+.tdp-title{font-family:var(--font-d);font-size:1.2rem;font-weight:900;color:var(--neon);margin-bottom:6px;}
+.tdp-sub{font-size:.82rem;color:var(--text2);line-height:1.6;margin-bottom:20px;}
+.tdp-price{font-family:var(--font-d);font-size:1.8rem;font-weight:900;
+  background:linear-gradient(135deg,var(--neon),var(--purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  margin-bottom:6px;}
+.tdp-perks{text-align:left;margin-bottom:22px;}
+.tdp-perk{display:flex;align-items:center;gap:8px;font-size:.78rem;color:var(--text2);padding:5px 0;}
+.tdp-perk::before{content:'✓';color:var(--green);font-weight:700;flex-shrink:0;}
+
+/* ─── CURRENCY TOGGLE ─── */
+.currency-toggle-wrap{display:flex;align-items:center;gap:10px;margin:12px 0 18px;}
+.currency-toggle{
+  position:relative;width:72px;height:30px;border-radius:15px;
+  background:rgba(0,212,255,.08);border:1px solid rgba(0,212,255,.2);cursor:pointer;
+}
+.currency-toggle-thumb{
+  position:absolute;top:3px;left:3px;width:24px;height:24px;border-radius:50%;
+  background:var(--neon);transition:transform .3s cubic-bezier(.4,0,.2,1);
+  box-shadow:0 0 10px rgba(0,212,255,.5);
+}
+.currency-toggle.inr .currency-toggle-thumb{transform:translateX(42px);background:var(--gold);box-shadow:0 0 10px rgba(255,215,0,.5);}
+.currency-label{font-family:var(--font-d);font-size:.72rem;font-weight:700;color:var(--text3);transition:color .3s;}
+.currency-label.active-lbl{color:var(--neon);}
+.currency-label.active-lbl.inr-lbl{color:var(--gold);}
+/* Fade animation for currency switch */
+@keyframes cur-fade{0%{opacity:0;transform:translateY(4px);}100%{opacity:1;transform:translateY(0);}}
+.cur-anim{animation:cur-fade .35s ease both;}
+
+/* ─── EDGE-TO-EDGE HOME GRID ─── */
+#page-home .games-grid{margin:0 -14px;border-radius:0;padding:0 14px;}
+@media(min-width:768px){#page-home .games-grid{margin:0;padding:0;}}
+
 </style>
 
 </head>
@@ -959,7 +1272,21 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;heigh
         <div class="auth-divider"><span>or</span></div>
         <input class="v-input" id="authEmail" type="email" placeholder="Email address"/>
         <input class="v-input" id="authPass" type="password" placeholder="Password (min 6 chars)"/>
-        <div id="authNameField" style="display:none"><input class="v-input" id="authName" type="text" placeholder="Display name"/></div>
+        <div id="authNameField" style="display:none"><input class="v-input" id="authName" type="text" placeholder="Display name"/>
+          <input class="v-input" id="authUserId" type="text" placeholder="Unique User ID (e.g. vortex_john)" style="display:none;"/>
+          <select class="v-input" id="authCountry" style="display:none;background:rgba(255,255,255,.04);color:var(--text);">
+            <option value="">Select Country</option>
+            <option>India</option><option>USA</option><option>UK</option><option>UAE</option><option>Canada</option><option>Australia</option><option>Germany</option><option>France</option><option>Other</option>
+          </select>
+          <select class="v-input" id="authGender" style="display:none;background:rgba(255,255,255,.04);color:var(--text);">
+            <option value="">Select Gender</option>
+            <option>Male</option><option>Female</option><option>Non-binary</option><option>Prefer not to say</option>
+          </select>
+          <select class="v-input" id="authCurrency" style="display:none;background:rgba(255,255,255,.04);color:var(--text);">
+            <option value="">Preferred Currency</option>
+            <option value="INR">INR (₹)</option><option value="USDT">USDT</option><option value="BTC">BTC</option>
+          </select>
+        </div>
         <button class="btn-neon" id="authSubmitBtn" onclick="submitAuth()">Login</button>
       </div>
       <div id="otpFormArea" style="display:none">
@@ -985,6 +1312,10 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;heigh
 
 <!-- ══════════════ HEADER ══════════════ -->
 <header class="header" id="mainHeader" style="display:none">
+  <!-- Hamburger — mobile only -->
+  <div class="h-hamburger" id="hamburgerBtn" onclick="toggleSidebar()">
+    <span></span><span></span><span></span>
+  </div>
   <div class="h-logo" id="logoClickArea" onclick="logoClick()">
     <svg width="28" height="28" viewBox="0 0 90 90">
       <circle cx="45" cy="45" r="43" fill="none" stroke="rgba(0,212,255,0.25)" stroke-width="1"/>
@@ -1028,8 +1359,15 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;heigh
   <div class="pd-item danger" onclick="signOut()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>Sign Out</div>
 </div>
 
+<!-- ══════════════ SIDEBAR BACKDROP ══════════════ -->
+<div class="sidebar-backdrop" id="sidebarBackdrop" onclick="closeSidebar()"></div>
+
 <!-- ══════════════ LEFT SIDEBAR ══════════════ -->
-<div class="left-sidebar" id="mainSidebar" style="display:none">
+<div class="left-sidebar" id="mainSidebar" style="display:flex">
+  <!-- Close button (mobile only) -->
+  <div class="sb-close-btn">
+    <button onclick="closeSidebar()" title="Close menu">✕</button>
+  </div>
   <div class="sb-label">Navigation</div>
   <div class="sb-item" id="sb-home" onclick="goPage('home')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Home</div>
   <div class="sb-item" id="sb-games" onclick="goPage('games')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>All Games<span class="sb-badge">25</span></div>
@@ -1089,7 +1427,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;heigh
       </div>
       <div class="sh mb-12"><div class="sh-title">Hot Games</div><span class="sh-action" onclick="goPage('games')">All Games →</span></div>
       <div class="hscroll mb-20" id="hotGamesRow"></div>
-      <div class="sh mb-12"><div class="sh-title">Vortex Originals</div></div>
+      <div class="sh mb-12"><div class="sh-title">🎮 All 100 Games</div><div style="font-size:.68rem;color:var(--text3);">Tap to play</div></div>
       <div class="games-grid mb-20" id="homeGrid"></div>
       <div class="sh mb-12"><div class="sh-title">Recent Big Wins</div></div>
       <div class="card overflow-h"><table class="tbl"><thead><tr><th>Player</th><th>Game</th><th>Wager</th><th>Multiplier</th><th>Profit</th></tr></thead><tbody id="recentWinsTbody"></tbody></table></div>
@@ -1432,15 +1770,279 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;heigh
     </div>
 
   </div><!-- /main-area -->
-</div><!-- /app-layout -->
+
+<!-- ══════════════ TOWER GAME PAGE ══════════════ -->
+<div id="page-tower" class="page" style="display:none;">
+  <div class="page-header">
+    <div class="back-btn" onclick="goPage('games')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg></div>
+    <div><div class="page-title">Tower</div><div class="page-sub">Climb Higher · Risk More · Win Bigger</div></div>
+  </div>
+  <div style="text-align:center;padding:40px 20px;">
+    <div style="font-size:5rem;margin-bottom:16px;">🏗️</div>
+    <div style="font-family:var(--font-d);font-size:1.3rem;font-weight:800;color:var(--neon);margin-bottom:10px;">Tower Game</div>
+    <div style="font-size:.88rem;color:var(--text2);max-width:300px;margin:0 auto 20px;">Pick the right path up the tower. Each floor you climb increases your multiplier!</div>
+    <div style="background:rgba(0,212,255,.06);border:1px solid rgba(0,212,255,.15);border-radius:var(--r);padding:16px;margin-bottom:20px;font-family:var(--font-m);font-size:.82rem;color:var(--neon);">Full game launching soon! 🚀</div>
+    <button class="btn-neon" style="width:auto;padding:12px 40px;" onclick="toast('Tower game in development — stay tuned!','gold',3000)">Notify Me</button>
+  </div>
+</div>
+<div id="page-trade" class="page" style="display:none;">
+  <div class="page-header">
+    <div class="page-title">📈 Pro Trading</div>
+    <div class="page-sub">BTC/USDT · Live Market</div>
+  </div>
+
+  <!-- Tab bar -->
+  <div class="trade-tabs">
+    <div class="trade-tab active" id="tab-chart" onclick="switchTradeTab('chart')">Chart</div>
+    <div class="trade-tab" id="tab-signals" onclick="switchTradeTab('signals')">🤖 VIP Signals</div>
+    <div class="trade-tab" id="tab-history" onclick="switchTradeTab('history')">History</div>
+  </div>
+
+  <!-- ── CHART PANEL ── -->
+  <div class="trade-panel active" id="panel-chart">
+    <!-- Live price ticker bar -->
+    <div class="trade-ticker-bar">
+      <span class="ttb-pair">BTC/USDT</span>
+      <span class="ttb-price" id="ttbPrice">$43,250.00</span>
+      <span class="ttb-change up" id="ttbChange">+0.00%</span>
+      <span class="ttb-stat">H: <span id="ttbHigh">—</span></span>
+      <span class="ttb-stat">L: <span id="ttbLow">—</span></span>
+      <span class="ttb-stat">Vol: <span id="ttbVol">1.2B</span></span>
+    </div>
+
+    <!-- Pro candlestick chart -->
+    <div class="card mb-12">
+      <div class="pro-chart-wrap" style="height:280px;">
+        <canvas id="proTradeCanvas" style="height:280px;"></canvas>
+        <div class="chart-tooltip" id="chartTooltip"></div>
+      </div>
+    </div>
+
+    <!-- Bet controls -->
+    <div class="card card-p mb-12">
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:14px;">
+        <div>
+          <div style="font-size:.65rem;color:var(--text3);text-transform:uppercase;letter-spacing:.1em;margin-bottom:4px;">Bet Amount (USDT)</div>
+          <input class="ctrl-input" id="tradeBetAmt" type="number" value="10" min="1" inputmode="decimal" style="width:140px;"/>
+        </div>
+        <div style="text-align:right;">
+          <div class="trade-timer-badge" id="tradeTimerBadge">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            <span id="tradeTimerDisp">Waiting</span>
+          </div>
+          <div style="font-size:.62rem;color:var(--text3);margin-top:4px;" id="tradeStatusLine">Place a bet to start the round</div>
+        </div>
+      </div>
+      <!-- Quick amounts -->
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px;">
+        <button onclick="document.getElementById('tradeBetAmt').value=5" style="padding:4px 10px;background:rgba(0,212,255,.06);border:1px solid rgba(0,212,255,.15);border-radius:var(--r3);color:var(--text2);font-size:.68rem;cursor:pointer;">$5</button>
+        <button onclick="document.getElementById('tradeBetAmt').value=10" style="padding:4px 10px;background:rgba(0,212,255,.06);border:1px solid rgba(0,212,255,.15);border-radius:var(--r3);color:var(--text2);font-size:.68rem;cursor:pointer;">$10</button>
+        <button onclick="document.getElementById('tradeBetAmt').value=25" style="padding:4px 10px;background:rgba(0,212,255,.06);border:1px solid rgba(0,212,255,.15);border-radius:var(--r3);color:var(--text2);font-size:.68rem;cursor:pointer;">$25</button>
+        <button onclick="document.getElementById('tradeBetAmt').value=50" style="padding:4px 10px;background:rgba(0,212,255,.06);border:1px solid rgba(0,212,255,.15);border-radius:var(--r3);color:var(--text2);font-size:.68rem;cursor:pointer;">$50</button>
+        <button onclick="document.getElementById('tradeBetAmt').value=100" style="padding:4px 10px;background:rgba(0,212,255,.06);border:1px solid rgba(0,212,255,.15);border-radius:var(--r3);color:var(--text2);font-size:.68rem;cursor:pointer;">$100</button>
+        <button onclick="tradeBetHalf()" style="padding:4px 10px;background:rgba(0,212,255,.06);border:1px solid rgba(0,212,255,.15);border-radius:var(--r3);color:var(--text2);font-size:.68rem;cursor:pointer;">½</button>
+        <button onclick="tradeBetDouble()" style="padding:4px 10px;background:rgba(0,212,255,.06);border:1px solid rgba(0,212,255,.15);border-radius:var(--r3);color:var(--text2);font-size:.68rem;cursor:pointer;">2×</button>
+      </div>
+      <!-- Direction buttons -->
+      <div class="trade-dir-btns">
+        <button class="trade-up-btn" id="tradeUpBtn" onclick="placeTradeBet('up')">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="18 15 12 9 6 15"/></svg>
+          UP &nbsp;+95%
+        </button>
+        <button class="trade-dn-btn" id="tradeDownBtn" onclick="placeTradeBet('down')">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="6 9 12 15 18 9"/></svg>
+          DOWN &nbsp;+95%
+        </button>
+      </div>
+      <div id="tradeActiveBet" style="margin-top:12px;display:none;padding:11px 14px;background:rgba(0,212,255,.05);border:1px solid rgba(0,212,255,.15);border-radius:var(--r);font-size:.78rem;color:var(--neon);"></div>
+    </div>
+  </div>
+
+  <!-- ── SIGNALS PANEL ── -->
+  <div class="trade-panel" id="panel-signals">
+    <div id="signalBotContent"></div>
+  </div>
+
+  <!-- ── HISTORY PANEL ── -->
+  <div class="trade-panel" id="panel-history">
+    <div class="card overflow-h">
+      <table class="tbl"><thead><tr><th>#</th><th>Dir</th><th>Entry</th><th>Exit</th><th>P&amp;L</th></tr></thead>
+      <tbody id="tradeHistTbody"><tr><td colspan="5" style="text-align:center;color:var(--text3);padding:18px;">No trades yet</td></tr></tbody></table>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ TRADE DEPOSIT POPUP ══════════════ -->
+<div id="tradeDepositPopup">
+  <div class="tdp-card">
+    <button class="tdp-close" onclick="closeTradeDepositPopup()">✕</button>
+    <div class="tdp-icon">💎</div>
+    <div class="tdp-title">Unlock Pro Trading</div>
+    <div class="tdp-sub">Access professional Bitcoin trading with real profits on every correct prediction.</div>
+    <div class="tdp-price">$5 Deposit</div>
+    <div style="font-size:.72rem;color:var(--text3);margin-bottom:18px;">(≈ ₹415 · One-time unlock)</div>
+    <div class="tdp-perks">
+      <div class="tdp-perk">Professional candlestick chart (TradingView-style)</div>
+      <div class="tdp-perk">Up to +95% profit on correct predictions</div>
+      <div class="tdp-perk">Access to 20+ trading pairs</div>
+      <div class="tdp-perk">VIP Signal Bot access ($1.20/mo)</div>
+      <div class="tdp-perk">Instant USDT payouts</div>
+    </div>
+    <button class="btn-neon" onclick="closeTradeDepositPopup();showDepositModal();" style="width:100%;padding:15px;">+ Deposit $5 to Unlock</button>
+    <button onclick="closeTradeDepositPopup();unlockTradeAdmin();" style="margin-top:10px;background:none;border:none;color:var(--text3);font-size:.68rem;cursor:pointer;text-decoration:underline;display:block;width:100%;">Admin bypass (testing)</button>
+  </div>
+</div>
+
+<!-- ══════════════ EARN PAGE ══════════════ -->
+<div id="page-earn" class="page" style="display:none;">
+  <div class="page-header"><div class="page-title">💰 Earn</div><div class="page-sub">Referrals · Bounties · Tasks</div></div>
+
+  <!-- Token Balance -->
+  <div class="card card-p mb-16" style="background:linear-gradient(135deg,rgba(255,215,0,.08),rgba(255,215,0,.02));border-color:rgba(255,215,0,.25);text-align:center;">
+    <div style="font-size:.65rem;color:var(--gold);text-transform:uppercase;letter-spacing:.12em;margin-bottom:6px;">Token Balance</div>
+    <div style="font-family:var(--font-d);font-size:2.2rem;font-weight:900;color:var(--gold);" id="tokenBalDisp">0</div>
+    <div style="font-size:.72rem;color:var(--text3);margin-top:4px;">₹1 = 1 Token · Min Withdrawal: 500 Tokens</div>
+    <button onclick="redeemTokens()" style="margin-top:12px;padding:9px 28px;background:rgba(255,215,0,.15);border:1px solid rgba(255,215,0,.3);border-radius:var(--r3);color:var(--gold);font-family:var(--font-d);font-size:.75rem;font-weight:700;cursor:pointer;">Redeem Tokens</button>
+  </div>
+
+  <!-- Referral Section -->
+  <div class="sh mb-8"><div class="sh-title">👥 Referral Program</div></div>
+  <div class="card card-p mb-16">
+    <div style="display:flex;gap:14px;align-items:flex-start;margin-bottom:14px;">
+      <div style="font-size:2.2rem;">🎯</div>
+      <div>
+        <div style="font-family:var(--font-d);font-size:.88rem;font-weight:700;color:var(--green);">Earn $0.75 per Referral</div>
+        <div style="font-size:.78rem;color:var(--text2);margin-top:4px;">Share your unique link. Each friend who signs up earns you tokens automatically.</div>
+      </div>
+    </div>
+    <div style="background:rgba(0,212,255,.05);border:1px solid rgba(0,212,255,.15);border-radius:var(--r);padding:10px 14px;margin-bottom:10px;font-family:var(--font-m);font-size:.78rem;color:var(--neon);" id="referralLinkDisp">Loading...</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+      <button onclick="copyReferralLink()" style="padding:10px;background:rgba(0,212,255,.1);border:1px solid rgba(0,212,255,.2);border-radius:var(--r);color:var(--neon);font-size:.78rem;font-weight:700;cursor:pointer;">📋 Copy Link</button>
+      <button onclick="shareReferral()" style="padding:10px;background:rgba(123,47,255,.1);border:1px solid rgba(123,47,255,.2);border-radius:var(--r);color:var(--purple);font-size:.78rem;font-weight:700;cursor:pointer;">📤 Share</button>
+    </div>
+    <div style="margin-top:10px;font-size:.72rem;color:var(--text3);text-align:center;">Total Referrals: <span id="totalReferrals" style="color:var(--neon);">0</span> · Earned: <span id="referralEarned" style="color:var(--gold);">$0.00</span></div>
+  </div>
+
+  <!-- YouTube Bounty -->
+  <div class="sh mb-8"><div class="sh-title">🎬 YouTube Bounty — ₹1,000</div></div>
+  <div class="card card-p mb-16" style="background:rgba(255,0,0,.04);border-color:rgba(255,0,0,.2);">
+    <div style="font-size:.82rem;color:var(--text);line-height:1.7;margin-bottom:14px;">
+      <strong style="color:#ff4444;">₹1,000 Reward</strong> for creating a YouTube video about Vortex.IO!<br/>
+      Requirements: Min 2 minutes · Show gameplay · Include referral link in description.
+    </div>
+    <div id="ytBountyStatus" style="margin-bottom:10px;"></div>
+    <input class="v-input" id="ytVideoUrl" placeholder="Paste your YouTube video URL here..." style="margin-bottom:8px;"/>
+    <button onclick="submitYTBounty()" style="width:100%;padding:13px;background:linear-gradient(135deg,#ff4444,#cc0000);border:none;border-radius:var(--r);color:white;font-family:var(--font-d);font-size:.82rem;font-weight:700;cursor:pointer;letter-spacing:.05em;">🎬 Submit for Review</button>
+  </div>
+
+  <!-- BC.GAME Task -->
+  <div class="sh mb-8"><div class="sh-title">🎮 BC.GAME Task — ₹500</div></div>
+  <div class="card card-p mb-16" style="background:rgba(123,47,255,.04);border-color:rgba(123,47,255,.2);">
+    <div style="font-size:.82rem;color:var(--text);line-height:1.7;margin-bottom:14px;">
+      Complete a task on BC.GAME and earn <strong style="color:var(--purple);">₹500</strong>!<br/>
+      Upload 2 screenshots of your BC.GAME activity + your Player ID.
+    </div>
+    <div id="bcTaskStatus" style="margin-bottom:10px;"></div>
+    <input class="v-input" id="bcPlayerId" placeholder="BC.GAME Player ID" style="margin-bottom:8px;"/>
+    <input class="v-input" id="bcScreenshot1" placeholder="Screenshot 1 URL (Imgur/Drive link)" style="margin-bottom:8px;"/>
+    <input class="v-input" id="bcScreenshot2" placeholder="Screenshot 2 URL (Imgur/Drive link)" style="margin-bottom:8px;"/>
+    <button onclick="submitBCTask()" style="width:100%;padding:13px;background:linear-gradient(135deg,rgba(123,47,255,.3),rgba(123,47,255,.1));border:1px solid rgba(123,47,255,.4);border-radius:var(--r);color:var(--purple);font-family:var(--font-d);font-size:.82rem;font-weight:700;cursor:pointer;letter-spacing:.05em;">🚀 Submit BC.GAME Task</button>
+  </div>
+
+  <!-- Daily Tasks shortcut -->
+  <div class="sh mb-8"><div class="sh-title">📋 Daily Tasks</div></div>
+  <div class="card card-p" style="cursor:pointer;" onclick="goPage('tasks')">
+    <div style="display:flex;align-items:center;gap:12px;">
+      <div style="font-size:2rem;">🎯</div>
+      <div><div style="font-weight:700;color:var(--text);">Complete Tasks · Earn ₹3 Each</div><div style="font-size:.78rem;color:var(--text2);margin-top:3px;">Tap to view all available affiliate tasks</div></div>
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-left:auto;color:var(--text3);"><polyline points="9 18 15 12 9 6"/></svg>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ PROFILE PAGE ══════════════ -->
+<div id="page-profile-page" class="page" style="display:none;">
+  <div class="page-header"><div class="page-title">👤 Profile</div></div>
+
+  <!-- Profile Card -->
+  <div class="card card-p mb-16" style="text-align:center;background:linear-gradient(135deg,rgba(0,212,255,.06),rgba(123,47,255,.04));border-color:rgba(0,212,255,.2);">
+    <div id="profilePhotoWrap" style="width:80px;height:80px;border-radius:50%;border:3px solid var(--neon);margin:0 auto 12px;overflow:hidden;background:var(--bg3);display:flex;align-items:center;justify-content:center;font-family:var(--font-d);font-size:2rem;font-weight:800;color:var(--neon);" id="profileAvatar">V</div>
+    <div style="font-family:var(--font-d);font-size:1.1rem;font-weight:800;" id="profileNameDisp">Player</div>
+    <div style="font-size:.78rem;color:var(--text2);margin-top:4px;" id="profileEmailDisp">—</div>
+    <div style="margin-top:8px;display:inline-flex;align-items:center;gap:8px;background:rgba(255,215,0,.08);border:1px solid rgba(255,215,0,.2);padding:5px 16px;border-radius:var(--r3);">
+      <span style="color:var(--gold);font-size:.75rem;font-weight:700;">👑</span>
+      <span style="font-family:var(--font-d);font-size:.75rem;font-weight:700;color:var(--gold);" id="profileVipLevel">Bronze I</span>
+    </div>
+  </div>
+
+  <!-- Edit Profile -->
+  <div class="sh mb-8"><div class="sh-title">Edit Profile</div></div>
+  <div class="card card-p mb-16">
+    <div style="margin-bottom:10px;">
+      <div style="font-size:.72rem;color:var(--text3);margin-bottom:5px;text-transform:uppercase;letter-spacing:.07em;">Display Name</div>
+      <input class="v-input" id="editProfileName" placeholder="Your display name" style="margin-bottom:0;"/>
+    </div>
+    <div style="margin-bottom:10px;">
+      <div style="font-size:.72rem;color:var(--text3);margin-bottom:5px;text-transform:uppercase;letter-spacing:.07em;">Bio</div>
+      <textarea class="v-input" id="editProfileBio" placeholder="Tell us about yourself..." rows="3" style="resize:none;"></textarea>
+    </div>
+    <div style="margin-bottom:14px;">
+      <div style="font-size:.72rem;color:var(--text3);margin-bottom:5px;text-transform:uppercase;letter-spacing:.07em;">Profile Photo URL</div>
+      <input class="v-input" id="editProfilePhoto" placeholder="https://imgur.com/your-photo.jpg" style="margin-bottom:0;"/>
+    </div>
+    <button onclick="saveProfileEdits()" class="btn-neon">💾 Save Profile</button>
+  </div>
+
+  <!-- Currency Toggle -->
+  <div class="sh mb-8"><div class="sh-title">💱 Display Currency</div></div>
+  <div class="card card-p mb-16">
+    <div style="font-size:.78rem;color:var(--text2);margin-bottom:12px;">All balances and rewards display in your chosen currency.</div>
+    <div class="currency-toggle-wrap">
+      <span class="currency-label active-lbl" id="cur-usd-lbl">USD ($)</span>
+      <div class="currency-toggle" id="currencyToggle" onclick="toggleCurrency()">
+        <div class="currency-toggle-thumb"></div>
+      </div>
+      <span class="currency-label" id="cur-inr-lbl">INR (₹)</span>
+    </div>
+    <div style="font-size:.72rem;color:var(--text3);" id="curRateDisp">1 USDT = ₹83.40 · Auto-updated</div>
+  </div>
+
+  <!-- KYC Info -->
+  <div class="sh mb-8"><div class="sh-title">KYC Information</div></div>
+  <div class="card card-p mb-16">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+      <div><div style="font-size:.65rem;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;margin-bottom:4px;">User ID</div><div style="font-family:var(--font-m);font-size:.82rem;color:var(--neon);" id="kycUserId">—</div></div>
+      <div><div style="font-size:.65rem;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;margin-bottom:4px;">Country</div><div style="font-size:.82rem;" id="kycCountry">—</div></div>
+      <div><div style="font-size:.65rem;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;margin-bottom:4px;">Gender</div><div style="font-size:.82rem;" id="kycGender">—</div></div>
+      <div><div style="font-size:.65rem;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;margin-bottom:4px;">Currency</div><div style="font-family:var(--font-m);font-size:.82rem;color:var(--gold);" id="kycCurrency">—</div></div>
+    </div>
+    <div style="margin-top:12px;padding:8px 12px;background:rgba(0,255,136,.05);border:1px solid rgba(0,255,136,.15);border-radius:var(--r);font-size:.72rem;color:var(--green);">
+      ✅ KYC Status: <span id="kycStatus">Verified</span>
+    </div>
+  </div>
+
+  <!-- VIP Progress -->
+  <div class="sh mb-8"><div class="sh-title">VIP Progress</div></div>
+  <div class="card card-p mb-16">
+    <div id="profileVipSection"></div>
+  </div>
+
+  <!-- Account Actions -->
+  <div class="card card-p">
+    <div class="pd-item" onclick="goPage('wallet')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>Wallet & Transactions</div>
+    <div class="pd-item" onclick="goPage('tasks')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>Daily Tasks</div>
+    <div class="pd-item danger" onclick="signOut()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>Sign Out</div>
+  </div>
+</div>
 
 <!-- ══════════════ BOTTOM NAV ══════════════ -->
 <nav class="bottom-nav" id="mainNav" style="display:none">
   <div class="bn-item active" id="bn-home" onclick="goPage('home')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg><span>Home</span></div>
+  <div class="bn-item" id="bn-trade" onclick="goPage('trade')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg><span>Trade</span></div>
   <div class="bn-item highlight" id="bn-games" onclick="goPage('games')"><svg viewBox="0 0 24 24" fill="none" stroke="#00d4ff" stroke-width="2.5" style="filter:drop-shadow(0 0 6px #00d4ff) drop-shadow(0 0 12px rgba(0,212,255,.4))"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><span>Games</span></div>
+  <div class="bn-item" id="bn-earn" onclick="goPage('earn')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg><span>Earn</span></div>
   <div class="bn-item" id="bn-wallet" onclick="goPage('wallet')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg><span>Wallet</span></div>
-  <div class="bn-item" id="bn-tasks" onclick="goPage('tasks')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg><span>Tasks</span></div>
-  <div class="bn-item" id="bn-chat" onclick="toggleChat()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><span>Chat</span></div>
+  <div class="bn-item" id="bn-profile" onclick="goPage('profile-page')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg><span>Profile</span></div>
 </nav>
 
 <!-- ══════════════ CHAT SIDEBAR ══════════════ -->
@@ -1717,13 +2319,16 @@ function updateVip() {
 /* ─── PAGE NAVIGATION ─── */
 function goPage(page) {
   currentPage = page;
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.page').forEach(p => { p.classList.remove('active'); p.style.display = 'none'; });
   const el = document.getElementById('page-' + page);
-  if (el) el.classList.add('active');
+  if (el) { el.classList.add('active'); el.style.display = 'block'; }
   document.querySelectorAll('.sb-item, .bn-item').forEach(i => i.classList.remove('active'));
   const sbEl = document.getElementById('sb-' + page);
   if (sbEl) sbEl.classList.add('active');
-  const bnEl = document.getElementById('bn-' + page);
+  // Bottom nav mapping
+  const bnMap = { home: 'home', trade: 'trade', games: 'games', crash: 'games', mines: 'games', tower: 'games', singularity: 'games', rush: 'games', roulette: 'games', dice: 'games', earn: 'earn', tasks: 'earn', wallet: 'wallet', 'profile-page': 'profile' };
+  const bnKey = bnMap[page] || page;
+  const bnEl = document.getElementById('bn-' + bnKey);
   if (bnEl) bnEl.classList.add('active');
   if (page === 'home') renderHome();
   if (page === 'games') renderGames();
@@ -1738,6 +2343,10 @@ function goPage(page) {
   if (page === 'mailbox') renderMailbox();
   if (page === 'leaderboard') renderLeaderboard();
   if (page === 'mybets') renderMyBets();
+  if (page === 'trade') { initTradingPage(); }
+  if (page === 'earn') { renderEarnPage(); }
+  if (page === 'profile-page') { renderProfilePage(); }
+  // Handle /vortex-admin-777 route
   closeDD();
   window.scrollTo(0, 0);
 }
@@ -1752,6 +2361,11 @@ function authTab(mode, el) {
   el.classList.add('active');
   document.getElementById('authNameField').style.display = mode === 'signup' ? '' : 'none';
   document.getElementById('authSubmitBtn').textContent = mode === 'login' ? 'Login' : 'Create Account';
+  // Show extra KYC fields on signup
+  ['authUserId','authCountry','authGender','authCurrency'].forEach(id => {
+    const el2 = document.getElementById(id);
+    if (el2) el2.style.display = mode === 'signup' ? '' : 'none';
+  });
 }
 
 function submitAuth() {
@@ -1777,7 +2391,14 @@ function otpNav(idx, el) {
 function verifyOtp() {
   const entered = [0,1,2,3,4,5].map(i => document.getElementById('otp'+i).value).join('');
   if (entered === otpCode) {
-    completeLogin({ name: pendingAuthEmail.split('@')[0], email: pendingAuthEmail, picture: '' });
+    const name = document.getElementById('authName')?.value.trim() || pendingAuthEmail.split('@')[0];
+    const userId = document.getElementById('authUserId')?.value.trim() || 'vx_' + Math.random().toString(36).slice(2,8);
+    const country = document.getElementById('authCountry')?.value || 'India';
+    const gender = document.getElementById('authGender')?.value || 'Prefer not to say';
+    const currency = document.getElementById('authCurrency')?.value || 'INR';
+    const kycData = { userId, country, gender, currency };
+    localStorage.setItem('vx_kyc', JSON.stringify(kycData));
+    completeLogin({ name, email: pendingAuthEmail, picture: '', kyc: kycData });
   } else {
     toast('Invalid OTP code', 'error');
     [0,1,2,3,4,5].forEach(i => { document.getElementById('otp'+i).value = ''; });
@@ -1815,7 +2436,6 @@ function completeLogin(user) {
   document.getElementById('mainSidebar').style.display = 'flex';
   document.getElementById('mainNav').style.display = 'flex';
   updateProfileUI();
-  // Welcome bonus — Free Spins
   if (authMode === 'signup' || !localStorage.getItem('vx_welcomed')) {
     freeSpins = 5;
     localStorage.setItem('vx_welcomed', '1');
@@ -1834,6 +2454,14 @@ function completeLogin(user) {
   localStorage.setItem('vx_lastlogin', today);
   goPage('home');
   setTimeout(() => toast(`Welcome back, ${user.name}! 🎯 Day ${loginStreak} streak!`, 'success', 3000), 500);
+  // Save to admin user registry
+  try {
+    const allUsers = JSON.parse(localStorage.getItem('vx_all_users') || '[]');
+    if (!allUsers.find(u => u.email === user.email)) {
+      allUsers.push({ name: user.name, email: user.email, joined: new Date().toISOString() });
+      localStorage.setItem('vx_all_users', JSON.stringify(allUsers));
+    }
+  } catch(e){}
 }
 
 function updateProfileUI() {
@@ -1879,23 +2507,42 @@ function logoClick() {
 }
 
 /* ─── HOME ─── */
+/* ── Shared icon builder ── */
+function neonSvg(path, color, extra='') {
+  return `<svg viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="2" style="width:46%;height:46%;filter:drop-shadow(0 0 7px ${color}) drop-shadow(0 0 16px ${color}55);" ${extra}>${path}</svg>`;
+}
 const NEON_ICONS = {
-  crash: `<svg viewBox="0 0 24 24" fill="none" stroke="#ff4d6a" stroke-width="2" style="width:48%;height:48%;filter:drop-shadow(0 0 8px #ff4d6a) drop-shadow(0 0 18px rgba(255,77,106,.4))"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>`,
-  mines: `<svg viewBox="0 0 24 24" fill="none" stroke="#00ff88" stroke-width="2" style="width:48%;height:48%;filter:drop-shadow(0 0 8px #00ff88) drop-shadow(0 0 18px rgba(0,255,136,.4))"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>`,
-  singularity: `<svg viewBox="0 0 24 24" fill="none" stroke="#7b2fff" stroke-width="2" style="width:48%;height:48%;filter:drop-shadow(0 0 8px #7b2fff) drop-shadow(0 0 18px rgba(123,47,255,.4))"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="4"/><line x1="4.93" y1="4.93" x2="9.17" y2="9.17"/><line x1="14.83" y1="14.83" x2="19.07" y2="19.07"/><line x1="14.83" y1="9.17" x2="19.07" y2="4.93"/><line x1="4.93" y1="19.07" x2="9.17" y2="14.83"/></svg>`,
-  rush: `<svg viewBox="0 0 24 24" fill="none" stroke="#00d4ff" stroke-width="2" style="width:48%;height:48%;filter:drop-shadow(0 0 8px #00d4ff) drop-shadow(0 0 18px rgba(0,212,255,.4))"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>`,
-  roulette: `<svg viewBox="0 0 24 24" fill="none" stroke="#ff9900" stroke-width="2" style="width:48%;height:48%;filter:drop-shadow(0 0 8px #ff9900) drop-shadow(0 0 18px rgba(255,153,0,.4))"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/><line x1="12" y1="2" x2="12" y2="5"/><line x1="12" y1="19" x2="12" y2="22"/><line x1="2" y1="12" x2="5" y2="12"/><line x1="19" y1="12" x2="22" y2="12"/></svg>`,
-  dice: `<svg viewBox="0 0 24 24" fill="none" stroke="#c084fc" stroke-width="2" style="width:48%;height:48%;filter:drop-shadow(0 0 8px #c084fc) drop-shadow(0 0 18px rgba(192,132,252,.4))"><rect x="2" y="2" width="20" height="20" rx="3"/><circle cx="8" cy="8" r="1.5" fill="#c084fc"/><circle cx="16" cy="8" r="1.5" fill="#c084fc"/><circle cx="12" cy="12" r="1.5" fill="#c084fc"/><circle cx="8" cy="16" r="1.5" fill="#c084fc"/><circle cx="16" cy="16" r="1.5" fill="#c084fc"/></svg>`,
-  limbo: `<svg viewBox="0 0 24 24" fill="none" stroke="#ffd700" stroke-width="2" style="width:48%;height:48%;filter:drop-shadow(0 0 8px #ffd700) drop-shadow(0 0 18px rgba(255,215,0,.4))"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>`,
-  wheel: `<svg viewBox="0 0 24 24" fill="none" stroke="#00ff88" stroke-width="2" style="width:48%;height:48%;filter:drop-shadow(0 0 8px #00ff88) drop-shadow(0 0 18px rgba(0,255,136,.4))"><circle cx="12" cy="12" r="10"/><line x1="12" y1="2" x2="12" y2="22"/><line x1="2" y1="12" x2="22" y2="12"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/><line x1="19.07" y1="4.93" x2="4.93" y2="19.07"/></svg>`,
-  hilo: `<svg viewBox="0 0 24 24" fill="none" stroke="#ff4d6a" stroke-width="2" style="width:48%;height:48%;filter:drop-shadow(0 0 8px #ff4d6a) drop-shadow(0 0 18px rgba(255,77,106,.4))"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>`,
-  plinko: `<svg viewBox="0 0 24 24" fill="none" stroke="#00d4ff" stroke-width="2" style="width:48%;height:48%;filter:drop-shadow(0 0 8px #00d4ff) drop-shadow(0 0 18px rgba(0,212,255,.4))"><circle cx="12" cy="5" r="2" fill="#00d4ff"/><circle cx="6" cy="11" r="1.5" fill="#00d4ff" opacity=".5"/><circle cx="12" cy="11" r="1.5" fill="#00d4ff" opacity=".5"/><circle cx="18" cy="11" r="1.5" fill="#00d4ff" opacity=".5"/><circle cx="3" cy="17" r="1.5" fill="#00d4ff" opacity=".3"/><circle cx="9" cy="17" r="1.5" fill="#00d4ff" opacity=".3"/><circle cx="15" cy="17" r="1.5" fill="#00d4ff" opacity=".3"/><circle cx="21" cy="17" r="1.5" fill="#00d4ff" opacity=".3"/></svg>`,
+  crash:      neonSvg('<polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/>','#ff4d6a'),
+  mines:      neonSvg('<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>','#00ff88'),
+  tower:      neonSvg('<rect x="9" y="2" width="6" height="20" rx="1"/><rect x="3" y="8" width="18" height="3" rx="1"/><rect x="3" y="14" width="18" height="3" rx="1"/>','#7b2fff'),
+  singularity:neonSvg('<circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="4"/><line x1="4.93" y1="4.93" x2="9.17" y2="9.17"/><line x1="14.83" y1="14.83" x2="19.07" y2="19.07"/><line x1="14.83" y1="9.17" x2="19.07" y2="4.93"/><line x1="4.93" y1="19.07" x2="9.17" y2="14.83"/>','#7b2fff'),
+  rush:       neonSvg('<polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>','#00d4ff'),
+  roulette:   neonSvg('<circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/><line x1="12" y1="2" x2="12" y2="5"/><line x1="12" y1="19" x2="12" y2="22"/><line x1="2" y1="12" x2="5" y2="12"/><line x1="19" y1="12" x2="22" y2="12"/>','#ff9900'),
+  dice:       neonSvg('<rect x="2" y="2" width="20" height="20" rx="3"/><circle cx="8" cy="8" r="1.5" fill="#c084fc"/><circle cx="16" cy="8" r="1.5" fill="#c084fc"/><circle cx="12" cy="12" r="1.5" fill="#c084fc"/><circle cx="8" cy="16" r="1.5" fill="#c084fc"/><circle cx="16" cy="16" r="1.5" fill="#c084fc"/>','#c084fc'),
+  limbo:      neonSvg('<polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>','#ffd700'),
+  wheel:      neonSvg('<circle cx="12" cy="12" r="10"/><line x1="12" y1="2" x2="12" y2="22"/><line x1="2" y1="12" x2="22" y2="12"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/><line x1="19.07" y1="4.93" x2="4.93" y2="19.07"/>','#00ff88'),
+  hilo:       neonSvg('<rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/>','#ff4d6a'),
+  plinko:     neonSvg('<circle cx="12" cy="5" r="2" fill="#00d4ff"/><circle cx="6" cy="11" r="1.5" fill="#00d4ff" opacity=".5"/><circle cx="12" cy="11" r="1.5" fill="#00d4ff" opacity=".5"/><circle cx="18" cy="11" r="1.5" fill="#00d4ff" opacity=".5"/><circle cx="3" cy="17" r="1.5" fill="#00d4ff" opacity=".3"/><circle cx="9" cy="17" r="1.5" fill="#00d4ff" opacity=".3"/><circle cx="15" cy="17" r="1.5" fill="#00d4ff" opacity=".3"/><circle cx="21" cy="17" r="1.5" fill="#00d4ff" opacity=".3"/>','#00d4ff'),
 };
+/* Category icons for the 89 placeholder games */
+const CAT_ICONS = [
+  neonSvg('<rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/>','#00d4ff'),                    // cards
+  neonSvg('<circle cx="12" cy="12" r="10"/><path d="M8 12l2 2 4-4"/>','#00ff88'),                                                                                           // slot
+  neonSvg('<rect x="2" y="2" width="20" height="20" rx="3"/><circle cx="7" cy="7" r="1" fill="#ffd700"/><circle cx="17" cy="12" r="1" fill="#ffd700"/><circle cx="7" cy="17" r="1" fill="#ffd700"/>','#ffd700'), // dice var
+  neonSvg('<circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>','#ff9900'),                                                                                // timer
+  neonSvg('<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>','#c084fc'),                                 // star
+  neonSvg('<path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>','#ff4d6a'), // hearts
+  neonSvg('<polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>','#00d4ff'),                                                                                           // lightning
+  neonSvg('<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>','#00ff88'),                                                                                            // shield
+  neonSvg('<circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.22 4.22l2.12 2.12M17.66 17.66l2.12 2.12M2 12h3M19 12h3M4.22 19.78l2.12-2.12M17.66 6.34l2.12-2.12"/>','#ffd700'), // sun
+  neonSvg('<path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>','#7b2fff'),           // cube
+];
 
 const GAMES_DATA = [
   { id: 'crash', name: 'Crash', players: 847, badge: 'hot', bgColor: '#0d0508' },
   { id: 'mines', name: 'Mines', players: 632, badge: 'hot', bgColor: '#020d06' },
-  { id: 'singularity', name: 'Singularity', players: 412, badge: 'new', bgColor: '#08041a' },
+  { id: 'tower', name: 'Tower', players: 412, badge: 'new', bgColor: '#08041a' },
+  { id: 'singularity', name: 'Singularity', players: 389, badge: 'new', bgColor: '#08041a' },
   { id: 'rush', name: 'Vortex Rush', players: 298, badge: 'new', bgColor: '#020a0f' },
   { id: 'roulette', name: 'Roulette', players: 521, badge: '', bgColor: '#0f0600' },
   { id: 'dice', name: 'Dice', players: 389, badge: '', bgColor: '#07020f' },
@@ -1904,53 +2551,38 @@ const GAMES_DATA = [
   { id: 'hilo', name: 'HiLo', players: 198, badge: '', bgColor: '#0f0208' },
   { id: 'plinko', name: 'Plinko', players: 334, badge: '', bgColor: '#02080f' },
 ];
+const ACTIVE_GAMES_SET = new Set(['crash','mines','tower','singularity','rush','roulette','dice']);
+const ALL_100_GAMES = (function(){
+  const extras = ['Blackjack','Baccarat','Keno','Slots Pro','Dragon Tiger','Andar Bahar','Teen Patti','3 Card Poker','Sic Bo','Pai Gow','Fast Keno','Lightning Dice','Super Sic Bo','Dragon Drop','Money Wheel','Golden Bat','Speed Baccarat','Quantum Roulette','Monopoly Live','Deal or No Deal','Football Studio','Gonzo Quest','Book of Dead','Starburst','Reactoonz','Gates of Olympus','Sweet Bonanza','Big Bass Bonanza','Money Train','Dead or Alive','Razor Shark','Wolf Gold','Rise of Merlin','Jammin Jars','Fruit Party','Invaders Moon','Release the Kraken','Buffalo King','Primate King','Wild West Gold','Piggy Riches','Reel King','Eye of Horus','Fishin Frenzy','Rainbow Riches','Mega Moolah','Divine Fortune','Hall of Gods','Age of Gods','Jackpot Giant','Gladiator','Lara Croft','Sherlock','Batman','Jurassic Park','Terminator','Iron Man','Thor','Hulk','Captain America','Spider Man','X Men','Fantastic Four','Blade','Daredevil','Punisher','Ghost Rider','Elektra','Wolverine','Cyclops','Storm','Jean Grey','Rogue','Gambit','Avalon','Thunderstruck','Immortal Romance','Hitman','Tomb Raider','Playboy','Lucky Leprechaun','Tiki Bounce','Amazon Wild','Snow Leopard','Dolphin Coast','Mega Gems','Diamond Empire','Royal Charm'];
+  const base = [...GAMES_DATA];
+  extras.forEach((name, i) => base.push({ id: 'dev_' + i, name, players: Math.floor(50 + Math.random()*300), badge:'', bgColor:'#04060f', dev:true }));
+  return base.slice(0, 100);
+})();
 
 function gameCard(g) {
-  const active = ['crash', 'mines', 'singularity', 'rush', 'roulette', 'dice'];
-  const icon = NEON_ICONS[g.id] || `<div style="font-size:2rem;opacity:.5;">★</div>`;
-  return `<div class="game-card" onclick="${active.includes(g.id) ? `goPage('${g.id}')` : `toast('${g.name} coming soon!','info')`}">
-    ${g.badge ? `<span class="gc-badge ${g.badge}">${g.badge}</span>` : ''}
-    <div class="gc-icon" style="background:radial-gradient(ellipse at 40% 30%,${g.bgColor} 0%,#020408 70%);display:flex;align-items:center;justify-content:center;">${icon}</div>
+  const active = ACTIVE_GAMES_SET.has(g.id);
+  const icon = NEON_ICONS[g.id] || CAT_ICONS[Math.abs(g.name.charCodeAt(0) + g.name.charCodeAt(1)) % CAT_ICONS.length];
+  const clickFn = active ? `goPage('${g.id}')` : `showDevPopup('${g.name}')`;
+  const soonBadge = g.dev ? `<span style="position:absolute;top:6px;right:6px;background:rgba(255,215,0,.12);color:var(--gold);font-size:.5rem;font-weight:700;padding:2px 5px;border-radius:8px;border:1px solid rgba(255,215,0,.2);z-index:2;">SOON</span>` : '';
+  const mainBadge = g.badge ? `<span class="gc-badge ${g.badge}">${g.badge}</span>` : '';
+  return `<div class="game-card" onclick="${clickFn}" style="${g.dev?'opacity:.75;':''}">
+    ${mainBadge}${soonBadge}
+    <div class="gc-play-overlay"><div class="gc-play-btn">${active?'Play Now':'Coming Soon'}</div></div>
+    <div class="gc-icon" style="background:radial-gradient(ellipse at 40% 30%,${g.bgColor||'#04060f'} 0%,#020408 70%);">${icon}</div>
     <div class="gc-body"><div class="gc-name">${g.name}</div><div class="gc-players"><span class="gc-dot"></span>${g.players.toLocaleString()} playing</div></div>
   </div>`;
 }
 
-function renderHome() {
-  const ticker = document.getElementById('liveTicker');
-  if (ticker) {
-    const games = ['Crash', 'Mines', 'Singularity', 'Dice', 'Roulette'];
-    ticker.innerHTML = Array.from({ length: 14 }, () => {
-      const mult = (1.5 + Math.random() * 20).toFixed(2);
-      const profit = (Math.random() * 500 + 10).toFixed(2);
-      return `<div class="tick-chip"><span class="tick-dot"></span><span style="color:var(--text2)">${pick(names)}</span>&nbsp;won&nbsp;<span class="tick-win">$${profit}</span>&nbsp;at&nbsp;<span style="color:var(--neon)">${mult}×</span>&nbsp;on&nbsp;<span style="color:var(--text3)">${pick(games)}</span></div>`;
-    }).join('');
-  }
-  const hotRow = document.getElementById('hotGamesRow');
-  if (hotRow) {
-    hotRow.innerHTML = GAMES_DATA.slice(0, 6).map(g => {
-      const icon = NEON_ICONS[g.id] || '';
-      return `<div class="feat-card" onclick="${['crash','mines','singularity','rush','roulette','dice'].includes(g.id) ? `goPage('${g.id}')` : `toast('${g.name} coming soon!','info')`}">
-        <div class="feat-card-img" style="background:radial-gradient(ellipse at 40% 30%,${g.bgColor} 0%,#020408 70%);display:flex;align-items:center;justify-content:center;">${icon}</div>
-        <div class="feat-card-body"><div class="feat-card-name">${g.name}</div><div class="feat-card-players"><span class="gc-dot"></span>${g.players} playing</div></div>
-      </div>`;}).join('');
-  }
-  const homeGrid = document.getElementById('homeGrid');
-  if (homeGrid) homeGrid.innerHTML = GAMES_DATA.slice(0, 6).map(gameCard).join('');
-  const tbody = document.getElementById('recentWinsTbody');
-  if (tbody) {
-    tbody.innerHTML = Array.from({ length: 10 }, () => {
-      const mult = (1.2 + Math.random() * 18).toFixed(2);
-      const wager = (Math.random() * 200 + 5).toFixed(2);
-      const profit = (wager * mult - parseFloat(wager)).toFixed(2);
-      return `<tr><td style="color:var(--text2)">${pick(names)}</td><td>${pick(['Crash','Mines','Dice','Roulette'])}</td><td class="font-mono">${fmt(wager)}</td><td class="text-neon font-mono">${mult}×</td><td class="text-green font-mono">+${fmt(profit)}</td></tr>`;
-    }).join('');
-  }
-  document.getElementById('statOnline').textContent = Math.floor(rnd(13000, 16000)).toLocaleString();
+function showDevPopup(name) {
+  toast('🚧 ' + name + ': Development In Progress — Coming Soon!', 'gold', 3500);
 }
 
 function renderGames() {
   const grid = document.getElementById('allGamesGrid');
-  if (grid) grid.innerHTML = GAMES_DATA.map(gameCard).join('');
+  const home = document.getElementById('homeGrid');
+  const html = ALL_100_GAMES.map(gameCard).join('');
+  if (grid) grid.innerHTML = html;
+  if (home) home.innerHTML = html;
 }
 
 /* ─── CRASH ─── */
@@ -2928,10 +3560,10 @@ function renderWallet() {
 /* ─── DEPOSIT / WITHDRAW ─── */
 let selectedCrypto = 'usdt_trc20';
 const CRYPTO_ADDRS = {
-  usdt_trc20: 'TVortex7b2fSampleTRC20AddressHere123',
-  usdt_erc20: '0xVortex7b2fSampleERC20AddressHere123',
-  btc: 'bc1qvortex7b2fSampleBitcoinAddressHere',
-  sol: 'VortexSampleSolanaAddressHere1234567890'
+  usdt_trc20: 'TSRhUUukXB3saiUsgce48qkqUDhLuzkqJQ',
+  usdt_erc20: 'TSRhUUukXB3saiUsgce48qkqUDhLuzkqJQ',
+  btc: 'bc1q8n9zwdta96ult5lvpw527cxyr98hvns7rzru7t',
+  sol: '9gzfiQC4cT5SCYN1wUXgseTxzYvCvn3VRsro2ryhmvXp'
 };
 
 function showDepositModal() { document.getElementById('depositModal').classList.add('show'); }
@@ -3180,6 +3812,8 @@ function chatSend() {
   const msg = input.value.trim();
   if (!msg) return;
   input.value = '';
+  // Secret admin access
+  if (msg === '/vortex-admin-777') { openAdmin(); return; }
   // Secret VIP code check
   if (msg.toUpperCase() === 'VORTEX69') {
     openVipGallery();
@@ -3245,6 +3879,7 @@ function startChatBots() {
 function openAdmin() {
   renderAdmin();
   document.getElementById('adminPanel').classList.add('show');
+  setTimeout(renderAdminBountySection, 100);
 }
 
 function renderAdmin() {
@@ -3341,6 +3976,51 @@ function tryAutoLogin() {
   }
 }
 
+/* ─── HAMBURGER / SIDEBAR TOGGLE ─── */
+let sidebarOpen = false;
+
+function toggleSidebar() {
+  sidebarOpen ? closeSidebar() : openSidebar();
+}
+
+function openSidebar() {
+  sidebarOpen = true;
+  const sb = document.getElementById('mainSidebar');
+  const bd = document.getElementById('sidebarBackdrop');
+  const hb = document.getElementById('hamburgerBtn');
+  if (sb) sb.classList.add('mobile-open');
+  if (bd) bd.classList.add('show');
+  if (hb) hb.classList.add('open');
+  if (window.innerWidth < 768) document.body.style.overflow = 'hidden';
+}
+
+function closeSidebar() {
+  sidebarOpen = false;
+  const sb = document.getElementById('mainSidebar');
+  const bd = document.getElementById('sidebarBackdrop');
+  const hb = document.getElementById('hamburgerBtn');
+  if (sb) sb.classList.remove('mobile-open');
+  if (bd) bd.classList.remove('show');
+  if (hb) hb.classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+// Auto-close sidebar on resize to desktop
+window.addEventListener('resize', () => {
+  if (window.innerWidth >= 768) {
+    document.body.style.overflow = '';
+    const bd = document.getElementById('sidebarBackdrop');
+    if (bd) bd.classList.remove('show');
+  }
+});
+
+// Patch goPage to auto-close sidebar on mobile nav
+const _vx_origGoPage = goPage;
+goPage = function(page) {
+  if (window.innerWidth < 768 && sidebarOpen) closeSidebar();
+  _vx_origGoPage(page);
+};
+
 /* ─── ARENA SHAKE KEYFRAME (injected) ─── */
 const shakeStyle = document.createElement('style');
 shakeStyle.textContent = `@keyframes arena-shake{0%,100%{transform:translate(0)}15%{transform:translate(-5px,-3px)}30%{transform:translate(5px,3px)}45%{transform:translate(-7px,2px)}60%{transform:translate(7px,-2px)}75%{transform:translate(-3px,4px)}90%{transform:translate(3px,-4px)}}`;
@@ -3348,7 +4028,6 @@ document.head.appendChild(shakeStyle);
 
 /* ─── INIT ─── */
 window.addEventListener('DOMContentLoaded', () => {
-  // Entrance counter update
   setInterval(() => {
     const el = document.getElementById('eOnline');
     if (el) el.textContent = Math.floor(rnd(13000, 16000)).toLocaleString();
@@ -3358,7 +4037,679 @@ window.addEventListener('DOMContentLoaded', () => {
   tryAutoLogin();
   updateCrashProfit();
   updateDice();
+  // Restore persisted token balance
+  tokenBalance = parseInt(localStorage.getItem('vx_tokens') || '0');
+  // Apply saved currency preference
+  applyCurrencyToggleUI();
+  // Render games immediately
+  renderGames();
 });
+
+/* ══════════════ TRADING MODULE — PRO ══════════════ */
+let tCanvas, tCtx, tCandles = [], tBase = 43250, tOpenDay = 43250;
+let tInterval, tTickerInterval, tTimerInterval;
+let tTimerSecs = 0, tTimerRunning = false;
+let tradeActiveBet = null, tradeRound = parseInt(localStorage.getItem('vx_trade_round')||'1');
+let tradeHistory = JSON.parse(localStorage.getItem('vx_trade_hist')||'[]');
+let tradeUnlocked = !!localStorage.getItem('vx_trade_unlocked');
+let tradeFirstAttempt = !tradeUnlocked;
+
+/* Candle state */
+let tCurrentCandle = null;
+const T_CANDLE_TICKS = 20; // ticks per candle
+let tCandleTick = 0;
+const T_CANDLE_COUNT = 60; // visible candles
+
+/* Restore active bet */
+try { const ab = JSON.parse(localStorage.getItem('vx_active_trade')||'null'); if(ab) tradeActiveBet = ab; } catch(e){}
+
+function initTradingPage() {
+  tCanvas = document.getElementById('proTradeCanvas');
+  if (!tCanvas) return;
+  resizeTradeCanvas();
+  window.addEventListener('resize', resizeTradeCanvas);
+
+  // Generate initial candle history
+  if (tCandles.length === 0) {
+    let p = 42000 + Math.random()*3000;
+    for (let i = 0; i < T_CANDLE_COUNT; i++) {
+      const o = p;
+      const h = o + Math.random()*200;
+      const l = o - Math.random()*200;
+      const change = (Math.random()-.48)*300;
+      const c = Math.max(l, Math.min(h, o+change));
+      tCandles.push({o,h,l,c});
+      p = c;
+    }
+    tBase = p;
+    tOpenDay = tCandles[0].o;
+  }
+  tCurrentCandle = { o:tBase, h:tBase, l:tBase, c:tBase };
+
+  startTradeFeeds();
+  drawProChart();
+
+  // Restore active bet UI
+  if (tradeActiveBet) restoreActiveBetUI();
+
+  // Hover crosshair
+  tCanvas.addEventListener('mousemove', onChartMouseMove);
+  tCanvas.addEventListener('mouseleave', () => { document.getElementById('chartTooltip').style.display='none'; });
+
+  // Signal bot panel
+  renderSignalBotContent();
+  renderTradeHistory();
+}
+
+function resizeTradeCanvas() {
+  if (!tCanvas) return;
+  const dpr = window.devicePixelRatio || 1;
+  const rect = tCanvas.parentElement.getBoundingClientRect();
+  tCanvas.width = rect.width * dpr;
+  tCanvas.height = 280 * dpr;
+  tCanvas.style.height = '280px';
+  if (tCtx) tCtx.setTransform(1,0,0,1,0,0);
+  tCtx = tCanvas.getContext('2d');
+  tCtx.scale(dpr, dpr);
+  drawProChart();
+}
+
+function startTradeFeeds() {
+  clearInterval(tInterval); clearInterval(tTickerInterval);
+  // Price tick every 300ms — smooth updates
+  tInterval = setInterval(() => {
+    const change = (Math.random()-.488) * (tBase*0.0012);
+    tBase = Math.max(10000, tBase + change);
+    // Update current candle
+    if (tCurrentCandle) {
+      tCurrentCandle.c = tBase;
+      tCurrentCandle.h = Math.max(tCurrentCandle.h, tBase);
+      tCurrentCandle.l = Math.min(tCurrentCandle.l, tBase);
+    }
+    tCandleTick++;
+    if (tCandleTick >= T_CANDLE_TICKS) {
+      tCandleTick = 0;
+      tCandles.push({...tCurrentCandle});
+      if (tCandles.length > T_CANDLE_COUNT) tCandles.shift();
+      tCurrentCandle = { o:tBase, h:tBase, l:tBase, c:tBase };
+    }
+    updateTickerBar(change);
+    drawProChart();
+    // Timer countdown
+    if (tTimerRunning && tTimerSecs > 0) {
+      tTimerSecs--;
+      updateTradeTimerUI();
+      if (tTimerSecs <= 0) endTradingRound();
+    }
+  }, 300);
+}
+
+function updateTickerBar(change) {
+  const p = document.getElementById('ttbPrice');
+  const ch = document.getElementById('ttbChange');
+  const hi = document.getElementById('ttbHigh');
+  const lo = document.getElementById('ttbLow');
+  if (!p) return;
+  const priceStr = '$' + tBase.toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2});
+  p.textContent = priceStr;
+  p.style.color = change >= 0 ? 'var(--green)' : 'var(--red)';
+  const pct = ((tBase - tOpenDay) / tOpenDay * 100).toFixed(2);
+  const sign = pct >= 0 ? '+' : '';
+  ch.textContent = sign+pct+'%';
+  ch.className = 'ttb-change ' + (pct >= 0 ? 'up' : 'dn');
+  const allPrices = [...tCandles.map(c=>c.h), tBase];
+  const allLows   = [...tCandles.map(c=>c.l), tBase];
+  if (hi) hi.textContent = '$'+Math.max(...allPrices).toLocaleString('en',{minimumFractionDigits:0,maximumFractionDigits:0});
+  if (lo) lo.textContent = '$'+Math.min(...allLows).toLocaleString('en',{minimumFractionDigits:0,maximumFractionDigits:0});
+}
+
+const CHART_PAD = { top:18, right:68, bottom:28, left:8 };
+function drawProChart() {
+  if (!tCtx || !tCanvas) return;
+  const dpr = window.devicePixelRatio||1;
+  const W = tCanvas.width/dpr, H = tCanvas.height/dpr;
+  const pd = CHART_PAD;
+  const cW = W - pd.left - pd.right;
+  const cH = H - pd.top  - pd.bottom;
+
+  tCtx.clearRect(0,0,W,H);
+
+  // Background
+  tCtx.fillStyle = '#020408';
+  tCtx.fillRect(0,0,W,H);
+
+  const allCandles = [...tCandles];
+  if (tCurrentCandle) allCandles.push({...tCurrentCandle, live:true});
+  if (allCandles.length < 2) return;
+
+  const highs = allCandles.map(c=>c.h), lows = allCandles.map(c=>c.l);
+  const mn = Math.min(...lows)*0.9995, mx = Math.max(...highs)*1.0005;
+  const range = mx - mn || 1;
+  const toY = v => pd.top + cH - ((v-mn)/range)*cH;
+
+  // Grid lines + price labels
+  tCtx.font = `${10/dpr > 9 ? 10 : 10}px 'JetBrains Mono', monospace`;
+  tCtx.textAlign = 'left';
+  for (let i = 0; i <= 5; i++) {
+    const y = pd.top + (cH/5)*i;
+    const price = mx - (range/5)*i;
+    tCtx.strokeStyle = 'rgba(0,212,255,0.05)';
+    tCtx.lineWidth = 1;
+    tCtx.beginPath(); tCtx.moveTo(pd.left,y); tCtx.lineTo(pd.left+cW,y); tCtx.stroke();
+    tCtx.fillStyle = 'rgba(180,200,220,0.45)';
+    tCtx.fillText('$'+price.toLocaleString('en',{minimumFractionDigits:0,maximumFractionDigits:0}), pd.left+cW+6, y+3.5);
+  }
+
+  // Current price line
+  const curY = toY(tBase);
+  const rising = tBase >= (allCandles[0]?.o || tBase);
+  tCtx.strokeStyle = rising ? 'rgba(0,255,136,0.35)' : 'rgba(255,51,102,0.35)';
+  tCtx.setLineDash([4,4]); tCtx.lineWidth=1;
+  tCtx.beginPath(); tCtx.moveTo(pd.left, curY); tCtx.lineTo(pd.left+cW, curY); tCtx.stroke();
+  tCtx.setLineDash([]);
+  // Current price tag
+  const priceTagX = pd.left+cW+2;
+  tCtx.fillStyle = rising ? 'rgba(0,255,136,.8)' : 'rgba(255,51,102,.8)';
+  tCtx.fillRect(priceTagX, curY-9, 65, 18);
+  tCtx.fillStyle = '#04060f'; tCtx.textAlign='left';
+  tCtx.fillText('$'+tBase.toLocaleString('en',{minimumFractionDigits:1,maximumFractionDigits:1}), priceTagX+3, curY+4);
+
+  // Draw candles
+  const candleW = Math.max(2, (cW / allCandles.length) - 1.5);
+  allCandles.forEach((c, i) => {
+    const x = pd.left + (i / allCandles.length) * cW;
+    const cX = x + candleW/2;
+    const bull = c.c >= c.o;
+    const col = c.live ? (bull?'#00d4ff':'#c084fc') : (bull?'#00ff88':'#ff3366');
+    const bodyTop = toY(Math.max(c.o,c.c));
+    const bodyBot = toY(Math.min(c.o,c.c));
+    const bodyH = Math.max(1, bodyBot-bodyTop);
+    // Wick
+    tCtx.strokeStyle = col; tCtx.lineWidth = 1;
+    tCtx.beginPath(); tCtx.moveTo(cX, toY(c.h)); tCtx.lineTo(cX, toY(c.l)); tCtx.stroke();
+    // Body
+    tCtx.fillStyle = col+'cc';
+    tCtx.fillRect(x, bodyTop, candleW, bodyH);
+    // Glow on live candle
+    if (c.live) {
+      tCtx.shadowColor = col; tCtx.shadowBlur = 8;
+      tCtx.fillRect(x, bodyTop, candleW, bodyH);
+      tCtx.shadowBlur = 0;
+    }
+  });
+
+  // Entry price line if active bet
+  if (tradeActiveBet) {
+    const ey = toY(tradeActiveBet.entryPrice);
+    tCtx.strokeStyle = 'rgba(255,215,0,0.6)';
+    tCtx.setLineDash([6,3]); tCtx.lineWidth=1.5;
+    tCtx.beginPath(); tCtx.moveTo(pd.left,ey); tCtx.lineTo(pd.left+cW,ey); tCtx.stroke();
+    tCtx.setLineDash([]);
+    tCtx.fillStyle='rgba(255,215,0,.8)'; tCtx.textAlign='left';
+    tCtx.fillText('Entry $'+tradeActiveBet.entryPrice.toFixed(0), pd.left+4, ey-4);
+  }
+
+  tCtx.textAlign = 'left';
+}
+
+function onChartMouseMove(e) {
+  if (!tCtx || !tCanvas) return;
+  const dpr = window.devicePixelRatio||1;
+  const W = tCanvas.width/dpr, H = tCanvas.height/dpr;
+  const rect = tCanvas.getBoundingClientRect();
+  const mx = (e.clientX - rect.left);
+  const pd = CHART_PAD;
+  const cW = W-pd.left-pd.right, cH = H-pd.top-pd.bottom;
+  const allCandles = [...tCandles, tCurrentCandle].filter(Boolean);
+  const mn = Math.min(...allCandles.map(c=>c.l))*0.9995, mx2 = Math.max(...allCandles.map(c=>c.h))*1.0005;
+  const range = mx2-mn||1;
+  const idx = Math.floor((mx-pd.left)/cW * allCandles.length);
+  const c = allCandles[Math.max(0,Math.min(allCandles.length-1,idx))];
+  if (!c) return;
+  const tt = document.getElementById('chartTooltip');
+  if (!tt) return;
+  tt.style.display = 'block';
+  tt.style.left = (Math.min(mx+12, rect.width-160)) + 'px';
+  tt.style.top = '8px';
+  tt.innerHTML = `O: <b>$${c.o.toFixed(1)}</b> &nbsp;H: <b style="color:#00ff88">$${c.h.toFixed(1)}</b> &nbsp;L: <b style="color:#ff3366">$${c.l.toFixed(1)}</b> &nbsp;C: <b>$${c.c.toFixed(1)}</b>`;
+}
+
+function updateTradeTimerUI() {
+  const badge = document.getElementById('tradeTimerBadge');
+  const disp  = document.getElementById('tradeTimerDisp');
+  const line  = document.getElementById('tradeStatusLine');
+  const m = Math.floor(tTimerSecs/60).toString().padStart(2,'0');
+  const s = (tTimerSecs%60).toString().padStart(2,'0');
+  if (disp) disp.textContent = `Trade Active: ${m}:${s}`;
+  if (badge) {
+    badge.className = 'trade-timer-badge' + (tTimerSecs<=30?' danger':' active');
+  }
+  if (line && tradeActiveBet) {
+    const dir = tradeActiveBet.direction==='up'?'▲ UP':'▼ DOWN';
+    line.textContent = `${dir} @ $${tradeActiveBet.entryPrice.toFixed(2)} · ${tTimerSecs}s remaining`;
+  }
+}
+
+function placeTradeBet(direction) {
+  if (tradeActiveBet) { toast('Active trade in progress — wait for result!','info'); return; }
+  if (!tradeUnlocked) { showTradeDepositPopup(); return; }
+  const amt = parseFloat(document.getElementById('tradeBetAmt')?.value);
+  if (!amt||amt<1||amt>balance) { toast('Invalid bet amount','error'); return; }
+  updateBalance(-amt);
+  tradeActiveBet = { direction, amt, entryPrice:tBase, round:tradeRound };
+  localStorage.setItem('vx_active_trade', JSON.stringify(tradeActiveBet));
+  // Start countdown (60 seconds per round)
+  tTimerSecs = 60; tTimerRunning = true;
+  updateTradeTimerUI();
+  // Lock buttons
+  const ub=document.getElementById('tradeUpBtn'), db=document.getElementById('tradeDownBtn');
+  if(ub)ub.disabled=true; if(db)db.disabled=true;
+  const actEl = document.getElementById('tradeActiveBet');
+  if (actEl) { actEl.style.display=''; actEl.innerHTML=`<span style="color:${direction==='up'?'var(--green)':'var(--red)'};">${direction==='up'?'▲':'▼'} ${direction.toUpperCase()}</span> &nbsp;@ $${tBase.toFixed(2)} &nbsp;·&nbsp; ${fmt(amt)} USDT`; }
+  toast(`${direction==='up'?'▲':'▼'} ${direction.toUpperCase()} — trade started! 60s countdown.`, direction==='up'?'success':'error');
+}
+
+function restoreActiveBetUI() {
+  const ub=document.getElementById('tradeUpBtn'), db=document.getElementById('tradeDownBtn');
+  if(ub)ub.disabled=true; if(db)db.disabled=true;
+  const actEl = document.getElementById('tradeActiveBet');
+  if(actEl){actEl.style.display='';actEl.innerHTML=`<span style="color:${tradeActiveBet.direction==='up'?'var(--green)':'var(--red)'};">${tradeActiveBet.direction==='up'?'▲':'▼'} ${tradeActiveBet.direction.toUpperCase()}</span> &nbsp;@ $${tradeActiveBet.entryPrice.toFixed(2)}`;}
+  tTimerSecs=60; tTimerRunning=true; updateTradeTimerUI();
+}
+
+function endTradingRound() {
+  tTimerRunning = false; tTimerSecs = 0;
+  const startP = tradeActiveBet?.entryPrice || tBase;
+  const endP   = tBase;
+  const went = endP >= startP ? 'up' : 'down';
+  let pnl = 0;
+  if (tradeActiveBet) {
+    const won = tradeActiveBet.direction === went;
+    pnl = won ? +(tradeActiveBet.amt*0.95).toFixed(2) : -tradeActiveBet.amt;
+    updateBalance(won ? tradeActiveBet.amt + pnl : 0);
+    addTx(won?'Trade Win':'Trade Loss', pnl, won?'won':'lost');
+    const msg = won ? `✅ Trade WON +${fmt(pnl)} USDT` : `❌ Trade LOST ${fmt(tradeActiveBet.amt)} USDT`;
+    toast(msg, won?'success':'error', 4500);
+    tradeHistory.unshift({round:tradeRound,dir:tradeActiveBet.direction,entry:tradeActiveBet.entryPrice.toFixed(2),exit:endP.toFixed(2),pnl,won});
+    if (tradeHistory.length>20) tradeHistory.pop();
+    localStorage.setItem('vx_trade_hist', JSON.stringify(tradeHistory));
+    renderTradeHistory();
+  }
+  tradeRound++; localStorage.setItem('vx_trade_round', tradeRound);
+  tradeActiveBet = null; localStorage.removeItem('vx_active_trade');
+  const ub=document.getElementById('tradeUpBtn'), db=document.getElementById('tradeDownBtn');
+  if(ub)ub.disabled=false; if(db)db.disabled=false;
+  const actEl=document.getElementById('tradeActiveBet'); if(actEl)actEl.style.display='none';
+  const badge=document.getElementById('tradeTimerBadge'); if(badge)badge.className='trade-timer-badge';
+  const disp=document.getElementById('tradeTimerDisp'); if(disp)disp.textContent='Waiting';
+  const line=document.getElementById('tradeStatusLine'); if(line)line.textContent='Place a bet to start the round';
+}
+
+function renderTradeHistory() {
+  const tbody = document.getElementById('tradeHistTbody');
+  if (!tbody) return;
+  tbody.innerHTML = tradeHistory.length===0
+    ? '<tr><td colspan="5" style="text-align:center;color:var(--text3);padding:18px;">No trades yet</td></tr>'
+    : tradeHistory.map(h=>`<tr>
+        <td style="color:var(--text3);">#${h.round}</td>
+        <td style="color:${h.dir==='up'?'var(--green)':'var(--red)'};">${h.dir==='up'?'▲':'▼'} ${h.dir.toUpperCase()}</td>
+        <td style="font-family:var(--font-m);">$${h.entry}</td>
+        <td style="font-family:var(--font-m);">$${h.exit}</td>
+        <td style="font-family:var(--font-m);color:${h.won?'var(--green)':'var(--red)'};">${h.won?'+':'-'}${fmt(Math.abs(h.pnl))}</td>
+      </tr>`).join('');
+}
+
+/* ── Tab switcher ── */
+function switchTradeTab(tab) {
+  ['chart','signals','history'].forEach(t=>{
+    document.getElementById('tab-'+t)?.classList.toggle('active',t===tab);
+    document.getElementById('panel-'+t)?.classList.toggle('active',t===tab);
+  });
+  if (tab==='signals') renderSignalBotContent();
+}
+
+/* ── Quick bet helpers ── */
+function tradeBetHalf(){const i=document.getElementById('tradeBetAmt');if(i)i.value=Math.max(1,parseFloat(i.value||10)/2).toFixed(2);}
+function tradeBetDouble(){const i=document.getElementById('tradeBetAmt');if(i)i.value=(parseFloat(i.value||10)*2).toFixed(2);}
+
+/* ── Trade deposit popup ── */
+function showTradeDepositPopup() {
+  const p = document.getElementById('tradeDepositPopup');
+  if (p) p.classList.add('show');
+}
+function closeTradeDepositPopup() {
+  const p = document.getElementById('tradeDepositPopup');
+  if (p) p.classList.remove('show');
+}
+function unlockTradeAdmin() {
+  tradeUnlocked = true; tradeFirstAttempt = false;
+  localStorage.setItem('vx_trade_unlocked','1');
+  toast('🔧 Trade unlocked (admin bypass)','gold',3000);
+}
+
+/* ══════════════ SIGNAL BOT MODULE ══════════════ */
+let signalBotActive = !!localStorage.getItem('vx_signal_bot');
+const SIGNAL_PAIRS = ['BTC/USDT','ETH/USDT','SOL/USDT','BNB/USDT','XRP/USDT','DOGE/USDT','ADA/USDT','AVAX/USDT'];
+const SIGNAL_TF    = ['1m','3m','5m','15m','1h'];
+
+function generateFakeSignals(count=6) {
+  return Array.from({length:count},(_,i)=>{
+    const type = Math.random()>.45?'buy':'sell';
+    const pair = SIGNAL_PAIRS[Math.floor(Math.random()*SIGNAL_PAIRS.length)];
+    const tf   = SIGNAL_TF[Math.floor(Math.random()*SIGNAL_TF.length)];
+    const tp   = (1.5+Math.random()*4).toFixed(1);
+    const sl   = (0.5+Math.random()*1.5).toFixed(1);
+    const win  = 88+Math.floor(Math.random()*10);
+    const mins = Math.floor(Math.random()*55)+1;
+    return {type,pair,tf,tp,sl,win,mins};
+  });
+}
+
+function renderSignalBotContent() {
+  const el = document.getElementById('signalBotContent');
+  if (!el) return;
+  if (!signalBotActive) {
+    el.innerHTML = `
+      <div class="card card-p mb-16" style="background:linear-gradient(135deg,rgba(123,47,255,.1),rgba(0,212,255,.05));border-color:rgba(123,47,255,.3);text-align:center;">
+        <div style="font-size:2.5rem;margin-bottom:10px;">🤖</div>
+        <div style="font-family:var(--font-d);font-size:1.1rem;font-weight:900;color:var(--neon);margin-bottom:6px;">AI Signal Bot</div>
+        <div style="font-size:.82rem;color:var(--text2);line-height:1.7;margin-bottom:16px;">
+          Get <strong style="color:var(--green);">99% accurate</strong> BUY/SELL signals powered by AI.<br/>
+          8–15 signals per day · Live push alerts · 90%+ win rate verified.
+        </div>
+        <div style="font-family:var(--font-d);font-size:1.6rem;font-weight:900;color:var(--gold);margin-bottom:4px;">₹100<span style="font-size:.65em;color:var(--text3);">/month</span></div>
+        <div style="font-size:.68rem;color:var(--text3);margin-bottom:18px;">= $1.20 USD · Cancel anytime</div>
+        <button class="vip-signal-btn" onclick="activateSignalBot()">🚀 Get VIP Signals — ₹100/mo</button>
+      </div>
+      <div class="card card-p" style="opacity:.5;pointer-events:none;position:relative;">
+        <div class="signal-lock-overlay">
+          <div style="font-size:1.4rem;">🔒</div>
+          <div style="font-family:var(--font-d);font-size:.78rem;color:var(--neon);">Subscribe to Unlock</div>
+        </div>
+        <div class="signal-card buy"><div class="signal-type buy">BUY</div><div class="signal-pair">BTC/USDT · 5m</div><div class="signal-meta">TP: +2.4% · SL: -0.8% · Win rate: 94%</div><div class="signal-win-bar"><div class="signal-win-fill" style="width:94%;"></div></div></div>
+        <div class="signal-card sell"><div class="signal-type sell">SELL</div><div class="signal-pair">ETH/USDT · 15m</div><div class="signal-meta">TP: +3.1% · SL: -1.0% · Win rate: 91%</div><div class="signal-win-bar"><div class="signal-win-fill" style="width:91%;"></div></div></div>
+      </div>`;
+  } else {
+    const signals = generateFakeSignals(6);
+    el.innerHTML = `
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px;">
+        <div>
+          <div style="font-family:var(--font-d);font-size:.9rem;font-weight:800;color:var(--green);">🤖 Signal Bot ACTIVE</div>
+          <div style="font-size:.68rem;color:var(--text3);">Live AI signals · 90%+ win rate · Updated every 3 min</div>
+        </div>
+        <span style="font-size:.65rem;background:rgba(0,255,136,.1);color:var(--green);border:1px solid rgba(0,255,136,.2);padding:3px 10px;border-radius:20px;font-weight:700;">PRO</span>
+      </div>
+      ${signals.map((s,i)=>`
+        <div class="signal-card ${s.type}" style="animation-delay:${i*0.1}s">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:6px;">
+            <div><div class="signal-type ${s.type}">${s.type.toUpperCase()}</div><div class="signal-pair">${s.pair} · ${s.tf}</div></div>
+            <div style="text-align:right;font-size:.65rem;color:var(--text3);">${s.mins}m ago</div>
+          </div>
+          <div class="signal-meta">TP: +${s.tp}% &nbsp;·&nbsp; SL: -${s.sl}% &nbsp;·&nbsp; <span style="color:var(--green);font-weight:700;">${s.win}% win rate</span></div>
+          <div class="signal-win-bar"><div class="signal-win-fill" id="sfill_${i}"></div></div>
+          <div class="signal-win-lbl"><span>0%</span><span>${s.win}%</span></div>
+        </div>`).join('')}
+      <div style="text-align:center;margin-top:16px;font-size:.68rem;color:var(--text3);">Next signal update in <span id="signalCountdown">3:00</span></div>`;
+    // Animate win bars
+    setTimeout(()=>{
+      signals.forEach((_,i)=>{
+        const f=document.getElementById('sfill_'+i); if(f)f.style.width=signals[i].win+'%';
+      });
+    }, 200);
+    // Countdown timer
+    let sc = 180;
+    clearInterval(window._signalTimer);
+    window._signalTimer = setInterval(()=>{
+      sc--; if(sc<0){sc=180;renderSignalBotContent();}
+      const el2=document.getElementById('signalCountdown');
+      if(el2)el2.textContent=Math.floor(sc/60)+':'+(sc%60).toString().padStart(2,'0');
+    },1000);
+  }
+}
+
+function activateSignalBot() {
+  // Show payment prompt first
+  if (balance < 1.2) { toast('Minimum ₹100 balance required','error'); return; }
+  updateBalance(-1.2);
+  addTx('VIP Signal Bot','1.2','subscription');
+  signalBotActive = true;
+  localStorage.setItem('vx_signal_bot','1');
+  toast('🤖 Signal Bot activated! 99% AI signals unlocked.','success',4000);
+  renderSignalBotContent();
+}
+
+/* ══════════════ EARN / BOUNTY MODULE ══════════════ */
+let tokenBalance = 0;
+let ytBountySubmitted = false, bcTaskSubmitted = false;
+let totalReferrals = parseInt(localStorage.getItem('vx_referrals') || '0');
+
+function renderEarnPage() {
+  tokenBalance = parseInt(localStorage.getItem('vx_tokens') || '0');
+  const tb = document.getElementById('tokenBalDisp');
+  if (tb) tb.textContent = tokenBalance.toLocaleString();
+  const refEl = document.getElementById('referralLinkDisp');
+  if (refEl) refEl.textContent = 'https://vortex.io/ref/' + (currentUser?.name?.replace(/\s+/g,'') || 'player').toLowerCase();
+  const tr = document.getElementById('totalReferrals');
+  if (tr) tr.textContent = totalReferrals;
+  const re = document.getElementById('referralEarned');
+  if (re) re.textContent = '$' + (totalReferrals * 0.75).toFixed(2);
+  // YT bounty status
+  const yt = localStorage.getItem('vx_yt_bounty');
+  const ytStatus = document.getElementById('ytBountyStatus');
+  if (ytStatus && yt) {
+    const d = JSON.parse(yt);
+    ytStatus.innerHTML = `<div style="padding:8px 12px;border-radius:var(--r);background:rgba(255,215,0,.08);border:1px solid rgba(255,215,0,.2);font-size:.75rem;color:var(--gold);margin-bottom:8px;">⏳ Submitted: ${d.url}<br/>Status: <strong>${d.status}</strong></div>`;
+  }
+  // BC.GAME task status
+  const bc = localStorage.getItem('vx_bc_task');
+  const bcStatus = document.getElementById('bcTaskStatus');
+  if (bcStatus && bc) {
+    const d = JSON.parse(bc);
+    const submitted = new Date(d.time);
+    const hrs = Math.floor((Date.now() - submitted.getTime()) / 3600000);
+    const status = hrs >= 24 ? '✅ Approved' : `⏳ Pending (${hrs}h / 24h)`;
+    bcStatus.innerHTML = `<div style="padding:8px 12px;border-radius:var(--r);background:rgba(123,47,255,.08);border:1px solid rgba(123,47,255,.2);font-size:.75rem;color:var(--purple);margin-bottom:8px;">ID: ${d.playerId} · ${status}</div>`;
+  }
+}
+
+function copyReferralLink() {
+  const link = 'https://vortex.io/ref/' + (currentUser?.name?.replace(/\s+/g,'') || 'player').toLowerCase();
+  navigator.clipboard.writeText(link).catch(()=>{});
+  toast('📋 Referral link copied!', 'success');
+  // Simulate referral credit
+  totalReferrals++;
+  tokenBalance += 75; // $0.75 = 75 tokens
+  localStorage.setItem('vx_tokens', tokenBalance);
+  localStorage.setItem('vx_referrals', totalReferrals);
+  toast('🎉 +75 tokens earned for sharing!', 'gold', 3000);
+  renderEarnPage();
+}
+
+function shareReferral() {
+  const link = 'https://vortex.io/ref/' + (currentUser?.name?.replace(/\s+/g,'') || 'player').toLowerCase();
+  if (navigator.share) navigator.share({ title: 'Join Vortex.IO', text: 'Play & earn crypto at Vortex.IO!', url: link });
+  else { navigator.clipboard.writeText(link).catch(()=>{}); toast('Link copied — share it anywhere!', 'success'); }
+}
+
+function redeemTokens() {
+  tokenBalance = parseInt(localStorage.getItem('vx_tokens') || '0');
+  if (tokenBalance < 500) { toast(`Need 500 tokens to redeem. You have ${tokenBalance}.`, 'error'); return; }
+  const usdt = tokenBalance / 100;
+  updateBalance(usdt);
+  tokenBalance = 0;
+  localStorage.setItem('vx_tokens', 0);
+  addTx('Token Redemption', usdt, 'credited');
+  toast(`✅ Redeemed ${usdt.toFixed(2)} USDT from tokens!`, 'success', 4000);
+  renderEarnPage();
+}
+
+function submitYTBounty() {
+  const url = document.getElementById('ytVideoUrl')?.value.trim();
+  if (!url || !url.includes('youtube')) { toast('Enter a valid YouTube URL', 'error'); return; }
+  const data = { url, status: 'Pending Review', time: new Date().toISOString(), user: currentUser?.email };
+  localStorage.setItem('vx_yt_bounty', JSON.stringify(data));
+  // Add to admin bounty list
+  const bountyList = JSON.parse(localStorage.getItem('vx_admin_bounties') || '[]');
+  bountyList.push({ type: 'YouTube', user: currentUser?.name || 'Player', email: currentUser?.email, data: url, status: 'pending', time: new Date().toISOString() });
+  localStorage.setItem('vx_admin_bounties', JSON.stringify(bountyList));
+  toast('🎬 YouTube bounty submitted! Review within 24-48h.', 'success', 5000);
+  renderEarnPage();
+}
+
+function submitBCTask() {
+  const id = document.getElementById('bcPlayerId')?.value.trim();
+  const s1 = document.getElementById('bcScreenshot1')?.value.trim();
+  const s2 = document.getElementById('bcScreenshot2')?.value.trim();
+  if (!id || !s1 || !s2) { toast('Fill in all BC.GAME fields', 'error'); return; }
+  const data = { playerId: id, screenshot1: s1, screenshot2: s2, time: new Date().toISOString(), status: 'pending', user: currentUser?.email };
+  localStorage.setItem('vx_bc_task', JSON.stringify(data));
+  const bountyList = JSON.parse(localStorage.getItem('vx_admin_bounties') || '[]');
+  bountyList.push({ type: 'BC.GAME', user: currentUser?.name || 'Player', email: currentUser?.email, data: `ID:${id}`, status: 'pending', time: new Date().toISOString() });
+  localStorage.setItem('vx_admin_bounties', JSON.stringify(bountyList));
+  toast('🚀 BC.GAME task submitted! 24h review period started.', 'success', 5000);
+  renderEarnPage();
+}
+
+/* ══════════════ PROFILE PAGE MODULE ══════════════ */
+/* ══════════════ CURRENCY TOGGLE ══════════════ */
+let currencyPref = localStorage.getItem('vx_currency') || 'USD';
+const USD_TO_INR = 83.4;
+
+function toggleCurrency() {
+  currencyPref = currencyPref === 'USD' ? 'INR' : 'USD';
+  localStorage.setItem('vx_currency', currencyPref);
+  applyCurrencyToggleUI();
+  // Fade-animate all currency values
+  document.querySelectorAll('.cur-val').forEach(el => {
+    el.classList.remove('cur-anim');
+    void el.offsetWidth;
+    el.classList.add('cur-anim');
+    const usd = parseFloat(el.dataset.usd || '0');
+    el.textContent = fmtCur(usd);
+  });
+  toast(`Currency: ${currencyPref === 'INR' ? '₹ INR' : '$ USD'}`, 'success', 2000);
+  // Update header balance display
+  refreshBalanceDisplay();
+}
+
+function applyCurrencyToggleUI() {
+  const toggle = document.getElementById('currencyToggle');
+  const usdLbl = document.getElementById('cur-usd-lbl');
+  const inrLbl = document.getElementById('cur-inr-lbl');
+  if (!toggle) return;
+  const isINR = currencyPref === 'INR';
+  toggle.classList.toggle('inr', isINR);
+  if (usdLbl) { usdLbl.className = 'currency-label' + (isINR ? '' : ' active-lbl'); }
+  if (inrLbl) { inrLbl.className = 'currency-label' + (isINR ? ' active-lbl inr-lbl' : ''); }
+}
+
+function fmtCur(usd) {
+  if (currencyPref === 'INR') {
+    const inr = usd * USD_TO_INR;
+    return '₹' + inr.toLocaleString('en-IN', {minimumFractionDigits:2, maximumFractionDigits:2});
+  }
+  return '$' + usd.toLocaleString('en', {minimumFractionDigits:2, maximumFractionDigits:2});
+}
+
+function refreshBalanceDisplay() {
+  const el = document.getElementById('hBalDisp');
+  if (el) {
+    el.classList.remove('cur-anim'); void el.offsetWidth; el.classList.add('cur-anim');
+    el.textContent = fmtCur(balance);
+  }
+  const wb = document.getElementById('walletBalDisp');
+  if (wb) { wb.classList.remove('cur-anim'); void wb.offsetWidth; wb.classList.add('cur-anim'); wb.textContent = fmtCur(balance); }
+}
+
+function renderProfilePage() {
+  if (!currentUser) return;
+  applyCurrencyToggleUI();
+  const n = document.getElementById('profileNameDisp');
+  const e = document.getElementById('profileEmailDisp');
+  const av = document.getElementById('profileAvatar');
+  if (n) n.textContent = currentUser.name || 'Player';
+  if (e) e.textContent = currentUser.email || '—';
+  if (av) av.textContent = (currentUser.name||'V')[0].toUpperCase();
+  const photo = localStorage.getItem('vx_profile_photo');
+  if (photo && av) { av.innerHTML = `<img src="${photo}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" onerror="this.style.display='none'">`; }
+  // Pre-fill edit fields
+  const en = document.getElementById('editProfileName');
+  const eb = document.getElementById('editProfileBio');
+  const ep = document.getElementById('editProfilePhoto');
+  if (en) en.value = currentUser.name || '';
+  if (eb) eb.value = localStorage.getItem('vx_profile_bio') || '';
+  if (ep) ep.value = localStorage.getItem('vx_profile_photo') || '';
+  // KYC data
+  const kyc = JSON.parse(localStorage.getItem('vx_kyc') || '{}');
+  if (document.getElementById('kycUserId')) document.getElementById('kycUserId').textContent = kyc.userId || currentUser.email?.split('@')[0] || '—';
+  if (document.getElementById('kycCountry')) document.getElementById('kycCountry').textContent = kyc.country || 'India';
+  if (document.getElementById('kycGender')) document.getElementById('kycGender').textContent = kyc.gender || '—';
+  if (document.getElementById('kycCurrency')) document.getElementById('kycCurrency').textContent = kyc.currency || 'INR';
+  // VIP
+  const curTier = VIP_TIERS.find(t => totalWagered >= t.min && totalWagered < t.max) || VIP_TIERS[0];
+  const vipLvl = document.getElementById('profileVipLevel');
+  if (vipLvl) vipLvl.textContent = curTier.name;
+  const vipSec = document.getElementById('profileVipSection');
+  if (vipSec) {
+    const next = VIP_TIERS[VIP_TIERS.indexOf(curTier)+1];
+    const pct = next ? Math.min(100, ((totalWagered - curTier.min) / (next.min - curTier.min)) * 100) : 100;
+    vipSec.innerHTML = `<div style="margin-bottom:10px;"><div style="display:flex;justify-content:space-between;font-size:.78rem;margin-bottom:6px;"><span style="font-family:var(--font-d);color:var(--neon);">👑 ${curTier.name}</span>${next?`<span style="color:var(--text3);">Next: ${next.name}</span>`:''}</div><div class="vip-bar"><div class="vip-bar-fill" style="width:${pct}%;"></div></div><div style="font-size:.68rem;color:var(--text3);margin-top:5px;">Wagered: ${fmt(totalWagered)} / ${next?fmt(next.min):'MAX'} USDT</div></div>`;
+  }
+}
+
+function saveProfileEdits() {
+  const name = document.getElementById('editProfileName')?.value.trim();
+  const bio = document.getElementById('editProfileBio')?.value.trim();
+  const photo = document.getElementById('editProfilePhoto')?.value.trim();
+  if (name && currentUser) { currentUser.name = name; localStorage.setItem('vx_user', JSON.stringify(currentUser)); updateProfileUI(); }
+  if (bio) localStorage.setItem('vx_profile_bio', bio);
+  if (photo) localStorage.setItem('vx_profile_photo', photo);
+  toast('✅ Profile saved!', 'success');
+  renderProfilePage();
+}
+
+/* ══════════════ ADMIN BOUNTY PANEL ══════════════ */
+function renderAdminBountySection() {
+  const adminBody = document.querySelector('.admin-body');
+  if (!adminBody) return;
+  if (document.getElementById('adminBountySection')) document.getElementById('adminBountySection').remove();
+  const bountyList = JSON.parse(localStorage.getItem('vx_admin_bounties') || '[]');
+  const allUsers = JSON.parse(localStorage.getItem('vx_all_users') || '[]');
+  const sec = document.createElement('div');
+  sec.id = 'adminBountySection';
+  sec.innerHTML = `
+    <div style="margin-top:20px;">
+      <div style="font-family:var(--font-d);font-size:.88rem;font-weight:700;color:var(--gold);margin-bottom:12px;border-bottom:1px solid rgba(255,215,0,.15);padding-bottom:8px;">🎬 Bounty Submissions (${bountyList.length})</div>
+      ${bountyList.length === 0 ? '<div style="color:var(--text3);font-size:.8rem;padding:10px;">No bounty submissions yet</div>' : bountyList.map((b,i) => `
+        <div class="withdraw-row" id="adminBountyRow${i}">
+          <div class="withdraw-info">
+            <div class="withdraw-user">${b.user} <span style="color:var(--text3);font-size:.72rem;">${b.email||''}</span></div>
+            <div style="font-size:.72rem;color:var(--text2);">${b.type} · ${(b.data||'').slice(0,60)} · ${new Date(b.time).toLocaleDateString()}</div>
+          </div>
+          <span class="withdraw-status ws-${b.status}">${b.status}</span>
+          ${b.status==='pending'?`<button class="admin-btn approve" onclick="adminBountyAction(${i},'approved')">✓ Approve</button><button class="admin-btn deny" onclick="adminBountyAction(${i},'denied')">✗</button>`:''}
+        </div>`).join('')}
+    </div>
+    <div style="margin-top:18px;">
+      <div style="font-family:var(--font-d);font-size:.88rem;font-weight:700;color:var(--neon);margin-bottom:12px;border-bottom:1px solid rgba(0,212,255,.1);padding-bottom:8px;">👥 All Users (${allUsers.length})</div>
+      ${allUsers.length===0?'<div style="color:var(--text3);font-size:.8rem;padding:10px;">No registered users yet</div>':allUsers.map(u=>`<div style="padding:8px 12px;border-bottom:1px solid rgba(255,255,255,.04);font-size:.78rem;"><strong>${u.name}</strong> · ${u.email} · Joined: ${new Date(u.joined||Date.now()).toLocaleDateString()}</div>`).join('')}
+    </div>`;
+  adminBody.appendChild(sec);
+}
+
+function adminBountyAction(idx, action) {
+  const bountyList = JSON.parse(localStorage.getItem('vx_admin_bounties') || '[]');
+  bountyList[idx].status = action;
+  localStorage.setItem('vx_admin_bounties', JSON.stringify(bountyList));
+  if (action === 'approved') {
+    const reward = bountyList[idx].type === 'YouTube' ? 1000 : 500;
+    updateBalance(reward);
+    addTx(bountyList[idx].type + ' Bounty Reward', reward, 'credited');
+    toast('✅ Bounty approved! ₹' + reward + ' credited.', 'success');
+  } else { toast('Bounty denied.', 'error'); }
+  renderAdmin();
+  setTimeout(renderAdminBountySection, 50);
+}
 
 /* ─── VIP GALLERY ─── */
 let vipTypedBuffer = '';
@@ -3373,7 +4724,8 @@ function checkVortex69(msg) {
 }
 
 function openVipGallery() {
-  document.getElementById('vipGallery').classList.add('show');
+  const el = document.getElementById('vipGallery');
+  el.style.display = 'block';
   document.body.style.overflow = 'hidden';
   playSound('win');
   spawnParticles(window.innerWidth/2, window.innerHeight/2, 60,
@@ -3382,7 +4734,7 @@ function openVipGallery() {
 }
 
 function closeVipGallery() {
-  document.getElementById('vipGallery').classList.remove('show');
+  document.getElementById('vipGallery').style.display = 'none';
   document.body.style.overflow = '';
 }
 
@@ -3423,8 +4775,8 @@ document.addEventListener('keydown', e => {
 </script>
 
 <!-- ══════════════ VIP GALLERY (Secret: type VORTEX69 in chat) ══════════════ -->
-<div class="vip-gallery-overlay" id="vipGallery">
-  <div class="vip-gallery-close" onclick="closeVipGallery()">✕</div>
+<div class="vip-gallery-overlay" id="vipGallery" style="display:none;position:fixed;inset:0;z-index:4000;background:rgba(0,0,0,0.92);backdrop-filter:blur(20px);overflow-y:auto;padding:20px;">
+  <div class="vip-gallery-close" onclick="closeVipGallery()" style="position:fixed;top:16px;right:16px;z-index:4001;width:40px;height:40px;border-radius:50%;background:rgba(255,51,102,0.2);border:1px solid rgba(255,51,102,0.4);display:flex;align-items:center;justify-content:center;cursor:pointer;color:#ff3366;font-size:18px;font-weight:700;line-height:1;">✕</div>
   <div class="vip-gallery-inner">
     <div class="vip-gallery-header">
       <div class="vip-gallery-logo">🌀</div>
