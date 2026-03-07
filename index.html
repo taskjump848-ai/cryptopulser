@@ -613,16 +613,28 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;heigh
 
 /* BC.Game-style card — tall with colored gradient bg */
 .game-card{
- border-radius:14px;overflow:hidden;cursor:pointer;
+ border-radius:16px;overflow:hidden;cursor:pointer;
  background:linear-gradient(160deg,#0d1228 0%,#070a18 100%);
- border:1px solid rgba(255,255,255,.06);
- transition:transform .25s cubic-bezier(.34,1.56,.64,1),border-color .2s,box-shadow .2s;
+ border:1px solid rgba(255,255,255,.09);
+ transition:transform .22s cubic-bezier(.34,1.56,.64,1),border-color .18s,box-shadow .18s,filter .18s;
  position:relative;
+ box-shadow:0 4px 22px rgba(0,0,0,.55),inset 0 1px 0 rgba(255,255,255,.06),inset 0 -1px 0 rgba(0,0,0,.4);
+ will-change:transform;
+}
+.game-card::before{
+ content:'';position:absolute;inset:0;border-radius:16px;pointer-events:none;
+ background:linear-gradient(180deg,rgba(255,255,255,.045) 0%,transparent 55%);
+ z-index:2;
 }
 .game-card:hover{
- transform:translateY(-5px) scale(1.02);
- border-color:rgba(0,212,255,0.25);
- box-shadow:0 14px 36px rgba(0,0,0,0.5),0 0 24px rgba(0,212,255,0.1);
+ transform:translateY(-4px) scale(1.05);
+ border-color:rgba(0,212,255,.38);
+ box-shadow:0 16px 48px rgba(0,0,0,.65),0 0 28px rgba(0,212,255,.18),0 0 55px rgba(0,212,255,.06),inset 0 1px 0 rgba(255,255,255,.1);
+ filter:brightness(1.06);
+}
+.game-card.active-card:hover{
+ border-color:rgba(0,212,255,.55);
+ box-shadow:0 18px 55px rgba(0,0,0,.7),0 0 36px rgba(0,212,255,.28),0 0 70px rgba(0,212,255,.1);
 }
 /* Taller icon area like BC.Game */
 .gc-icon{
@@ -632,10 +644,14 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;heigh
 }
 .gc-icon-inner{
  font-size:clamp(2.8rem,8vw,4.5rem);
- filter:drop-shadow(0 0 20px currentColor);
- transition:transform .3s;position:relative;z-index:1;
+ filter:drop-shadow(0 0 12px currentColor) drop-shadow(0 0 28px currentColor);
+ transition:transform .22s cubic-bezier(.34,1.56,.64,1),filter .18s;
+ position:relative;z-index:1;
 }
-.game-card:hover .gc-icon-inner{transform:scale(1.12);}
+.game-card:hover .gc-icon-inner{
+ transform:scale(1.14);
+ filter:drop-shadow(0 0 16px currentColor) drop-shadow(0 0 40px currentColor);
+}
 /* Multiplier badge like BC.Game */
 .gc-mult-badge{
  position:absolute;top:8px;left:8px;z-index:3;
@@ -1927,76 +1943,238 @@ input[type=number], input[type=text], input[type=email] {
 .cbal-val { font-family: var(--font-m); font-size: .72rem; color: rgba(255,255,255,.7); text-align: right; }
 
 /* ════════════════════════════════════════════════════════════════
-   VORTEX SPIN — PRO 3-REEL SLOT MACHINE
+   VORTEX CIRCULAR ENGINE v3
+   · On-ring multiplier labels injected in every segment
+   · Cubic-bezier heavy-brake physics (0, 0, 0.2, 1)
+   · Per-ring light-up → auto-cashout on inner ring
+   · Zero emoji — pure geometric SVG + neon text
    ════════════════════════════════════════════════════════════════ */
-.vs-wrap{width:100%;border-radius:20px;overflow:hidden;position:relative;background:linear-gradient(160deg,#040811 0%,#080e20 60%,#04080e 100%);border:1px solid rgba(0,212,255,.18);box-shadow:0 0 80px rgba(0,212,255,.07),inset 0 2px 0 rgba(255,255,255,.03);padding:0 0 20px;margin-bottom:22px;}
-.vs-top-bar{background:linear-gradient(90deg,rgba(0,212,255,.06),rgba(123,47,255,.1),rgba(0,212,255,.06));border-bottom:1px solid rgba(0,212,255,.12);padding:13px 20px;display:flex;align-items:center;justify-content:space-between;}
-.vs-badge{display:inline-flex;align-items:center;gap:7px;background:linear-gradient(90deg,rgba(255,215,0,.14),rgba(255,215,0,.05));border:1px solid rgba(255,215,0,.32);border-radius:20px;padding:5px 14px;font-family:var(--font-d);font-size:.62rem;font-weight:700;color:#ffd700;text-transform:uppercase;letter-spacing:.12em;}
-.vs-badge::before{content:'';width:6px;height:6px;border-radius:50%;background:#ffd700;box-shadow:0 0 8px #ffd700;animation:pulse 1.2s infinite;}
-.vs-header-right{text-align:right;}.vs-header-right .vs-h-lbl{font-size:.55rem;color:var(--text3);font-family:var(--font-m);text-transform:uppercase;letter-spacing:.08em;}.vs-header-right .vs-h-bal{font-size:1rem;font-weight:700;color:var(--neon);font-family:var(--font-m);}
-.vs-machine{padding:16px 20px 0;display:flex;flex-direction:column;align-items:center;gap:14px;}
-.vs-title-row{width:100%;max-width:440px;display:flex;align-items:flex-end;justify-content:space-between;}
-.vs-title{font-family:var(--font-d);font-size:clamp(1.1rem,4vw,1.8rem);font-weight:900;line-height:1;letter-spacing:.03em;text-transform:uppercase;}
-.vs-t1{background:linear-gradient(90deg,#00d4ff,#7b2fff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}.vs-t2{color:#fff;}
-.vs-title-sub{font-size:.63rem;color:var(--text3);font-family:var(--font-m);margin-top:4px;}
-.vs-jackpot-display{text-align:right;}.vs-jackpot-lbl{font-size:.55rem;color:rgba(255,215,0,.6);font-family:var(--font-d);text-transform:uppercase;letter-spacing:.1em;}
-.vs-jackpot-val{font-family:var(--font-d);font-size:1rem;font-weight:900;color:#ffd700;text-shadow:0 0 20px rgba(255,215,0,.6);animation:vs-jp-pulse 2s ease-in-out infinite;}
-@keyframes vs-jp-pulse{0%,100%{text-shadow:0 0 15px rgba(255,215,0,.5);}50%{text-shadow:0 0 35px rgba(255,215,0,.9),0 0 60px rgba(255,215,0,.3);}}
-.vs-cabinet{width:100%;max-width:440px;position:relative;background:linear-gradient(180deg,#020509 0%,#040c18 50%,#020509 100%);border:1.5px solid rgba(0,212,255,.22);border-radius:18px;padding:16px 12px;box-shadow:0 0 50px rgba(0,212,255,.08),inset 0 1px 0 rgba(255,255,255,.05),inset 0 -1px 0 rgba(0,0,0,.5);}
-.vs-cabinet::before{content:'';position:absolute;top:0;left:12%;right:12%;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.15),transparent);}
-.vs-cabinet.vs-flash{animation:vs-cab-flash .65s ease;}
-@keyframes vs-cab-flash{0%,100%{border-color:rgba(0,212,255,.22);box-shadow:0 0 50px rgba(0,212,255,.08),inset 0 1px 0 rgba(255,255,255,.05);}45%{border-color:#ffd700;box-shadow:0 0 90px rgba(255,215,0,.65),0 0 140px rgba(255,215,0,.2),inset 0 1px 0 rgba(255,255,255,.1);}}
-.vs-payline{position:absolute;top:50%;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,rgba(255,215,0,.55),transparent);transform:translateY(-50%);pointer-events:none;z-index:10;opacity:0;transition:opacity .3s;}
-.vs-cabinet.vs-flash .vs-payline{opacity:1;}
-.vs-reels-row{display:flex;align-items:stretch;gap:8px;width:100%;}
-.vs-reel{flex:1;height:clamp(98px,21vw,136px);border-radius:12px;overflow:hidden;position:relative;background:linear-gradient(160deg,#020710,#010409);border:1px solid rgba(0,212,255,.14);box-shadow:inset 0 0 22px rgba(0,0,0,.75),inset 0 2px 0 rgba(255,255,255,.03);}
-.vs-reel::before,.vs-reel::after{content:'';position:absolute;left:0;right:0;height:33%;z-index:5;pointer-events:none;}
-.vs-reel::before{top:0;background:linear-gradient(180deg,rgba(2,7,16,.92),transparent);}
-.vs-reel::after{bottom:0;background:linear-gradient(0deg,rgba(2,7,16,.92),transparent);}
-.vs-reel-strip{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;}
-.vs-reel-strip.vs-spin-blur{filter:blur(7px) brightness(1.4) saturate(1.5);animation:vs-reel-whir .07s linear infinite;}
-@keyframes vs-reel-whir{0%{transform:translateY(0);}33%{transform:translateY(-14px);}66%{transform:translateY(6px);}100%{transform:translateY(0);}}
-.vs-reel-strip.vs-reel-land{animation:vs-reel-bounce .55s cubic-bezier(0.175,0.885,0.32,1.275) both;}
-@keyframes vs-reel-bounce{0%{transform:translateY(-40px) scale(.88);opacity:.3;filter:blur(5px);}55%{transform:translateY(9px) scale(1.07);opacity:1;filter:blur(0);}78%{transform:translateY(-4px) scale(.98);}100%{transform:translateY(0) scale(1);filter:blur(0);}}
-.vs-reel.vs-reel-win{border-color:rgba(255,215,0,.72);box-shadow:0 0 32px rgba(255,215,0,.38),inset 0 0 18px rgba(255,215,0,.07);animation:vs-rw-glow 1.1s ease-in-out infinite alternate;}
-@keyframes vs-rw-glow{from{box-shadow:0 0 22px rgba(255,215,0,.3),inset 0 0 14px rgba(255,215,0,.05);}to{box-shadow:0 0 55px rgba(255,215,0,.68),inset 0 0 28px rgba(255,215,0,.12);}}
-.vs-reel.vs-reel-loss{animation:vs-rl-shake .4s ease;}
-@keyframes vs-rl-shake{0%,100%{transform:translateX(0);}20%{transform:translateX(-5px);}40%{transform:translateX(5px);}60%{transform:translateX(-3px);}80%{transform:translateX(3px);}}
-.vs-sym-wrap{display:flex;align-items:center;justify-content:center;width:100%;height:100%;position:relative;z-index:2;}
-.vs-sym-wrap svg{width:55%;height:55%;display:block;transition:transform .3s cubic-bezier(.34,1.56,.64,1);}
-.vs-reel.vs-reel-win .vs-sym-wrap svg{transform:scale(1.25);}
-.vs-reel-sep{width:8px;flex-shrink:0;display:flex;align-items:center;justify-content:center;position:relative;}
-.vs-reel-sep::after{content:'';width:1px;height:55%;background:linear-gradient(180deg,transparent,rgba(0,212,255,.15),transparent);}
-.vs-result-bar{width:100%;max-width:440px;text-align:center;min-height:2.2em;display:flex;align-items:center;justify-content:center;}
-.vs-result-txt{font-family:var(--font-d);font-size:clamp(.72rem,2.5vw,.92rem);font-weight:800;letter-spacing:.06em;padding:8px 20px;border-radius:10px;transition:all .35s;}
-.vs-result-txt.idle{color:var(--text3);}
-.vs-result-txt.win{color:#ffd700;background:rgba(255,215,0,.07);border:1px solid rgba(255,215,0,.18);text-shadow:0 0 18px rgba(255,215,0,.5);}
-.vs-result-txt.jackpot{color:#00ff88;background:rgba(0,255,136,.06);border:1px solid rgba(0,255,136,.22);text-shadow:0 0 28px rgba(0,255,136,.7);animation:vs-jt-txt .48s ease infinite alternate;}
-@keyframes vs-jt-txt{from{text-shadow:0 0 18px rgba(0,255,136,.5);}to{text-shadow:0 0 55px rgba(0,255,136,1);}}
-.vs-result-txt.loss{color:rgba(180,180,180,.5);}.vs-result-txt.bomb-loss{color:rgba(255,45,206,.8);background:rgba(255,45,206,.05);border:1px solid rgba(255,45,206,.15);}
-.vs-controls{display:flex;align-items:stretch;gap:8px;width:100%;max-width:440px;}
-.vs-bet-panel{flex:1;background:rgba(0,212,255,.03);border:1px solid rgba(0,212,255,.12);border-radius:12px;padding:10px 14px;display:flex;flex-direction:column;gap:5px;}
-.vs-bet-lbl{font-size:.57rem;color:var(--text3);font-family:var(--font-m);text-transform:uppercase;letter-spacing:.08em;}
-.vs-bet-row{display:flex;align-items:center;gap:5px;}.vs-bet-input{flex:1;background:none;border:none;outline:none;color:var(--neon);font-family:var(--font-m);font-size:.98rem;font-weight:700;min-width:0;}
-.vs-bet-btns{display:flex;gap:4px;}.vs-bet-btn{padding:3px 8px;font-size:.6rem;font-family:var(--font-m);font-weight:700;background:rgba(0,212,255,.05);border:1px solid rgba(0,212,255,.11);color:rgba(0,212,255,.55);border-radius:6px;cursor:pointer;transition:all .12s;white-space:nowrap;}
-.vs-bet-btn:hover{background:rgba(0,212,255,.13);color:var(--neon);}
-.vs-spin-btn{flex-shrink:0;width:clamp(80px,22%,110px);border-radius:14px;border:none;cursor:pointer;background:linear-gradient(145deg,#00e0ff 0%,#7b2fff 55%,#ff2dce 100%);color:#fff;font-family:var(--font-d);font-size:.75rem;font-weight:900;text-transform:uppercase;letter-spacing:.06em;line-height:1.3;box-shadow:0 4px 24px rgba(0,212,255,.28),inset 0 1px 0 rgba(255,255,255,.2);transition:transform .15s,box-shadow .15s;position:relative;overflow:hidden;}
-.vs-spin-btn::before{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent 0%,rgba(255,255,255,.16) 50%,transparent 100%);transform:translateX(-110%);transition:transform .5s;}
-.vs-spin-btn:hover{transform:translateY(-2px);box-shadow:0 8px 32px rgba(0,212,255,.5);}.vs-spin-btn:hover::before{transform:translateX(110%);}
-.vs-spin-btn:disabled{opacity:.4;cursor:not-allowed;transform:none;}
-.vs-spin-btn.vs-spinning{animation:vs-btn-beat .32s ease-in-out infinite alternate;}
-@keyframes vs-btn-beat{from{box-shadow:0 4px 20px rgba(0,212,255,.3);}to{box-shadow:0 4px 40px rgba(123,47,255,.75);}}
-.vs-pays{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;width:100%;max-width:440px;}
-.vs-pay{display:flex;align-items:center;gap:5px;background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.065);border-radius:8px;padding:5px 10px;}
-.vs-pay-icon{width:22px;height:22px;flex-shrink:0;}.vs-pay-icon svg{width:100%;height:100%;}
-.vs-pay-combo{font-size:.54rem;color:var(--text3);font-family:var(--font-m);}
-.vs-pay-mult{font-family:var(--font-d);font-size:.67rem;font-weight:800;color:#ffd700;}.vs-pay-mult.red{color:rgba(255,45,206,.9);}
-.vs-stats-row{display:flex;gap:0;border:1px solid rgba(255,255,255,.06);border-radius:12px;overflow:hidden;width:100%;max-width:440px;}
-.vs-stat{flex:1;padding:9px 5px;text-align:center;border-right:1px solid rgba(255,255,255,.05);}.vs-stat:last-child{border-right:none;}
-.vs-stat-val{font-family:var(--font-d);font-size:.83rem;font-weight:800;color:var(--neon);}
-.vs-stat-lbl{font-size:.51rem;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;margin-top:2px;}
-.vs-confetti{position:fixed;pointer-events:none;z-index:99999;border-radius:1px;animation:vs-cf-fall var(--cd,2.2s) var(--delay,0s) ease-out both;}
-@keyframes vs-cf-fall{0%{transform:translate(var(--x0,0),var(--y0,0)) rotate(0deg) scale(1);opacity:1;}80%{opacity:.7;}100%{transform:translate(var(--x1,0),var(--y1,100vh)) rotate(var(--rot,540deg)) scale(.3);opacity:0;}}
+
+/* ── BANNER ── */
+.vce-banner{width:100%;border-radius:20px;overflow:hidden;position:relative;
+  background:linear-gradient(160deg,#040811 0%,#080e20 60%,#04080e 100%);
+  border:1px solid rgba(0,212,255,.2);
+  box-shadow:0 0 60px rgba(0,212,255,.08),inset 0 2px 0 rgba(255,255,255,.03);
+  padding:20px 24px;margin-bottom:22px;cursor:pointer;
+  transition:border-color .2s,box-shadow .2s;
+  display:flex;align-items:center;gap:18px;
+  transform:translateZ(0);will-change:transform;-webkit-tap-highlight-color:transparent;}
+.vce-banner::before{content:'';position:absolute;inset:0;pointer-events:none;
+  background:conic-gradient(from 0deg at 50% 50%,transparent 0deg,rgba(0,212,255,.025) 60deg,transparent 120deg,rgba(123,47,255,.02) 180deg,transparent 240deg);
+  animation:vce-banner-rot 12s linear infinite;}
+@keyframes vce-banner-rot{to{transform:rotate(360deg);}}
+.vce-banner:hover{border-color:rgba(0,212,255,.5);box-shadow:0 0 100px rgba(0,212,255,.18),inset 0 2px 0 rgba(255,255,255,.05);}
+.vce-banner-orb{position:relative;width:72px;height:72px;flex-shrink:0;}
+.vce-banner-orb svg{position:absolute;top:0;left:0;width:100%;height:100%;}
+.vce-banner-orb-ring1{animation:vce-orb-r1 2.2s linear infinite;transform-origin:36px 36px;}
+.vce-banner-orb-ring2{animation:vce-orb-r2 1.6s linear infinite;transform-origin:36px 36px;}
+.vce-banner-orb-ring3{animation:vce-orb-r3 1.1s linear infinite;transform-origin:36px 36px;}
+@keyframes vce-orb-r1{to{transform:rotate(360deg);}}
+@keyframes vce-orb-r2{to{transform:rotate(-360deg);}}
+@keyframes vce-orb-r3{to{transform:rotate(360deg);}}
+.vce-banner-info{flex:1;min-width:0;}
+.vce-banner-title{font-family:var(--font-d);font-size:clamp(.9rem,3vw,1.3rem);font-weight:900;
+  letter-spacing:.07em;text-transform:uppercase;
+  background:linear-gradient(90deg,#00d4ff 0%,#7b2fff 50%,#00ff88 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  filter:drop-shadow(0 0 18px rgba(0,212,255,.4));}
+.vce-banner-sub{font-size:.6rem;color:rgba(255,255,255,.38);font-family:var(--font-m);margin-top:4px;letter-spacing:.05em;}
+.vce-banner-pills{display:flex;gap:5px;flex-wrap:wrap;margin-top:8px;}
+.vce-banner-pill{font-size:.53rem;font-family:var(--font-d);font-weight:700;padding:2px 8px;border-radius:10px;letter-spacing:.05em;
+  background:rgba(0,212,255,.07);border:1px solid rgba(0,212,255,.18);color:rgba(0,212,255,.8);}
+.vce-banner-pill.gold{background:rgba(255,215,0,.07);border-color:rgba(255,215,0,.18);color:rgba(255,215,0,.85);}
+.vce-banner-pill.green{background:rgba(0,255,136,.07);border-color:rgba(0,255,136,.18);color:rgba(0,255,136,.85);}
+.vce-banner-cta{flex-shrink:0;background:linear-gradient(145deg,#00e0ff 0%,#7b2fff 55%,#ff2dce 100%);
+  color:#fff;border:none;border-radius:12px;padding:10px 18px;
+  font-family:var(--font-d);font-size:.7rem;font-weight:900;text-transform:uppercase;letter-spacing:.08em;
+  box-shadow:0 0 22px rgba(0,212,255,.32);cursor:pointer;white-space:nowrap;
+  animation:vce-cta-pulse 2.5s ease-in-out infinite;transition:transform .1s;}
+@keyframes vce-cta-pulse{0%,100%{box-shadow:0 0 18px rgba(0,212,255,.28);}50%{box-shadow:0 0 38px rgba(0,212,255,.65),0 0 55px rgba(123,47,255,.22);}}
+.vce-banner:hover .vce-banner-cta{transform:scale(1.06);}
+
+/* ── MODAL ── */
+#vceModal{position:fixed;inset:0;z-index:5000;background:rgba(0,0,0,.93);
+  backdrop-filter:blur(20px);display:flex;align-items:center;justify-content:center;padding:8px;}
+.vce-modal-box{width:100%;max-width:520px;max-height:calc(100vh - 16px);
+  background:linear-gradient(165deg,#030810 0%,#06101e 55%,#030810 100%);
+  border:1px solid rgba(0,212,255,.18);border-radius:22px;
+  overflow-y:auto;overflow-x:hidden;
+  box-shadow:0 0 100px rgba(0,212,255,.1),0 40px 80px rgba(0,0,0,.7);
+  transform:translateZ(0);will-change:transform;
+  animation:vce-box-in .2s cubic-bezier(.175,.885,.32,1.275) both;}
+@keyframes vce-box-in{from{transform:scale(.88) translateY(24px);opacity:0;}to{transform:scale(1) translateY(0);opacity:1;}}
+.vce-modal-box::-webkit-scrollbar{width:3px;}
+.vce-modal-box::-webkit-scrollbar-thumb{background:rgba(0,212,255,.2);border-radius:2px;}
+
+/* Header */
+.vce-modal-header{display:flex;align-items:center;justify-content:space-between;
+  padding:13px 18px;
+  background:linear-gradient(90deg,rgba(0,212,255,.06),rgba(123,47,255,.09),rgba(0,212,255,.06));
+  border-bottom:1px solid rgba(0,212,255,.1);
+  position:sticky;top:0;z-index:10;backdrop-filter:blur(12px);}
+.vce-header-left{display:flex;align-items:center;gap:10px;}
+.vce-header-orb{width:28px;height:28px;flex-shrink:0;}
+.vce-modal-logo{font-family:var(--font-d);font-size:.82rem;font-weight:900;
+  background:linear-gradient(90deg,#00d4ff,#7b2fff);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;letter-spacing:.09em;}
+.vce-modal-bal-wrap{text-align:right;}
+.vce-modal-bal-lbl{font-size:.46rem;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;font-family:var(--font-m);}
+.vce-modal-bal{font-family:var(--font-m);font-size:.82rem;font-weight:700;color:var(--neon);}
+.vce-close-btn{width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,.05);
+  border:1px solid rgba(255,255,255,.09);color:rgba(255,255,255,.45);
+  display:flex;align-items:center;justify-content:center;cursor:pointer;
+  font-size:13px;transition:all .12s;flex-shrink:0;}
+.vce-close-btn:hover{background:rgba(255,45,206,.14);color:var(--red);border-color:rgba(255,45,206,.28);}
+
+/* Canvas */
+.vce-canvas-wrap{display:flex;align-items:center;justify-content:center;padding:14px 18px 6px;position:relative;}
+#vceCanvas{display:block;transform:translateZ(0);will-change:transform;backface-visibility:hidden;-webkit-backface-visibility:hidden;}
+.vce-center-overlay{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;pointer-events:none;z-index:5;}
+.vce-mult-val{font-family:var(--font-d);font-size:clamp(1.1rem,4.5vw,1.8rem);font-weight:900;color:#fff;line-height:1;
+  text-shadow:0 0 28px rgba(0,212,255,.8),0 0 55px rgba(0,212,255,.4);transition:color .25s,text-shadow .25s;}
+.vce-mult-val.gold{color:#ffd700;text-shadow:0 0 28px rgba(255,215,0,.9),0 0 55px rgba(255,215,0,.4);}
+.vce-mult-val.bomb-color{color:#ff2dce;text-shadow:0 0 28px rgba(255,45,206,.9);}
+.vce-mult-val.animate-pop{animation:vce-lvl-pop .48s cubic-bezier(.34,1.56,.64,1);}
+@keyframes vce-lvl-pop{0%{transform:scale(.6);opacity:.2;}55%{transform:scale(1.35);}100%{transform:scale(1);opacity:1;}}
+.vce-mult-lbl{font-family:var(--font-d);font-size:.46rem;font-weight:700;color:rgba(0,212,255,.52);letter-spacing:.13em;text-transform:uppercase;margin-top:4px;}
+
+/* ── RING ACCUMULATION DISPLAY ── */
+.vce-ring-acc{
+  display:flex;align-items:stretch;justify-content:center;gap:0;
+  margin:4px 18px 6px;
+  background:rgba(5,12,28,.7);
+  border:1px solid rgba(0,212,255,.1);
+  border-radius:14px;overflow:hidden;
+  transition:border-color .3s,box-shadow .3s;}
+.vce-ring-acc.active{
+  border-color:rgba(255,215,0,.28);
+  box-shadow:0 0 24px rgba(255,215,0,.1);}
+.vce-ring-cell{
+  flex:1;padding:9px 6px;text-align:center;
+  border-right:1px solid rgba(255,255,255,.05);
+  background:rgba(255,255,255,.01);
+  transition:all .38s cubic-bezier(.34,1.56,.64,1);}
+.vce-ring-cell:last-of-type{border-right:none;}
+.vce-ring-cell.landed{
+  background:rgba(0,212,255,.07);
+  box-shadow:inset 0 0 18px rgba(0,212,255,.08);}
+.vce-ring-cell.bomb-landed{
+  background:rgba(255,45,206,.07);
+  box-shadow:inset 0 0 18px rgba(255,45,206,.1);}
+.vce-ring-cell.jackpot-landed{
+  background:rgba(255,215,0,.08);
+  animation:vce-jcell .5s ease infinite alternate;}
+@keyframes vce-jcell{from{box-shadow:inset 0 0 12px rgba(255,215,0,.15);}to{box-shadow:inset 0 0 32px rgba(255,215,0,.45);}}
+.vce-rc-label{font-size:.42rem;color:rgba(255,255,255,.22);font-family:var(--font-d);letter-spacing:.1em;text-transform:uppercase;margin-bottom:5px;}
+.vce-rc-val{font-family:var(--font-d);font-size:.9rem;font-weight:900;color:rgba(255,255,255,.15);
+  transition:color .25s,text-shadow .25s;letter-spacing:.03em;}
+.vce-ring-cell.landed .vce-rc-val{color:var(--neon);text-shadow:0 0 14px rgba(0,212,255,.6);}
+.vce-ring-cell.bomb-landed .vce-rc-val{color:rgba(255,45,206,.9);text-shadow:0 0 14px rgba(255,45,206,.5);}
+.vce-ring-cell.jackpot-landed .vce-rc-val{color:#ffd700;text-shadow:0 0 18px rgba(255,215,0,.8);}
+.vce-rc-sub{font-size:.4rem;color:rgba(255,255,255,.14);font-family:var(--font-m);text-transform:uppercase;letter-spacing:.07em;margin-top:3px;}
+
+/* total strip */
+.vce-ring-total-strip{
+  width:100%;padding:6px 14px;
+  display:flex;align-items:center;justify-content:space-between;
+  border-top:1px solid rgba(255,255,255,.05);
+  background:rgba(255,255,255,.01);}
+.vce-ring-total-lbl{font-size:.46rem;color:rgba(255,255,255,.28);font-family:var(--font-d);letter-spacing:.1em;text-transform:uppercase;}
+.vce-ring-total-val{font-family:var(--font-d);font-size:.88rem;font-weight:900;
+  color:rgba(255,255,255,.18);transition:all .38s;}
+.vce-ring-acc.active .vce-ring-total-val{color:#ffd700;text-shadow:0 0 16px rgba(255,215,0,.55);}
+
+/* cashout flash */
+.vce-cashout-burst{
+  position:absolute;inset:0;z-index:20;pointer-events:none;
+  background:radial-gradient(circle at 50% 50%,rgba(255,215,0,.22),transparent 70%);
+  border-radius:14px;
+  animation:vce-co-burst .55s ease-out forwards;}
+@keyframes vce-co-burst{0%{opacity:1;transform:scale(.8);}100%{opacity:0;transform:scale(1.4);}}
+
+/* Result */
+.vce-result-wrap{min-height:38px;display:flex;align-items:center;justify-content:center;padding:2px 18px 8px;}
+.vce-result-txt{font-family:var(--font-d);font-size:clamp(.65rem,2.3vw,.85rem);font-weight:800;
+  letter-spacing:.06em;padding:7px 18px;border-radius:10px;text-align:center;transition:all .25s;}
+.vce-result-txt.idle{color:var(--text3);}
+.vce-result-txt.win{color:#ffd700;background:rgba(255,215,0,.07);border:1px solid rgba(255,215,0,.18);
+  text-shadow:0 0 18px rgba(255,215,0,.55);animation:vce-win-glow .45s ease infinite alternate;}
+@keyframes vce-win-glow{from{text-shadow:0 0 12px rgba(255,215,0,.35);}to{text-shadow:0 0 32px rgba(255,215,0,.9);}}
+.vce-result-txt.jackpot{color:#00ff88;background:rgba(0,255,136,.06);border:1px solid rgba(0,255,136,.22);
+  animation:vce-jackpot-pulse .35s ease infinite alternate;}
+@keyframes vce-jackpot-pulse{from{text-shadow:0 0 18px rgba(0,255,136,.4);}to{text-shadow:0 0 55px rgba(0,255,136,1),0 0 90px rgba(0,255,136,.35);}}
+.vce-result-txt.bomb{color:rgba(255,45,206,.9);background:rgba(255,45,206,.06);border:1px solid rgba(255,45,206,.18);}
+.vce-result-txt.neutral{color:rgba(0,212,255,.7);border:1px solid rgba(0,212,255,.1);}
+.vce-result-txt.cashout{color:#00ff88;background:rgba(0,255,136,.07);border:1px solid rgba(0,255,136,.25);
+  animation:vce-jackpot-pulse .38s ease infinite alternate;}
+
+/* ── BETTING PANEL — GLASS ── */
+.vce-bet-glass{
+  margin:0 18px 12px;
+  background:rgba(5,12,28,.85);backdrop-filter:blur(18px);
+  border:1px solid rgba(0,212,255,.14);border-radius:16px;overflow:hidden;
+  box-shadow:0 8px 32px rgba(0,0,0,.4),inset 0 1px 0 rgba(255,255,255,.04);}
+.vce-bet-glass-header{display:flex;align-items:center;justify-content:space-between;
+  padding:9px 14px;background:rgba(0,212,255,.04);border-bottom:1px solid rgba(0,212,255,.08);}
+.vce-bet-glass-lbl{font-family:var(--font-d);font-size:.55rem;font-weight:700;color:rgba(0,212,255,.55);letter-spacing:.1em;text-transform:uppercase;}
+.vce-autospin-toggle{display:flex;align-items:center;gap:7px;cursor:pointer;}
+.vce-autospin-lbl{font-family:var(--font-d);font-size:.5rem;font-weight:700;color:rgba(255,255,255,.35);letter-spacing:.08em;text-transform:uppercase;transition:color .2s;}
+.vce-autospin-lbl.on{color:var(--neon);}
+.vce-toggle-track{width:32px;height:17px;border-radius:9px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.1);position:relative;transition:all .2s;}
+.vce-toggle-track.on{background:rgba(0,212,255,.22);border-color:rgba(0,212,255,.4);box-shadow:0 0 12px rgba(0,212,255,.3);}
+.vce-toggle-knob{position:absolute;top:2px;left:2px;width:11px;height:11px;border-radius:50%;background:#fff;transition:transform .2s,background .2s;box-shadow:0 1px 4px rgba(0,0,0,.4);}
+.vce-toggle-track.on .vce-toggle-knob{transform:translateX(15px);background:var(--neon);}
+.vce-bet-glass-body{padding:12px 14px;display:flex;flex-direction:column;gap:10px;}
+.vce-bet-amount-row{display:flex;align-items:center;gap:8px;}
+.vce-bet-dollar{font-family:var(--font-m);font-size:.82rem;font-weight:700;color:rgba(0,212,255,.42);}
+.vce-bet-input{flex:1;background:rgba(0,212,255,.04);border:1px solid rgba(0,212,255,.14);border-radius:9px;
+  padding:9px 12px;color:var(--neon);font-family:var(--font-m);font-size:1rem;font-weight:700;
+  outline:none;transition:border-color .15s;min-width:0;}
+.vce-bet-input:focus{border-color:rgba(0,212,255,.38);box-shadow:0 0 0 3px rgba(0,212,255,.06);}
+.vce-quick-bets{display:flex;gap:5px;flex-wrap:wrap;}
+.vce-qbtn{flex:1;min-width:0;padding:6px 4px;font-size:.56rem;font-family:var(--font-d);font-weight:700;
+  background:rgba(0,212,255,.05);border:1px solid rgba(0,212,255,.12);color:rgba(0,212,255,.55);
+  border-radius:7px;cursor:pointer;transition:all .1s;text-align:center;letter-spacing:.04em;white-space:nowrap;}
+.vce-qbtn:hover{background:rgba(0,212,255,.14);color:var(--neon);border-color:rgba(0,212,255,.3);}
+.vce-qbtn.special{background:rgba(255,215,0,.06);border-color:rgba(255,215,0,.18);color:rgba(255,215,0,.65);}
+.vce-qbtn.special:hover{background:rgba(255,215,0,.12);color:#ffd700;}
+.vce-autospin-settings{display:none;gap:8px;animation:vce-fade-in .2s ease;}
+.vce-autospin-settings.visible{display:flex;}
+@keyframes vce-fade-in{from{opacity:0;transform:translateY(-6px);}to{opacity:1;transform:translateY(0);}}
+.vce-aspin-field{flex:1;display:flex;flex-direction:column;gap:4px;}
+.vce-aspin-lbl{font-size:.5rem;color:var(--text3);font-family:var(--font-m);text-transform:uppercase;letter-spacing:.06em;}
+.vce-aspin-input{width:100%;background:rgba(255,215,0,.04);border:1px solid rgba(255,215,0,.14);border-radius:7px;
+  padding:7px 10px;color:#ffd700;font-family:var(--font-m);font-size:.82rem;font-weight:700;outline:none;}
+
+/* Spin button */
+.vce-action-row{display:flex;gap:8px;padding:0 18px 12px;}
+.vce-spin-btn{
+  flex:1;height:56px;border-radius:14px;border:none;cursor:pointer;
+  background:linear-gradient(145deg,#00e0ff 0%,#7b2fff 55%,#ff2dce 100%);
+  color:#fff;font-family:var(--font-d);font-size:.82rem;font-weight:900;
+  text-transform:uppercase;letter-spacing:.08em;
+  box-shadow:0 4px 24px rgba(0,212,255,.3),inset 0 1px 0 rgba(255,255,255,.22);
+  transition:transform .1s,box-shadow .12s,filter .1s;
+  position:relative;overflow:hidden;
+  touch-action:manipulation;-webkit-tap-highlight-color:transparent;will-change:transform;}
+.vce-spin-btn::before{content:'';position:absolute;inset:0;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.18),transparent);
+  transform:translateX(-110%);transition:transform .4s;}
+.vce-spin-btn:hover{transform:translateY(-2px);box-shadow:0 8px 32px rgba(0,212,255,.55);filter:brightness(1.08);}
+.vce-spin-btn:hover::before{transform:translateX(110%);}
+.vce-spin-btn:active{transform:scale(.96);}
+.vce-spin-btn:disabled{opacity:.38;cursor:not-allowed;transform:none!important;filter:none!important;}
+.vce-spin-btn.spinning{animation:vce-btn-beat .22s ease-in-out infinite alternate;}
+@keyframes vce-btn-beat{from{box-shadow:0 4px 18px rgba(0,212,255,.28);}to{box-shadow:0 4px 40px rgba(123,47,255,.82);}}
+.vce-spin-btn.autospin-active{background:linear-gradient(145deg,#00ff88 0%,#00d4ff 60%,#7b2fff 100%);animation:vce-aspin-pulse 1s ease-in-out infinite alternate;}
+@keyframes vce-aspin-pulse{from{box-shadow:0 0 18px rgba(0,255,136,.28);}to{box-shadow:0 0 38px rgba(0,255,136,.7);}}
+
+/* Stats */
+.vce-stats-row{display:flex;border-top:1px solid rgba(255,255,255,.05);}
+.vce-stat{flex:1;padding:9px 5px;text-align:center;border-right:1px solid rgba(255,255,255,.04);}
+.vce-stat:last-child{border-right:none;}
+.vce-stat-val{font-family:var(--font-d);font-size:.78rem;font-weight:800;color:var(--neon);}
+.vce-stat-lbl{font-size:.44rem;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-top:2px;}
 
 </style>
 
@@ -2754,67 +2932,165 @@ input[type=number], input[type=text], input[type=email] {
   <div style="font-size:.65rem;color:rgba(0,212,255,.6);font-weight:600;">All Games</div>
  </div>
 
-  <!-- ═══ VORTEX SPIN — HERO FEATURED SLOT ═══ -->
-  <div class="vs-wrap" id="vsSection">
-   <div class="vs-top-bar">
-    <div class="vs-badge">&#11088; Featured &middot; Vortex Original</div>
-    <div class="vs-header-right">
-     <div class="vs-h-lbl">Balance</div>
-     <div class="vs-h-bal" id="vsBalDisp">$5,000.00</div>
+  <!-- ═══ VORTEX CIRCULAR ENGINE v3 — BANNER (DORMANT) ═══ -->
+  <div class="vce-banner" id="vceBanner" onclick="openVortexCircular()" role="button" tabindex="0">
+   <div class="vce-banner-orb" aria-hidden="true"><svg viewBox="0 0 72 72" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="bbOrbGrad" cx="50%" cy="42%" r="52%">
+      <stop offset="0%" stop-color="#00e0ff" stop-opacity=".9"/>
+      <stop offset="55%" stop-color="#7b2fff" stop-opacity=".7"/>
+      <stop offset="100%" stop-color="#7b2fff" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="bbOrbGlow"><feGaussianBlur stdDeviation="3.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+  </defs>
+  <g class="vce-banner-orb-ring1">
+    <ellipse cx="36" cy="36" rx="33" ry="11" stroke="rgba(0,212,255,.45)" stroke-width="1.2" fill="none" stroke-dasharray="5 3"/>
+  </g>
+  <g class="vce-banner-orb-ring2">
+    <ellipse cx="36" cy="36" rx="22" ry="22" stroke="rgba(123,47,255,.5)" stroke-width="1" fill="none" stroke-dasharray="4 4" transform="rotate(55 36 36)"/>
+  </g>
+  <g class="vce-banner-orb-ring3">
+    <ellipse cx="36" cy="36" rx="13" ry="13" stroke="rgba(0,255,136,.5)" stroke-width="1" fill="none" stroke-dasharray="3 5" transform="rotate(30 36 36)"/>
+  </g>
+  <circle cx="36" cy="36" r="9" fill="url(#bbOrbGrad)" filter="url(#bbOrbGlow)"/>
+  <circle cx="36" cy="36" r="4" fill="rgba(255,255,255,.9)" filter="url(#bbOrbGlow)"/>
+</svg></div>
+   <div class="vce-banner-info">
+    <div class="vce-banner-title">Vortex Circular</div>
+    <div class="vce-banner-sub">3 Rings &middot; Per-Segment Multipliers &middot; Auto-Cashout &middot; 144Hz</div>
+    <div class="vce-banner-pills">
+     <span class="vce-banner-pill">Outer: up to 3&times;</span>
+     <span class="vce-banner-pill gold">Middle: up to 7&times;</span>
+     <span class="vce-banner-pill green">Inner: up to 25&times;</span>
     </div>
    </div>
-   <div class="vs-machine">
-    <div class="vs-title-row">
-     <div>
-      <div class="vs-title"><span class="vs-t1">Vortex</span> <span class="vs-t2">Spin</span></div>
-      <div class="vs-title-sub">3 Reels &middot; Provably Fair &middot; Instant Payouts</div>
-     </div>
-     <div class="vs-jackpot-display">
-      <div class="vs-jackpot-lbl">Jackpot Prize</div>
-      <div class="vs-jackpot-val" id="vsJackpotVal">50&times;</div>
-     </div>
-    </div>
-    <div class="vs-cabinet" id="vsCabinet">
-     <div class="vs-payline"></div>
-     <div class="vs-reels-row">
-      <div class="vs-reel" id="vsReel0"><div class="vs-reel-strip" id="vsStrip0"><div class="vs-sym-wrap" id="vsSym0"></div></div></div>
-      <div class="vs-reel-sep"></div>
-      <div class="vs-reel" id="vsReel1"><div class="vs-reel-strip" id="vsStrip1"><div class="vs-sym-wrap" id="vsSym1"></div></div></div>
-      <div class="vs-reel-sep"></div>
-      <div class="vs-reel" id="vsReel2"><div class="vs-reel-strip" id="vsStrip2"><div class="vs-sym-wrap" id="vsSym2"></div></div></div>
-     </div>
-    </div>
-    <div class="vs-result-bar"><div class="vs-result-txt idle" id="vsResultTxt">Place your bet and spin</div></div>
-    <div class="vs-controls">
-     <div class="vs-bet-panel">
-      <div class="vs-bet-lbl">Bet Amount</div>
-      <div class="vs-bet-row">
-       <span style="font-family:var(--font-m);font-size:.78rem;color:rgba(0,212,255,.5);">$</span>
-       <input class="vs-bet-input" id="vsBetInput" type="number" value="10" min="1" inputmode="decimal"/>
-      </div>
-      <div class="vs-bet-btns">
-       <div class="vs-bet-btn" onclick="vsAdjBet(.5)">&frac12;</div>
-       <div class="vs-bet-btn" onclick="vsAdjBet(2)">2&times;</div>
-       <div class="vs-bet-btn" onclick="vsSetBet(10)">$10</div>
-       <div class="vs-bet-btn" onclick="vsSetBet(50)">$50</div>
-       <div class="vs-bet-btn" onclick="vsSetBet(typeof balance!='undefined'?balance:10)">Max</div>
-      </div>
-     </div>
-     <button class="vs-spin-btn" id="vsSpinBtn" onclick="vsSpin()">&#9654;<br>SPIN</button>
-    </div>
-    <div class="vs-pays" id="vsPaysRow"></div>
-    <div class="vs-stats-row">
-     <div class="vs-stat"><div class="vs-stat-val" id="vsStatSpins">0</div><div class="vs-stat-lbl">Spins</div></div>
-     <div class="vs-stat"><div class="vs-stat-val" id="vsStatWins">0</div><div class="vs-stat-lbl">Wins</div></div>
-     <div class="vs-stat"><div class="vs-stat-val" id="vsStatBest">$0</div><div class="vs-stat-lbl">Best Win</div></div>
-     <div class="vs-stat"><div class="vs-stat-val" id="vsStatRtp">--%</div><div class="vs-stat-lbl">Session RTP</div></div>
-    </div>
-   </div>
+   <div class="vce-banner-cta">SPIN NOW</div>
   </div>
-  <!-- ═══ END VORTEX SPIN ═══ -->
+  <!-- ═══ END VCE BANNER ═══ -->
 
  <div class="games-grid" id="allGamesGrid"></div>
  </div>
+
+<!-- ═══ VORTEX CIRCULAR ENGINE v3 MODAL ═══ -->
+<div id="vceModal" style="display:none">
+ <div class="vce-modal-box">
+
+  <!-- HEADER -->
+  <div class="vce-modal-header">
+   <div class="vce-header-left">
+    <div class="vce-header-orb"><svg viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="mOrbG" cx="50%" cy="40%" r="52%">
+      <stop offset="0%" stop-color="#00e0ff" stop-opacity=".95"/>
+      <stop offset="100%" stop-color="#7b2fff" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="mOrbF"><feGaussianBlur stdDeviation="2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+  </defs>
+  <ellipse cx="14" cy="14" rx="12" ry="4.5" stroke="rgba(0,212,255,.4)" stroke-width="1" fill="none" style="animation:vce-orb-r1 2s linear infinite;transform-origin:14px 14px;"/>
+  <ellipse cx="14" cy="14" rx="8" ry="8" stroke="rgba(123,47,255,.45)" stroke-width="1" fill="none" stroke-dasharray="3 3" style="animation:vce-orb-r2 1.4s linear infinite;transform-origin:14px 14px;"/>
+  <circle cx="14" cy="14" r="4.5" fill="url(#mOrbG)" filter="url(#mOrbF)"/>
+  <circle cx="14" cy="14" r="2" fill="rgba(255,255,255,.88)"/>
+</svg></div>
+    <div class="vce-modal-logo">VORTEX CIRCULAR</div>
+   </div>
+   <div class="vce-modal-bal-wrap">
+    <div class="vce-modal-bal-lbl">Balance</div>
+    <div class="vce-modal-bal" id="vceBalDisp">$5,000.00</div>
+   </div>
+   <div class="vce-close-btn" onclick="closeVortexCircular()">&#x2715;</div>
+  </div>
+
+  <!-- CANVAS -->
+  <div class="vce-canvas-wrap" id="vceCanvasWrap">
+   <canvas id="vceCanvas"></canvas>
+   <div class="vce-center-overlay">
+    <div class="vce-mult-val" id="vceCenterMult">&#x26A1;</div>
+    <div class="vce-mult-lbl" id="vceCenterLbl">TOTAL</div>
+   </div>
+  </div>
+
+  <!-- RING ACCUMULATION DISPLAY (replaces level track) -->
+  <div class="vce-ring-acc" id="vceRingAcc">
+   <div class="vce-ring-cell pending" id="vceRC0">
+    <div class="vce-rc-label">RING 1</div>
+    <div class="vce-rc-val" id="vceRCVal0">&#x2014;</div>
+    <div class="vce-rc-sub">Outer</div>
+   </div>
+   <div class="vce-ring-cell pending" id="vceRC1">
+    <div class="vce-rc-label">RING 2</div>
+    <div class="vce-rc-val" id="vceRCVal1">&#x2014;</div>
+    <div class="vce-rc-sub">Middle</div>
+   </div>
+   <div class="vce-ring-cell pending" id="vceRC2">
+    <div class="vce-rc-label">RING 3</div>
+    <div class="vce-rc-val" id="vceRCVal2">&#x2014;</div>
+    <div class="vce-rc-sub">Inner</div>
+   </div>
+   <div class="vce-ring-total-strip">
+    <div class="vce-ring-total-lbl">AUTO-CASHOUT WIN</div>
+    <div class="vce-ring-total-val" id="vceRCTotal">$0.00</div>
+   </div>
+  </div>
+
+  <!-- RESULT -->
+  <div class="vce-result-wrap">
+   <div class="vce-result-txt idle" id="vceResultTxt">Spin all 3 rings to cash out</div>
+  </div>
+
+  <!-- GLASS BETTING PANEL -->
+  <div class="vce-bet-glass">
+   <div class="vce-bet-glass-header">
+    <div class="vce-bet-glass-lbl">Bet Amount</div>
+    <div class="vce-autospin-toggle" onclick="vceToggleAutoSpin()" id="vceAutoSpinToggle">
+     <div class="vce-autospin-lbl" id="vceAutoSpinLbl">Auto-Spin</div>
+     <div class="vce-toggle-track" id="vceToggleTrack">
+      <div class="vce-toggle-knob"></div>
+     </div>
+    </div>
+   </div>
+   <div class="vce-bet-glass-body">
+    <div class="vce-bet-amount-row">
+     <span class="vce-bet-dollar">$</span>
+     <input class="vce-bet-input" id="vceBetInput" type="number" value="10" min="0.01" step="0.01" inputmode="decimal"/>
+    </div>
+    <div class="vce-quick-bets">
+     <div class="vce-qbtn" onclick="vceSetBet(typeof balance!='undefined'?Math.max(0.01,Math.floor(balance*0.001*100)/100):1)">Min</div>
+     <div class="vce-qbtn" onclick="vceAdjBet(.5)">&frac12;&times;</div>
+     <div class="vce-qbtn" onclick="vceAdjBet(2)">2&times;</div>
+     <div class="vce-qbtn" onclick="vceSetBet(10)">$10</div>
+     <div class="vce-qbtn" onclick="vceSetBet(50)">$50</div>
+     <div class="vce-qbtn" onclick="vceSetBet(100)">$100</div>
+     <div class="vce-qbtn special" onclick="vceSetBet(typeof balance!='undefined'?balance:500)">Max</div>
+    </div>
+    <div class="vce-autospin-settings" id="vceAutoSpinSettings">
+     <div class="vce-aspin-field">
+      <div class="vce-aspin-lbl">Stop on Profit ($)</div>
+      <input class="vce-aspin-input" id="vceASpinProfit" type="number" placeholder="e.g. 500" value="200"/>
+     </div>
+     <div class="vce-aspin-field">
+      <div class="vce-aspin-lbl">Stop on Loss ($)</div>
+      <input class="vce-aspin-input" id="vceASpinLoss" type="number" placeholder="e.g. 100" value="100"/>
+     </div>
+    </div>
+   </div>
+  </div>
+
+  <!-- SPIN BUTTON -->
+  <div class="vce-action-row">
+   <button class="vce-spin-btn" id="vceSpinBtn" onclick="vceSpinBtnClick()">SPIN THE VORTEX</button>
+  </div>
+
+  <!-- STATS ROW -->
+  <div class="vce-stats-row">
+   <div class="vce-stat"><div class="vce-stat-val" id="vceStatSpins">0</div><div class="vce-stat-lbl">Spins</div></div>
+   <div class="vce-stat"><div class="vce-stat-val" id="vceStatWins">0</div><div class="vce-stat-lbl">Wins</div></div>
+   <div class="vce-stat"><div class="vce-stat-val" id="vceStatBest">$0</div><div class="vce-stat-lbl">Best Win</div></div>
+   <div class="vce-stat"><div class="vce-stat-val" id="vceStatRtp">--%</div><div class="vce-stat-lbl">RTP</div></div>
+  </div>
+
+ </div>
+</div>
+<!-- ═══ END VCE MODAL ═══ -->
 
  <!-- CRASH -->
  <div class="page" id="page-crash">
@@ -4346,176 +4622,474 @@ function neonSvg(path, color, extra='') {
  return `<svg viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="2" style="width:46%;height:46%;filter:drop-shadow(0 0 7px ${color}) drop-shadow(0 0 16px ${color}55);" ${extra}>${path}</svg>`;
 }
 const NEON_ICONS = {
- // CRASH — Rocket with exhaust trail
- crash: `<svg viewBox="0 0 48 48" width="52" height="52" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <defs><filter id="cg"><feGaussianBlur stdDeviation="2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
-  <g filter="url(#cg)">
-  <path d="M24 4C24 4 32 10 32 22L26 28H22L16 22C16 10 24 4 24 4Z" fill="#ff4d6a" opacity=".9"/>
-  <ellipse cx="24" cy="20" rx="4" ry="5" fill="#fff" opacity=".6"/>
-  <path d="M16 28L12 40L20 35L24 44L28 35L36 40L32 28" fill="#ff9933" opacity=".85"/>
-  <path d="M16 28L10 36" stroke="#ff6644" stroke-width="1.5" stroke-linecap="round" opacity=".5"/>
-  <path d="M32 28L38 36" stroke="#ff6644" stroke-width="1.5" stroke-linecap="round" opacity=".5"/>
-  <line x1="4" y1="42" x2="20" y2="26" stroke="#ff4d6a" stroke-width="1" opacity=".4" stroke-dasharray="2 3"/>
-  <polyline points="6 38 14 30 20 34" stroke="#ff4d6a" stroke-width="1.5" stroke-linecap="round" opacity=".6"/>
-  </g></svg>`,
- // MINES — Stylized bomb with danger cross
- mines: `<svg viewBox="0 0 48 48" width="52" height="52" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <defs><filter id="mg"><feGaussianBlur stdDeviation="2.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
-  <g filter="url(#mg)">
-  <circle cx="24" cy="26" r="14" fill="#00cc66" opacity=".15" stroke="#00ff88" stroke-width="1.5"/>
-  <circle cx="24" cy="26" r="10" fill="#00ff88" opacity=".2"/>
-  <circle cx="24" cy="26" r="6" fill="#00ff88" opacity=".7"/>
-  <rect x="21" y="10" width="6" height="8" rx="2" fill="#00cc66"/>
-  <line x1="24" y1="6" x2="24" y2="10" stroke="#00ff88" stroke-width="2" stroke-linecap="round"/>
-  <line x1="10" y1="26" x2="6" y2="26" stroke="#00ff88" stroke-width="2" stroke-linecap="round"/>
-  <line x1="38" y1="26" x2="42" y2="26" stroke="#00ff88" stroke-width="2" stroke-linecap="round"/>
-  <line x1="13.5" y1="13.5" x2="10.5" y2="10.5" stroke="#00ff88" stroke-width="2" stroke-linecap="round"/>
-  <line x1="34.5" y1="13.5" x2="37.5" y2="10.5" stroke="#00ff88" stroke-width="2" stroke-linecap="round"/>
-  <circle cx="21" cy="23" r="2" fill="#fff" opacity=".8"/>
-  </g></svg>`,
- // TOWER — Neon tower/staircase climbing up
- tower: `<svg viewBox="0 0 48 48" width="52" height="52" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <defs><filter id="tg"><feGaussianBlur stdDeviation="2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
-  <g filter="url(#tg)">
-  <rect x="6" y="36" width="36" height="6" rx="2" fill="#7b2fff" opacity=".9"/>
-  <rect x="10" y="28" width="28" height="6" rx="2" fill="#7b2fff" opacity=".8"/>
-  <rect x="14" y="20" width="20" height="6" rx="2" fill="#9944ff" opacity=".85"/>
-  <rect x="18" y="12" width="12" height="6" rx="2" fill="#bb66ff" opacity=".9"/>
-  <rect x="21" y="5" width="6" height="5" rx="2" fill="#dd88ff"/>
-  <line x1="24" y1="3" x2="24" y2="5" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
-  <polygon points="20,4 24,0 28,4" fill="#ffd700" opacity=".9"/>
-  </g></svg>`,
- // SINGULARITY — Black hole vortex with spiral arms
- singularity:`<svg viewBox="0 0 48 48" width="52" height="52" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <defs>
-   <radialGradient id="sgrd" cx="50%" cy="50%" r="50%">
-    <stop offset="0%" stop-color="#000" stop-opacity="1"/>
-    <stop offset="60%" stop-color="#7b2fff" stop-opacity=".4"/>
-    <stop offset="100%" stop-color="#7b2fff" stop-opacity="0"/>
-   </radialGradient>
-   <filter id="sgg"><feGaussianBlur stdDeviation="2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
-  </defs>
-  <g filter="url(#sgg)">
-  <circle cx="24" cy="24" r="20" fill="url(#sgrd)"/>
-  <ellipse cx="24" cy="24" rx="20" ry="8" stroke="#7b2fff" stroke-width="1" opacity=".6" fill="none"/>
-  <ellipse cx="24" cy="24" rx="14" ry="4" stroke="#9944ff" stroke-width="1.5" opacity=".7" fill="none"/>
-  <ellipse cx="24" cy="24" rx="7" ry="2" stroke="#bb66ff" stroke-width="1.5" opacity=".9" fill="none"/>
-  <circle cx="24" cy="24" r="4" fill="#1a0040"/>
-  <circle cx="24" cy="24" r="2" fill="#7b2fff"/>
-  <path d="M24 4C30 8 38 16 38 24" stroke="#7b2fff" stroke-width="1.5" stroke-linecap="round" opacity=".5" fill="none"/>
-  <path d="M24 44C18 40 10 32 10 24" stroke="#9944ff" stroke-width="1.5" stroke-linecap="round" opacity=".5" fill="none"/>
-  </g></svg>`,
- // RUSH — Lightning bolt speed trail
- rush: `<svg viewBox="0 0 48 48" width="52" height="52" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <defs><filter id="rg"><feGaussianBlur stdDeviation="2.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
-  <g filter="url(#rg)">
-  <polygon points="28,4 14,26 22,26 20,44 34,22 26,22 28,4" fill="#00d4ff" opacity=".9"/>
-  <line x1="4" y1="18" x2="12" y2="18" stroke="#00d4ff" stroke-width="2" stroke-linecap="round" opacity=".5"/>
-  <line x1="2" y1="24" x2="11" y2="24" stroke="#00aacc" stroke-width="1.5" stroke-linecap="round" opacity=".4"/>
-  <line x1="4" y1="30" x2="12" y2="30" stroke="#00d4ff" stroke-width="2" stroke-linecap="round" opacity=".5"/>
-  <line x1="34" y1="18" x2="44" y2="18" stroke="#00d4ff" stroke-width="1.5" stroke-linecap="round" opacity=".3"/>
-  <line x1="36" y1="30" x2="44" y2="30" stroke="#00d4ff" stroke-width="1.5" stroke-linecap="round" opacity=".3"/>
-  </g></svg>`,
- // ROULETTE — Detailed roulette wheel with sectors
- roulette:`<svg viewBox="0 0 48 48" width="52" height="52" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <defs><filter id="rogg"><feGaussianBlur stdDeviation="1.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
-  <g filter="url(#rogg)">
-  <circle cx="24" cy="24" r="20" stroke="#ff9900" stroke-width="1.5" fill="none" opacity=".7"/>
-  <circle cx="24" cy="24" r="16" stroke="#ff9900" stroke-width="1" fill="none" opacity=".5"/>
-  <path d="M24 8L24 16" stroke="#ff4444" stroke-width="3" stroke-linecap="round"/>
-  <path d="M40 24L32 24" stroke="#222" stroke-width="3" stroke-linecap="round"/>
-  <path d="M24 40L24 32" stroke="#ff4444" stroke-width="3" stroke-linecap="round"/>
-  <path d="M8 24L16 24" stroke="#222" stroke-width="3" stroke-linecap="round"/>
-  <path d="M35.3 12.7L29.7 18.3" stroke="#ff4444" stroke-width="2" stroke-linecap="round" opacity=".7"/>
-  <path d="M12.7 12.7L18.3 18.3" stroke="#222" stroke-width="2" stroke-linecap="round" opacity=".7"/>
-  <path d="M35.3 35.3L29.7 29.7" stroke="#222" stroke-width="2" stroke-linecap="round" opacity=".7"/>
-  <path d="M12.7 35.3L18.3 29.7" stroke="#ff4444" stroke-width="2" stroke-linecap="round" opacity=".7"/>
-  <circle cx="24" cy="24" r="7" fill="#cc7700" opacity=".4" stroke="#ff9900" stroke-width="1"/>
-  <circle cx="24" cy="24" r="3" fill="#fff" opacity=".9"/>
-  <circle cx="24" cy="14" r="2" fill="#fff" opacity=".8"/>
-  </g></svg>`,
- // DICE — Isometric 3D die
- dice: `<svg viewBox="0 0 48 48" width="52" height="52" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <defs><filter id="dg"><feGaussianBlur stdDeviation="1.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
-  <g filter="url(#dg)">
-  <polygon points="24,6 42,16 42,36 24,46 6,36 6,16" fill="#1a0a2e" stroke="#c084fc" stroke-width="1.5" opacity=".9"/>
-  <polygon points="24,6 42,16 24,26 6,16" fill="#2d1259" stroke="#c084fc" stroke-width="1"/>
-  <polygon points="24,26 42,16 42,36 24,46" fill="#1a0840" stroke="#c084fc" stroke-width="1"/>
-  <polygon points="24,26 6,16 6,36 24,46" fill="#120630" stroke="#c084fc" stroke-width="1"/>
-  <circle cx="24" cy="14" r="2.5" fill="#c084fc"/>
-  <circle cx="34" cy="22" r="2" fill="#c084fc"/>
-  <circle cx="34" cy="30" r="2" fill="#c084fc"/>
-  <circle cx="15" cy="22" r="2" fill="#c084fc" opacity=".7"/>
-  <circle cx="15" cy="30" r="2" fill="#c084fc" opacity=".7"/>
-  <circle cx="24" cy="38" r="2" fill="#c084fc" opacity=".5"/>
-  </g></svg>`,
- // LIMBO — Rising multiplier bar
- limbo: `<svg viewBox="0 0 48 48" width="52" height="52" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <defs><filter id="lg"><feGaussianBlur stdDeviation="1.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
-  <g filter="url(#lg)">
-  <polyline points="4,40 14,32 22,20 30,26 40,8" stroke="#ffd700" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <circle cx="40" cy="8" r="3.5" fill="#ffd700"/>
-  <line x1="4" y1="44" x2="44" y2="44" stroke="#ffd700" stroke-width="1.5" opacity=".4"/>
-  <line x1="4" y1="44" x2="4" y2="6" stroke="#ffd700" stroke-width="1.5" opacity=".4"/>
-  <line x1="4" y1="33" x2="8" y2="33" stroke="#ffd700" stroke-width="1" opacity=".3"/>
-  <line x1="4" y1="22" x2="8" y2="22" stroke="#ffd700" stroke-width="1" opacity=".3"/>
-  <text x="36" y="20" font-family="monospace" font-size="8" fill="#ffd700" font-weight="bold">∞×</text>
-  </g></svg>`,
- // WHEEL — Segmented prize wheel
- wheel: `<svg viewBox="0 0 48 48" width="52" height="52" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <defs><filter id="wg"><feGaussianBlur stdDeviation="1.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
-  <g filter="url(#wg)">
-  <path d="M24 4L28 20L24 24Z" fill="#00ff88"/>
-  <path d="M44 24L28 20L24 24Z" fill="#ffd700"/>
-  <path d="M24 44L28 20L24 24Z" fill="#ff4d6a" transform="rotate(90 24 24)"/>
-  <path d="M4 24L20 28L24 24Z" fill="#7b2fff"/>
-  <path d="M24 4L20 20L24 24Z" fill="#00d4ff" transform="rotate(45 24 24)"/>
-  <path d="M44 24L28 20L24 24Z" fill="#ff9900" transform="rotate(90 24 24)"/>
-  <path d="M24 44L20 28L24 24Z" fill="#00ff88" transform="rotate(135 24 24)"/>
-  <path d="M4 24L20 20L24 24Z" fill="#ff2dce" transform="rotate(180 24 24)"/>
-  <circle cx="24" cy="24" r="20" fill="none" stroke="#fff" stroke-width="1" opacity=".3"/>
-  <line x1="24" y1="4" x2="24" y2="44" stroke="#fff" stroke-width=".5" opacity=".2"/>
-  <line x1="4" y1="24" x2="44" y2="24" stroke="#fff" stroke-width=".5" opacity=".2"/>
-  <line x1="9.4" y1="9.4" x2="38.6" y2="38.6" stroke="#fff" stroke-width=".5" opacity=".2"/>
-  <line x1="38.6" y1="9.4" x2="9.4" y2="38.6" stroke="#fff" stroke-width=".5" opacity=".2"/>
-  <circle cx="24" cy="24" r="4" fill="#fff"/>
-  <polygon points="24,1 26,10 22,10" fill="#ffd700"/>
-  </g></svg>`,
- // HILO — Playing cards
- hilo: `<svg viewBox="0 0 48 48" width="52" height="52" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <defs><filter id="hg"><feGaussianBlur stdDeviation="1.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
-  <g filter="url(#hg)">
-  <rect x="6" y="10" width="24" height="32" rx="3" fill="#1a0830" stroke="#ff4d6a" stroke-width="1.5"/>
-  <rect x="18" y="6" width="24" height="32" rx="3" fill="#0a1830" stroke="#00d4ff" stroke-width="1.5"/>
-  <text x="22" y="26" font-family="Georgia,serif" font-size="14" fill="#00d4ff" font-weight="bold">A</text>
-  <text x="11" y="24" font-family="Georgia,serif" font-size="10" fill="#ff4d6a" font-weight="bold">K</text>
-  <text x="11" y="34" font-family="serif" font-size="10" fill="#ff4d6a">♠</text>
-  <text x="23" y="35" font-family="serif" font-size="10" fill="#00d4ff">♦</text>
-  </g></svg>`,
- // PLINKO — Pins and ball drop
- plinko:`<svg viewBox="0 0 48 48" width="52" height="52" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <defs><filter id="pg"><feGaussianBlur stdDeviation="1.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
-  <g filter="url(#pg)">
-  <circle cx="24" cy="5" r="3" fill="#00d4ff"/>
-  <circle cx="16" cy="13" r="2" fill="#00d4ff" opacity=".6"/>
-  <circle cx="24" cy="13" r="2" fill="#00d4ff" opacity=".6"/>
-  <circle cx="32" cy="13" r="2" fill="#00d4ff" opacity=".6"/>
-  <circle cx="12" cy="21" r="2" fill="#00d4ff" opacity=".5"/>
-  <circle cx="20" cy="21" r="2" fill="#00d4ff" opacity=".5"/>
-  <circle cx="28" cy="21" r="2" fill="#00d4ff" opacity=".5"/>
-  <circle cx="36" cy="21" r="2" fill="#00d4ff" opacity=".5"/>
-  <circle cx="8" cy="29" r="2" fill="#00d4ff" opacity=".35"/>
-  <circle cx="16" cy="29" r="2" fill="#00d4ff" opacity=".35"/>
-  <circle cx="24" cy="29" r="2" fill="#00d4ff" opacity=".35"/>
-  <circle cx="32" cy="29" r="2" fill="#00d4ff" opacity=".35"/>
-  <circle cx="40" cy="29" r="2" fill="#00d4ff" opacity=".35"/>
-  <path d="M20 21L18 33" stroke="#00d4ff" stroke-width="1" opacity=".5" stroke-dasharray="2 2"/>
-  <rect x="6" y="38" width="8" height="6" rx="2" fill="#ff4d6a" opacity=".7"/>
-  <rect x="16" y="36" width="8" height="8" rx="2" fill="#ffd700" opacity=".7"/>
-  <rect x="26" y="38" width="8" height="6" rx="2" fill="#00ff88" opacity=".7"/>
-  <rect x="36" y="37" width="6" height="7" rx="2" fill="#7b2fff" opacity=".7"/>
-  </g></svg>`,
+
+// ── CRASH — 3D rocket with layered fire plume ──────────────────
+crash: `<svg viewBox="0 0 64 64" width="60" height="60" fill="none" xmlns="http://www.w3.org/2000/svg">
+<defs>
+ <radialGradient id="cr-body" cx="38%" cy="22%" r="62%">
+  <stop offset="0%" stop-color="#ffffff" stop-opacity=".9"/>
+  <stop offset="35%" stop-color="#ff6680" stop-opacity=".95"/>
+  <stop offset="100%" stop-color="#cc1133" stop-opacity=".85"/>
+ </radialGradient>
+ <radialGradient id="cr-flame" cx="50%" cy="10%" r="90%">
+  <stop offset="0%" stop-color="#ffffff"/>
+  <stop offset="22%" stop-color="#ffee44"/>
+  <stop offset="50%" stop-color="#ff7700"/>
+  <stop offset="80%" stop-color="#ff2200"/>
+  <stop offset="100%" stop-color="transparent"/>
+ </radialGradient>
+ <radialGradient id="cr-inner-flame" cx="50%" cy="5%" r="70%">
+  <stop offset="0%" stop-color="#ffffff"/>
+  <stop offset="40%" stop-color="#ffffaa"/>
+  <stop offset="100%" stop-color="transparent"/>
+ </radialGradient>
+ <filter id="cr-glow"><feGaussianBlur stdDeviation="2.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+ <filter id="cr-softglow"><feGaussianBlur stdDeviation="4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+</defs>
+<g filter="url(#cr-softglow)">
+ <!-- Engine fire plume — back layer -->
+ <ellipse cx="32" cy="54" rx="10" ry="14" fill="url(#cr-flame)" opacity=".55"/>
+ <ellipse cx="29" cy="57" rx="5" ry="8" fill="#ff4400" opacity=".4"/>
+ <ellipse cx="35" cy="56" rx="4" ry="7" fill="#ff6600" opacity=".35"/>
+ <!-- Engine fire — inner bright -->
+ <ellipse cx="32" cy="50" rx="6" ry="9" fill="url(#cr-inner-flame)" opacity=".85"/>
+ <ellipse cx="32" cy="47" rx="3" ry="5" fill="#ffffcc" opacity=".9"/>
+ <!-- Rocket body — perspective angled -->
+ <path d="M32 6 C32 6 42 14 43 30 L38 40 L26 40 L21 30 C22 14 32 6 32 6Z" fill="url(#cr-body)"/>
+ <!-- Body shade panel -->
+ <path d="M32 6 C32 6 37 12 38.5 26 L36 40 L32 40 L32 6Z" fill="rgba(0,0,0,.18)"/>
+ <!-- Glass cockpit -->
+ <ellipse cx="32" cy="20" rx="5" ry="6.5" fill="#aaeeff" opacity=".55"/>
+ <ellipse cx="30.5" cy="18" rx="2.2" ry="2.8" fill="#ffffff" opacity=".55"/>
+ <ellipse cx="32" cy="20" rx="5" ry="6.5" stroke="rgba(255,255,255,.3)" stroke-width="0.8" fill="none"/>
+ <!-- Side fins — left -->
+ <path d="M21 30 L12 42 L22 38 Z" fill="#cc1133" opacity=".85"/>
+ <path d="M21 30 L12 42 L22 38 Z" stroke="rgba(255,100,120,.5)" stroke-width=".8" fill="none"/>
+ <!-- Side fins — right -->
+ <path d="M43 30 L52 42 L42 38 Z" fill="#cc1133" opacity=".85"/>
+ <path d="M43 30 L52 42 L42 38 Z" stroke="rgba(255,100,120,.5)" stroke-width=".8" fill="none"/>
+ <!-- Speed trail lines -->
+ <line x1="6" y1="48" x2="22" y2="34" stroke="#ff4d6a" stroke-width="1.2" stroke-linecap="round" opacity=".35" stroke-dasharray="3 4"/>
+ <line x1="4" y1="42" x2="18" y2="30" stroke="#ff9933" stroke-width=".8" stroke-linecap="round" opacity=".28" stroke-dasharray="2 5"/>
+ <line x1="58" y1="48" x2="42" y2="34" stroke="#ff4d6a" stroke-width=".8" stroke-linecap="round" opacity=".22" stroke-dasharray="3 5"/>
+ <!-- Highlight stripe -->
+ <path d="M29 8 C29 8 27 16 27 26" stroke="rgba(255,255,255,.4)" stroke-width="1.5" stroke-linecap="round"/>
+</g></svg>`,
+
+// ── TOWER — Futuristic neon skyscraper ────────────────────────
+tower: `<svg viewBox="0 0 64 64" width="60" height="60" fill="none" xmlns="http://www.w3.org/2000/svg">
+<defs>
+ <linearGradient id="tw-body" x1="0%" y1="0%" x2="100%" y2="0%">
+  <stop offset="0%" stop-color="#1a0840"/>
+  <stop offset="45%" stop-color="#2d1266"/>
+  <stop offset="100%" stop-color="#0e0428"/>
+ </linearGradient>
+ <linearGradient id="tw-side" x1="0%" y1="0%" x2="100%" y2="0%">
+  <stop offset="0%" stop-color="#0a0220"/>
+  <stop offset="100%" stop-color="#160840"/>
+ </linearGradient>
+ <linearGradient id="tw-sky" x1="0%" y1="0%" x2="0%" y2="100%">
+  <stop offset="0%" stop-color="#7b2fff" stop-opacity=".25"/>
+  <stop offset="100%" stop-color="transparent"/>
+ </linearGradient>
+ <filter id="tw-glow"><feGaussianBlur stdDeviation="2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+</defs>
+<g filter="url(#tw-glow)">
+ <!-- Sky glow backdrop -->
+ <rect x="14" y="0" width="36" height="64" rx="2" fill="url(#tw-sky)"/>
+ <!-- Building body — front face 3D perspective -->
+ <rect x="20" y="14" width="24" height="50" rx="1" fill="url(#tw-body)"/>
+ <!-- Building side face (3D effect) -->
+ <path d="M44 14 L54 20 L54 64 L44 64 Z" fill="url(#tw-side)" opacity=".85"/>
+ <!-- Floor windows — front face, 5 floors -->
+ <rect x="23" y="52" width="6" height="4" rx=".8" fill="#00d4ff" opacity=".85"/>
+ <rect x="31" y="52" width="6" height="4" rx=".8" fill="#00d4ff" opacity=".65"/>
+ <rect x="23" y="44" width="6" height="4" rx=".8" fill="#7b2fff" opacity=".9"/>
+ <rect x="31" y="44" width="6" height="4" rx=".8" fill="#7b2fff" opacity=".7"/>
+ <rect x="23" y="36" width="6" height="4" rx=".8" fill="#00ff88" opacity=".8"/>
+ <rect x="31" y="36" width="6" height="4" rx=".8" fill="#00d4ff" opacity=".6"/>
+ <rect x="23" y="28" width="6" height="4" rx=".8" fill="#ffd700" opacity=".75"/>
+ <rect x="31" y="28" width="6" height="4" rx=".8" fill="#7b2fff" opacity=".5"/>
+ <rect x="23" y="20" width="6" height="4" rx=".8" fill="#00d4ff" opacity=".6"/>
+ <rect x="31" y="20" width="6" height="4" rx=".8" fill="#00ff88" opacity=".5"/>
+ <!-- Side windows (3D perspective foreshortened) -->
+ <rect x="46" y="52" width="5" height="4" rx=".6" fill="#00d4ff" opacity=".45"/>
+ <rect x="46" y="44" width="5" height="4" rx=".6" fill="#7b2fff" opacity=".4"/>
+ <rect x="46" y="36" width="5" height="4" rx=".6" fill="#00ff88" opacity=".38"/>
+ <rect x="46" y="28" width="5" height="4" rx=".6" fill="#ffd700" opacity=".35"/>
+ <!-- Spire -->
+ <rect x="30" y="4" width="4" height="12" rx="1" fill="#bb66ff"/>
+ <rect x="31" y="2" width="2" height="5" rx=".5" fill="#fff" opacity=".9"/>
+ <!-- Spire beacon -->
+ <circle cx="32" cy="2" r="2.5" fill="#ff2dce" opacity=".95"/>
+ <circle cx="32" cy="2" r="1.2" fill="#fff"/>
+ <!-- Neon ground glow -->
+ <ellipse cx="32" cy="63" rx="18" ry="3" fill="#7b2fff" opacity=".28"/>
+ <!-- Building edge lights -->
+ <line x1="20" y1="14" x2="20" y2="64" stroke="#7b2fff" stroke-width="1.2" opacity=".6"/>
+ <line x1="44" y1="14" x2="44" y2="64" stroke="#7b2fff" stroke-width="1.2" opacity=".45"/>
+ <line x1="44" y1="14" x2="54" y2="20" stroke="#4d1a99" stroke-width="1" opacity=".5"/>
+</g></svg>`,
+
+// ── SINGULARITY — Black hole with accretion disk ──────────────
+singularity: `<svg viewBox="0 0 64 64" width="60" height="60" fill="none" xmlns="http://www.w3.org/2000/svg">
+<defs>
+ <radialGradient id="sg-hole" cx="50%" cy="50%" r="50%">
+  <stop offset="0%" stop-color="#000000"/>
+  <stop offset="55%" stop-color="#0a0020"/>
+  <stop offset="85%" stop-color="#1a0060" stop-opacity=".7"/>
+  <stop offset="100%" stop-color="transparent"/>
+ </radialGradient>
+ <radialGradient id="sg-glow" cx="50%" cy="50%" r="50%">
+  <stop offset="0%" stop-color="transparent"/>
+  <stop offset="50%" stop-color="#7b2fff" stop-opacity=".12"/>
+  <stop offset="75%" stop-color="#a855f7" stop-opacity=".2"/>
+  <stop offset="100%" stop-color="transparent"/>
+ </radialGradient>
+ <filter id="sg-blur"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+</defs>
+<g filter="url(#sg-blur)">
+ <!-- Outer glow halo -->
+ <circle cx="32" cy="32" r="28" fill="url(#sg-glow)"/>
+ <!-- Accretion disk rings — elliptical perspective -->
+ <ellipse cx="32" cy="32" rx="27" ry="9" stroke="#a855f7" stroke-width="1.8" fill="none" opacity=".55"/>
+ <ellipse cx="32" cy="32" rx="22" ry="7" stroke="#7b2fff" stroke-width="2.2" fill="none" opacity=".7"/>
+ <ellipse cx="32" cy="32" rx="16" ry="5.5" stroke="#9044ee" stroke-width="2.5" fill="none" opacity=".8"/>
+ <ellipse cx="32" cy="32" rx="10" ry="3.5" stroke="#bb66ff" stroke-width="2" fill="none" opacity=".85"/>
+ <!-- Hot accretion spots -->
+ <path d="M32 24 A8 2.5 0 0 1 44 28" stroke="#ff2dce" stroke-width="3" fill="none" stroke-linecap="round" opacity=".75"/>
+ <path d="M32 40 A8 2.5 0 0 1 20 36" stroke="#ffd700" stroke-width="2.5" fill="none" stroke-linecap="round" opacity=".6"/>
+ <!-- Spiral arm — top right -->
+ <path d="M38 14 C44 18 46 24 42 28" stroke="#c084fc" stroke-width="1.5" fill="none" stroke-linecap="round" opacity=".55"/>
+ <!-- Spiral arm — bottom left -->
+ <path d="M26 50 C20 46 18 40 22 36" stroke="#a855f7" stroke-width="1.5" fill="none" stroke-linecap="round" opacity=".45"/>
+ <!-- Black hole core -->
+ <circle cx="32" cy="32" r="9" fill="url(#sg-hole)"/>
+ <circle cx="32" cy="32" r="5.5" fill="#000"/>
+ <!-- Photon sphere glow ring -->
+ <circle cx="32" cy="32" r="9" stroke="#7b2fff" stroke-width="1.2" fill="none" opacity=".7"/>
+ <!-- Gravitational lensing flash -->
+ <path d="M42 22 L38 27" stroke="#fff" stroke-width="1" stroke-linecap="round" opacity=".5"/>
+</g></svg>`,
+
+// ── VORTEX RUSH — Lightning energy bolt ───────────────────────
+rush: `<svg viewBox="0 0 64 64" width="60" height="60" fill="none" xmlns="http://www.w3.org/2000/svg">
+<defs>
+ <linearGradient id="ru-bolt" x1="0%" y1="0%" x2="0%" y2="100%">
+  <stop offset="0%" stop-color="#ffffff"/>
+  <stop offset="25%" stop-color="#aaffff"/>
+  <stop offset="55%" stop-color="#00d4ff"/>
+  <stop offset="100%" stop-color="#0044aa"/>
+ </linearGradient>
+ <linearGradient id="ru-glow" x1="0%" y1="0%" x2="100%" y2="0%">
+  <stop offset="0%" stop-color="#00d4ff" stop-opacity=".0"/>
+  <stop offset="50%" stop-color="#00d4ff" stop-opacity=".18"/>
+  <stop offset="100%" stop-color="#00d4ff" stop-opacity=".0"/>
+ </linearGradient>
+ <filter id="ru-glow2"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+</defs>
+<g filter="url(#ru-glow2)">
+ <!-- Speed trail backdrop -->
+ <rect x="0" y="22" width="48" height="4" rx="2" fill="url(#ru-glow)" opacity=".8"/>
+ <rect x="4" y="30" width="42" height="3" rx="1.5" fill="url(#ru-glow)" opacity=".55"/>
+ <rect x="2" y="38" width="38" height="2.5" rx="1.2" fill="url(#ru-glow)" opacity=".4"/>
+ <!-- Speed lines left -->
+ <line x1="4" y1="18" x2="24" y2="18" stroke="#00d4ff" stroke-width="2" stroke-linecap="round" opacity=".55"/>
+ <line x1="2" y1="24" x2="20" y2="24" stroke="#00aacc" stroke-width="1.5" stroke-linecap="round" opacity=".4"/>
+ <line x1="4" y1="30" x2="22" y2="30" stroke="#00d4ff" stroke-width="1.5" stroke-linecap="round" opacity=".38"/>
+ <line x1="6" y1="36" x2="22" y2="36" stroke="#0088bb" stroke-width="1" stroke-linecap="round" opacity=".3"/>
+ <line x1="8" y1="42" x2="22" y2="42" stroke="#00d4ff" stroke-width="1" stroke-linecap="round" opacity=".22"/>
+ <!-- Lightning bolt — main shape, 3D beveled -->
+ <polygon points="40,4 24,28 33,28 22,60 52,30 40,30 40,4" fill="url(#ru-bolt)"/>
+ <!-- 3D bevel — right face darker -->
+ <polygon points="40,4 52,30 40,30" fill="rgba(0,0,0,.25)"/>
+ <!-- Bolt inner highlight -->
+ <polygon points="38,8 26,28 33,28 24,54 46,32 38,32 38,8" fill="rgba(255,255,255,.12)"/>
+ <!-- Top spark -->
+ <circle cx="40" cy="4" r="3.5" fill="#ffffff" opacity=".9"/>
+ <circle cx="40" cy="4" r="2" fill="#aaffff"/>
+ <!-- Energy arcs -->
+ <path d="M33 28 C38 22 44 24 44 28" stroke="#aaffff" stroke-width="1" fill="none" stroke-linecap="round" opacity=".5"/>
+ <path d="M22 60 C26 52 34 50 35 56" stroke="#00d4ff" stroke-width="1" fill="none" stroke-linecap="round" opacity=".4"/>
+</g></svg>`,
+
+// ── ROULETTE — 3D wheel with neon sectors ─────────────────────
+roulette: `<svg viewBox="0 0 64 64" width="60" height="60" fill="none" xmlns="http://www.w3.org/2000/svg">
+<defs>
+ <radialGradient id="ro-wheel" cx="42%" cy="35%" r="60%">
+  <stop offset="0%" stop-color="#3a1800"/>
+  <stop offset="55%" stop-color="#1a0a00"/>
+  <stop offset="100%" stop-color="#0a0400"/>
+ </radialGradient>
+ <radialGradient id="ro-center" cx="50%" cy="38%" r="52%">
+  <stop offset="0%" stop-color="#ffdd88"/>
+  <stop offset="55%" stop-color="#cc8800"/>
+  <stop offset="100%" stop-color="#663300"/>
+ </radialGradient>
+ <filter id="ro-glow"><feGaussianBlur stdDeviation="2.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+</defs>
+<g filter="url(#ro-glow)">
+ <!-- Outer ring shadow -->
+ <circle cx="32" cy="34" r="27" fill="rgba(0,0,0,.5)" opacity=".6"/>
+ <!-- Wheel body -->
+ <circle cx="32" cy="32" r="27" fill="url(#ro-wheel)" stroke="#cc7700" stroke-width="1.5"/>
+ <!-- Colored wheel sectors (8 sectors) -->
+ <path d="M32 32 L32 6 A26 26 0 0 1 50.4 13.4 Z" fill="#cc1111" opacity=".85"/>
+ <path d="M32 32 L50.4 13.4 A26 26 0 0 1 58 32 Z" fill="#111" opacity=".9"/>
+ <path d="M32 32 L58 32 A26 26 0 0 1 50.4 50.6 Z" fill="#cc1111" opacity=".8"/>
+ <path d="M32 32 L50.4 50.6 A26 26 0 0 1 32 58 Z" fill="#111" opacity=".9"/>
+ <path d="M32 32 L32 58 A26 26 0 0 1 13.6 50.6 Z" fill="#cc1111" opacity=".85"/>
+ <path d="M32 32 L13.6 50.6 A26 26 0 0 1 6 32 Z" fill="#111" opacity=".9"/>
+ <path d="M32 32 L6 32 A26 26 0 0 1 13.6 13.4 Z" fill="#cc1111" opacity=".8"/>
+ <path d="M32 32 L13.6 13.4 A26 26 0 0 1 32 6 Z" fill="#111" opacity=".9"/>
+ <!-- Dividing lines -->
+ <line x1="32" y1="6" x2="32" y2="58" stroke="#cc7700" stroke-width=".8" opacity=".6"/>
+ <line x1="6" y1="32" x2="58" y2="32" stroke="#cc7700" stroke-width=".8" opacity=".6"/>
+ <line x1="13.6" y1="13.4" x2="50.4" y2="50.6" stroke="#cc7700" stroke-width=".8" opacity=".6"/>
+ <line x1="50.4" y1="13.4" x2="13.6" y2="50.6" stroke="#cc7700" stroke-width=".8" opacity=".6"/>
+ <!-- Inner decorative ring -->
+ <circle cx="32" cy="32" r="18" fill="none" stroke="#ff9900" stroke-width="1.2" opacity=".55"/>
+ <circle cx="32" cy="32" r="12" fill="none" stroke="#cc7700" stroke-width=".8" opacity=".45"/>
+ <!-- Center hub -->
+ <circle cx="32" cy="32" r="7" fill="url(#ro-center)"/>
+ <circle cx="32" cy="32" r="4.5" fill="#886600"/>
+ <circle cx="32" cy="32" r="2.5" fill="#ffdd88"/>
+ <circle cx="31" cy="31" r="1" fill="#fff" opacity=".7"/>
+ <!-- Spinning ball -->
+ <circle cx="32" cy="8" r="3.2" fill="#ffffff"/>
+ <circle cx="31.2" cy="7.4" r="1.2" fill="#aabbcc" opacity=".7"/>
+ <!-- Neon rim -->
+ <circle cx="32" cy="32" r="27" fill="none" stroke="#ff9900" stroke-width=".8" opacity=".5"/>
+</g></svg>`,
+
+// ── DICE — Isometric 3D die with neon dots ───────────────────
+dice: `<svg viewBox="0 0 64 64" width="60" height="60" fill="none" xmlns="http://www.w3.org/2000/svg">
+<defs>
+ <linearGradient id="di-top" x1="0%" y1="0%" x2="100%" y2="100%">
+  <stop offset="0%" stop-color="#3a1a7a"/>
+  <stop offset="100%" stop-color="#1e0a50"/>
+ </linearGradient>
+ <linearGradient id="di-right" x1="0%" y1="0%" x2="100%" y2="0%">
+  <stop offset="0%" stop-color="#1a0840"/>
+  <stop offset="100%" stop-color="#0a0428"/>
+ </linearGradient>
+ <linearGradient id="di-left" x1="100%" y1="0%" x2="0%" y2="0%">
+  <stop offset="0%" stop-color="#2a1060"/>
+  <stop offset="100%" stop-color="#100420"/>
+ </linearGradient>
+ <filter id="di-glow"><feGaussianBlur stdDeviation="2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+</defs>
+<g filter="url(#di-glow)">
+ <!-- Shadow underneath -->
+ <ellipse cx="32" cy="60" rx="22" ry="5" fill="rgba(123,47,255,.3)"/>
+ <!-- Die — top face (isometric) -->
+ <path d="M32 5 L56 18 L32 31 L8 18 Z" fill="url(#di-top)" stroke="#c084fc" stroke-width="1.2"/>
+ <!-- Die — right face -->
+ <path d="M56 18 L56 46 L32 59 L32 31 Z" fill="url(#di-right)" stroke="#9955ee" stroke-width="1.2"/>
+ <!-- Die — left face -->
+ <path d="M8 18 L8 46 L32 59 L32 31 Z" fill="url(#di-left)" stroke="#7b2fff" stroke-width="1.2"/>
+ <!-- Top face dots (showing 5) -->
+ <circle cx="24" cy="13" r="2.8" fill="#c084fc"/>
+ <circle cx="40" cy="13" r="2.8" fill="#c084fc"/>
+ <circle cx="24" cy="22" r="2.8" fill="#c084fc"/>
+ <circle cx="32" cy="18" r="2.8" fill="#c084fc" opacity=".9"/>
+ <circle cx="40" cy="22" r="2.8" fill="#c084fc"/>
+ <!-- Right face dots (showing 3) -->
+ <circle cx="48" cy="27" r="2.2" fill="#a066dd" opacity=".85"/>
+ <circle cx="44" cy="36" r="2.2" fill="#a066dd" opacity=".85"/>
+ <circle cx="48" cy="45" r="2.2" fill="#a066dd" opacity=".85"/>
+ <!-- Left face dots (showing 1) -->
+ <circle cx="20" cy="37" r="2.8" fill="#9044cc" opacity=".8"/>
+ <!-- Top face edge highlight -->
+ <path d="M32 5 L56 18 L32 31 L8 18 Z" stroke="rgba(255,255,255,.12)" stroke-width=".8" fill="none"/>
+ <!-- Neon edge glow -->
+ <path d="M32 5 L56 18" stroke="#d088ff" stroke-width="1.5" opacity=".7"/>
+ <path d="M32 5 L8 18" stroke="#d088ff" stroke-width="1.5" opacity=".6"/>
+</g></svg>`,
+
+// ── LIMBO — Rising multiplier with peak explosion ─────────────
+limbo: `<svg viewBox="0 0 64 64" width="60" height="60" fill="none" xmlns="http://www.w3.org/2000/svg">
+<defs>
+ <linearGradient id="li-line" x1="0%" y1="100%" x2="100%" y2="0%">
+  <stop offset="0%" stop-color="#0088ff" stop-opacity=".3"/>
+  <stop offset="60%" stop-color="#ffd700" stop-opacity=".9"/>
+  <stop offset="100%" stop-color="#ffffff"/>
+ </linearGradient>
+ <linearGradient id="li-fill" x1="0%" y1="0%" x2="0%" y2="100%">
+  <stop offset="0%" stop-color="#ffd700" stop-opacity=".22"/>
+  <stop offset="100%" stop-color="#ffd700" stop-opacity=".0"/>
+ </linearGradient>
+ <filter id="li-glow"><feGaussianBlur stdDeviation="2.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+</defs>
+<g filter="url(#li-glow)">
+ <!-- Grid lines -->
+ <line x1="8" y1="16" x2="60" y2="16" stroke="#ffd700" stroke-width=".6" stroke-dasharray="3 4" opacity=".18"/>
+ <line x1="8" y1="28" x2="60" y2="28" stroke="#ffd700" stroke-width=".6" stroke-dasharray="3 4" opacity=".14"/>
+ <line x1="8" y1="40" x2="60" y2="40" stroke="#ffd700" stroke-width=".6" stroke-dasharray="3 4" opacity=".12"/>
+ <!-- Axes -->
+ <line x1="8" y1="52" x2="60" y2="52" stroke="#ffd700" stroke-width="1.5" opacity=".4"/>
+ <line x1="8" y1="8" x2="8" y2="52" stroke="#ffd700" stroke-width="1.5" opacity=".4"/>
+ <!-- Fill area under curve -->
+ <path d="M8 52 L14 48 L22 42 L30 36 L36 26 L42 14 L47 7 L47 52 Z" fill="url(#li-fill)"/>
+ <!-- Main chart line -->
+ <polyline points="8,52 14,48 22,42 30,36 36,26 42,14 47,7" stroke="url(#li-line)" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+ <!-- Peak explosion burst -->
+ <circle cx="47" cy="7" r="6" fill="#ffd700" opacity=".22"/>
+ <circle cx="47" cy="7" r="4" fill="#ffd700" opacity=".9"/>
+ <circle cx="46.2" cy="6.2" r="1.8" fill="#fff"/>
+ <!-- Burst rays -->
+ <line x1="47" y1="1" x2="47" y2="3.5" stroke="#ffd700" stroke-width="1.5" stroke-linecap="round" opacity=".8"/>
+ <line x1="53" y1="3" x2="51" y2="5" stroke="#ffd700" stroke-width="1.2" stroke-linecap="round" opacity=".7"/>
+ <line x1="55" y1="8" x2="52.5" y2="8" stroke="#ffd700" stroke-width="1.2" stroke-linecap="round" opacity=".7"/>
+ <line x1="41" y1="1" x2="43" y2="3.5" stroke="#ffd700" stroke-width="1.2" stroke-linecap="round" opacity=".6"/>
+ <!-- Multiplier label -->
+ <text x="50" y="22" font-family="monospace" font-size="9" fill="#ffd700" font-weight="bold" opacity=".85">∞×</text>
+ <!-- Axis tick marks -->
+ <line x1="8" y1="52" x2="8" y2="49" stroke="#ffd700" stroke-width="1" opacity=".35"/>
+ <line x1="22" y1="52" x2="22" y2="50" stroke="#ffd700" stroke-width=".8" opacity=".25"/>
+ <line x1="36" y1="52" x2="36" y2="50" stroke="#ffd700" stroke-width=".8" opacity=".25"/>
+</g></svg>`,
+
+// ── WHEEL — 3D prize wheel with depth ─────────────────────────
+wheel: `<svg viewBox="0 0 64 64" width="60" height="60" fill="none" xmlns="http://www.w3.org/2000/svg">
+<defs>
+ <radialGradient id="wh-hub" cx="40%" cy="35%" r="60%">
+  <stop offset="0%" stop-color="#ffffff" stop-opacity=".9"/>
+  <stop offset="55%" stop-color="#ccddff" stop-opacity=".8"/>
+  <stop offset="100%" stop-color="#4488cc" stop-opacity=".7"/>
+ </radialGradient>
+ <filter id="wh-glow"><feGaussianBlur stdDeviation="2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+</defs>
+<g filter="url(#wh-glow)">
+ <!-- Wheel depth shadow (3D illusion) -->
+ <ellipse cx="34" cy="34" rx="27" ry="27" fill="rgba(0,0,0,.5)"/>
+ <!-- 8 colored pie segments -->
+ <path d="M32 32 L32 5 A27 27 0 0 1 51.1 13.1 Z" fill="#00ff88"/>
+ <path d="M32 32 L51.1 13.1 A27 27 0 0 1 59 32 Z" fill="#ffd700"/>
+ <path d="M32 32 L59 32 A27 27 0 0 1 51.1 50.9 Z" fill="#ff4d6a"/>
+ <path d="M32 32 L51.1 50.9 A27 27 0 0 1 32 59 Z" fill="#7b2fff"/>
+ <path d="M32 32 L32 59 A27 27 0 0 1 12.9 50.9 Z" fill="#00d4ff"/>
+ <path d="M32 32 L12.9 50.9 A27 27 0 0 1 5 32 Z" fill="#ff9900"/>
+ <path d="M32 32 L5 32 A27 27 0 0 1 12.9 13.1 Z" fill="#ff2dce"/>
+ <path d="M32 32 L12.9 13.1 A27 27 0 0 1 32 5 Z" fill="#00ff88" opacity=".7"/>
+ <!-- Segment highlight (glass sheen) -->
+ <path d="M32 32 L32 5 A27 27 0 0 1 51.1 13.1 Z" fill="rgba(255,255,255,.12)"/>
+ <!-- Rim -->
+ <circle cx="32" cy="32" r="27" fill="none" stroke="#ffffff" stroke-width="2" opacity=".5"/>
+ <circle cx="32" cy="32" r="27" fill="none" stroke="#ffffff" stroke-width=".8" opacity=".25"/>
+ <!-- Spokes -->
+ <line x1="32" y1="5" x2="32" y2="59" stroke="rgba(255,255,255,.28)" stroke-width="1"/>
+ <line x1="5" y1="32" x2="59" y2="32" stroke="rgba(255,255,255,.28)" stroke-width="1"/>
+ <line x1="12.9" y1="13.1" x2="51.1" y2="50.9" stroke="rgba(255,255,255,.22)" stroke-width=".8"/>
+ <line x1="51.1" y1="13.1" x2="12.9" y2="50.9" stroke="rgba(255,255,255,.22)" stroke-width=".8"/>
+ <!-- Center hub — 3D sphere -->
+ <circle cx="32" cy="32" r="7.5" fill="url(#wh-hub)"/>
+ <circle cx="32" cy="32" r="4.5" fill="#88aadd" opacity=".8"/>
+ <circle cx="30.8" cy="30.8" r="2.2" fill="#ffffff" opacity=".7"/>
+ <!-- Pointer arrow at top -->
+ <polygon points="32,1 35,10 29,10" fill="#ffd700"/>
+ <polygon points="32,1 35,10 29,10" stroke="#fff" stroke-width=".8" fill="none" opacity=".5"/>
+</g></svg>`,
+
+// ── PLINKO — 3D pin board with glowing ball ───────────────────
+plinko: `<svg viewBox="0 0 64 64" width="60" height="60" fill="none" xmlns="http://www.w3.org/2000/svg">
+<defs>
+ <radialGradient id="pl-ball" cx="38%" cy="32%" r="58%">
+  <stop offset="0%" stop-color="#ffffff"/>
+  <stop offset="40%" stop-color="#88eeff"/>
+  <stop offset="100%" stop-color="#0088cc"/>
+ </radialGradient>
+ <radialGradient id="pl-trail" cx="50%" cy="0%" r="100%">
+  <stop offset="0%" stop-color="#00d4ff" stop-opacity=".7"/>
+  <stop offset="100%" stop-color="transparent"/>
+ </radialGradient>
+ <filter id="pl-glow"><feGaussianBlur stdDeviation="1.8" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+</defs>
+<g filter="url(#pl-glow)">
+ <!-- Board background subtle gradient -->
+ <rect x="4" y="6" width="56" height="52" rx="4" fill="rgba(0,212,255,.03)" stroke="rgba(0,212,255,.12)" stroke-width=".8"/>
+ <!-- PIN GRID — row 1 -->
+ <circle cx="20" cy="14" r="2.2" fill="#00d4ff" opacity=".7"/>
+ <circle cx="32" cy="14" r="2.2" fill="#00d4ff" opacity=".7"/>
+ <circle cx="44" cy="14" r="2.2" fill="#00d4ff" opacity=".7"/>
+ <!-- row 2 -->
+ <circle cx="14" cy="22" r="2.2" fill="#00d4ff" opacity=".6"/>
+ <circle cx="26" cy="22" r="2.2" fill="#00d4ff" opacity=".6"/>
+ <circle cx="38" cy="22" r="2.2" fill="#00d4ff" opacity=".6"/>
+ <circle cx="50" cy="22" r="2.2" fill="#00d4ff" opacity=".6"/>
+ <!-- row 3 -->
+ <circle cx="20" cy="30" r="2.2" fill="#00d4ff" opacity=".5"/>
+ <circle cx="32" cy="30" r="2.2" fill="#00d4ff" opacity=".5"/>
+ <circle cx="44" cy="30" r="2.2" fill="#00d4ff" opacity=".5"/>
+ <!-- row 4 -->
+ <circle cx="14" cy="38" r="2.2" fill="#00d4ff" opacity=".42"/>
+ <circle cx="26" cy="38" r="2.2" fill="#00d4ff" opacity=".42"/>
+ <circle cx="38" cy="38" r="2.2" fill="#00d4ff" opacity=".42"/>
+ <circle cx="50" cy="38" r="2.2" fill="#00d4ff" opacity=".42"/>
+ <!-- Ball trail -->
+ <path d="M32 4 L32 14 L26 22 L32 30 L26 38" stroke="#00d4ff" stroke-width="1.5" stroke-dasharray="2.5 3" opacity=".45" fill="none" stroke-linecap="round"/>
+ <!-- Prize buckets bottom -->
+ <rect x="6" y="48" width="9" height="10" rx="2" fill="#ff4d6a" opacity=".8"/>
+ <rect x="17" y="46" width="9" height="12" rx="2" fill="#ffd700" opacity=".85"/>
+ <rect x="28" y="44" width="9" height="14" rx="2" fill="#00ff88" opacity=".9"/>
+ <rect x="39" y="46" width="9" height="12" rx="2" fill="#ffd700" opacity=".85"/>
+ <rect x="50" y="48" width="8" height="10" rx="2" fill="#ff4d6a" opacity=".8"/>
+ <!-- Glowing ball at current position -->
+ <circle cx="26" cy="38" r="5.5" fill="rgba(0,212,255,.2)"/>
+ <circle cx="26" cy="38" r="4" fill="url(#pl-ball)"/>
+ <circle cx="24.8" cy="36.8" r="1.5" fill="#ffffff" opacity=".75"/>
+</g></svg>`,
+
+// ── VORTEX CIRCULAR — 3D glowing crystalline orb with rings ───
+vortex_circular: `<svg viewBox="0 0 64 64" width="60" height="60" fill="none" xmlns="http://www.w3.org/2000/svg">
+<defs>
+ <radialGradient id="vc-orb" cx="38%" cy="32%" r="62%">
+  <stop offset="0%" stop-color="#ffffff" stop-opacity=".95"/>
+  <stop offset="28%" stop-color="#88ddff" stop-opacity=".9"/>
+  <stop offset="55%" stop-color="#0088cc" stop-opacity=".85"/>
+  <stop offset="80%" stop-color="#4400bb" stop-opacity=".8"/>
+  <stop offset="100%" stop-color="#220060" stop-opacity=".7"/>
+ </radialGradient>
+ <radialGradient id="vc-halo" cx="50%" cy="50%" r="50%">
+  <stop offset="40%" stop-color="transparent"/>
+  <stop offset="75%" stop-color="#00d4ff" stop-opacity=".12"/>
+  <stop offset="100%" stop-color="transparent"/>
+ </radialGradient>
+ <filter id="vc-glow"><feGaussianBlur stdDeviation="2.8" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+</defs>
+<g filter="url(vc-glow)">
+ <!-- Outer halo -->
+ <circle cx="32" cy="32" r="30" fill="url(#vc-halo)"/>
+ <!-- Ring 1 — outer ellipse (3D perspective) -->
+ <ellipse cx="32" cy="32" rx="29" ry="10" stroke="#00d4ff" stroke-width="1.8" fill="none" opacity=".5" stroke-dasharray="6 3"/>
+ <!-- Ring 2 — middle tilted -->
+ <ellipse cx="32" cy="32" rx="22" ry="22" stroke="#7b2fff" stroke-width="1.5" fill="none" opacity=".5" transform="rotate(55 32 32)" stroke-dasharray="4 4"/>
+ <!-- Ring 3 — inner tight -->
+ <ellipse cx="32" cy="32" rx="13" ry="5" stroke="#00ff88" stroke-width="1.5" fill="none" opacity=".55" transform="rotate(-20 32 32)"/>
+ <!-- Orb glow backing -->
+ <circle cx="32" cy="32" r="14" fill="rgba(0,212,255,.15)"/>
+ <!-- Orb body — 3D sphere -->
+ <circle cx="32" cy="32" r="12" fill="url(#vc-orb)"/>
+ <!-- Crystal facet reflections -->
+ <path d="M26 26 L32 20 L38 26 L32 30 Z" fill="rgba(255,255,255,.18)"/>
+ <path d="M26 38 L32 44 L38 38 L32 34 Z" fill="rgba(0,212,255,.12)"/>
+ <!-- Specular highlight -->
+ <ellipse cx="28.5" cy="27" rx="4" ry="2.8" fill="rgba(255,255,255,.55)" transform="rotate(-35 28.5 27)"/>
+ <circle cx="27.5" cy="26" r="2" fill="rgba(255,255,255,.8)"/>
+ <!-- Orb rim glow -->
+ <circle cx="32" cy="32" r="12" stroke="#00d4ff" stroke-width="1.5" fill="none" opacity=".6"/>
+ <!-- Energy sparks around orb -->
+ <line x1="32" y1="16" x2="32" y2="19" stroke="#00d4ff" stroke-width="1.5" stroke-linecap="round" opacity=".7"/>
+ <line x1="46" y1="22" x2="44" y2="24.5" stroke="#7b2fff" stroke-width="1.2" stroke-linecap="round" opacity=".65"/>
+ <line x1="48" y1="32" x2="45" y2="32" stroke="#00d4ff" stroke-width="1.2" stroke-linecap="round" opacity=".6"/>
+ <line x1="46" y1="42" x2="44" y2="39.5" stroke="#00ff88" stroke-width="1.2" stroke-linecap="round" opacity=".55"/>
+ <line x1="32" y1="48" x2="32" y2="45" stroke="#00d4ff" stroke-width="1.5" stroke-linecap="round" opacity=".6"/>
+ <line x1="18" y1="42" x2="20" y2="39.5" stroke="#7b2fff" stroke-width="1.2" stroke-linecap="round" opacity=".55"/>
+ <line x1="16" y1="32" x2="19" y2="32" stroke="#00d4ff" stroke-width="1.2" stroke-linecap="round" opacity=".6"/>
+ <line x1="18" y1="22" x2="20" y2="24.5" stroke="#00ff88" stroke-width="1.2" stroke-linecap="round" opacity=".55"/>
+</g></svg>`,
 };
+/* Category icons for the 89 placeholder games */};
 /* Category icons for the 89 placeholder games */
 const CAT_ICONS = [
  neonSvg('<rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/>','#00d4ff'), // cards
@@ -4541,9 +5115,10 @@ const GAMES_DATA = [
  { id: 'limbo', name: 'Limbo', players: 487, badge: '', bgColor: '#0f0c00' },
  { id: 'wheel', name: 'Wheel', players: 445, badge: '', bgColor: '#020f06' },
  { id: 'hilo', name: 'HiLo', players: 498, badge: '', bgColor: '#0f0208' },
+ { id: 'vortex_circular', name: 'Vortex Circular', players: 612, badge: 'new', bgColor: '#021018' },
  { id: 'plinko', name: 'Plinko', players: 534, badge: '', bgColor: '#02080f' },
 ];
-const ACTIVE_GAMES_SET = new Set(['crash','mines','tower','singularity','rush','roulette','dice']);
+const ACTIVE_GAMES_SET = new Set(['crash','mines','tower','singularity','rush','roulette','dice','limbo','wheel','plinko','vortex_circular']);
 const ALL_100_GAMES = (function(){
  const extras = ['Blackjack','Baccarat','Keno','Slots Pro','Dragon Tiger','Andar Bahar','Teen Patti','3 Card Poker','Sic Bo','Pai Gow','Fast Keno','Lightning Dice','Super Sic Bo','Dragon Drop','Money Wheel','Golden Bat','Speed Baccarat','Quantum Roulette','Monopoly Live','Deal or No Deal','Football Studio','Gonzo Quest','Book of Dead','Starburst','Reactoonz','Gates of Olympus','Sweet Bonanza','Big Bass Bonanza','Money Train','Dead or Alive','Razor Shark','Wolf Gold','Rise of Merlin','Jammin Jars','Fruit Party','Invaders Moon','Release the Kraken','Buffalo King','Primate King','Wild West Gold','Piggy Riches','Reel King','Eye of Horus','Fishin Frenzy','Rainbow Riches','Mega Moolah','Divine Fortune','Hall of Gods','Age of Gods','Jackpot Giant','Gladiator','Lara Croft','Sherlock','Batman','Jurassic Park','Terminator','Iron Man','Thor','Hulk','Captain America','Spider Man','X Men','Fantastic Four','Blade','Daredevil','Punisher','Ghost Rider','Elektra','Wolverine','Cyclops','Storm','Jean Grey','Rogue','Gambit','Avalon','Thunderstruck','Immortal Romance','Hitman','Tomb Raider','Playboy','Lucky Leprechaun','Tiki Bounce','Amazon Wild','Snow Leopard','Dolphin Coast','Mega Gems','Diamond Empire','Royal Charm'];
  const base = [...GAMES_DATA];
@@ -4635,16 +5210,24 @@ function renderHome() {
 
 /* ─── BC.GAME CARD COLOR GRADIENTS ─── */
 const CARD_GRADIENTS = {
- crash:      'linear-gradient(145deg,#1a0a2e 0%,#2d0a5e 60%,#1a0a2e 100%)',
- mines:      'linear-gradient(145deg,#083018 0%,#0d4020 60%,#05180a 100%)',
- dice:       'linear-gradient(145deg,#0d1a2e 0%,#1a2d4a 60%,#0a1220 100%)',
- roulette:   'linear-gradient(145deg,#1e0a0a 0%,#3d1010 60%,#1a0808 100%)',
- singularity:'linear-gradient(145deg,#0a0a2e 0%,#0d0d5e 60%,#050520 100%)',
- rush:       'linear-gradient(145deg,#1e1400 0%,#3d2a00 60%,#1a1000 100%)',
- spinmaster: 'linear-gradient(145deg,#1a0020 0%,#320040 60%,#12001a 100%)',
- default:    'linear-gradient(145deg,#0d1228 0%,#070a18 100%)',
+ crash:          'linear-gradient(145deg,#1a0410 0%,#350818 55%,#180308 100%)',
+ mines:          'linear-gradient(145deg,#041a0c 0%,#083020 55%,#020e08 100%)',
+ tower:          'linear-gradient(145deg,#08041a 0%,#140830 55%,#060218 100%)',
+ singularity:    'linear-gradient(145deg,#060418 0%,#10083a 55%,#040214 100%)',
+ rush:           'linear-gradient(145deg,#021018 0%,#041e2e 55%,#010a12 100%)',
+ roulette:       'linear-gradient(145deg,#1a0a02 0%,#2e1404 55%,#120800 100%)',
+ dice:           'linear-gradient(145deg,#0a061e 0%,#18103a 55%,#060318 100%)',
+ limbo:          'linear-gradient(145deg,#161004 0%,#2a1e08 55%,#100c02 100%)',
+ wheel:          'linear-gradient(145deg,#041408 0%,#082814 55%,#020c04 100%)',
+ plinko:         'linear-gradient(145deg,#021014 0%,#041e28 55%,#010a10 100%)',
+ vortex_circular:'linear-gradient(145deg,#040c18 0%,#08183a 55%,#020810 100%)',
+ spinmaster:     'linear-gradient(145deg,#1a0020 0%,#320040 55%,#12001a 100%)',
+ default:        'linear-gradient(145deg,#0a0e1e 0%,#06081a 100%)',
 };
-const CARD_MULT = { crash:'999×', dice:'48×', roulette:'36×', singularity:'500×', rush:'200×' };
+const CARD_MULT = {
+ crash:'999×', dice:'48×', roulette:'36×', singularity:'500×', rush:'200×',
+ limbo:'∞×', tower:'100×', wheel:'50×', plinko:'1000×', vortex_circular:'50×'
+};
 
 function gameCard(g) {
  const active = ACTIVE_GAMES_SET.has(g.id);
@@ -9798,156 +10381,760 @@ input:focus, select:focus {
 </style>
 
 
-<!-- ═══ VORTEX SPIN ENGINE ═══ -->
+<!-- ═══ VORTEX CIRCULAR ENGINE v3 ═══ -->
 <script>
 (function(){
 'use strict';
-var VSYM={
-  star:'<svg viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg"><defs><radialGradient id="vs-rg-star" cx="50%" cy="45%" r="55%"><stop offset="0%" stop-color="#ffffff" stop-opacity=".95"/><stop offset="30%" stop-color="#00e0ff" stop-opacity=".9"/><stop offset="75%" stop-color="#7b2fff" stop-opacity=".6"/><stop offset="100%" stop-color="#7b2fff" stop-opacity="0"/></radialGradient><filter id="vs-f-star"><feGaussianBlur stdDeviation="2.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs><polygon points="30,4 34.8,19 50.5,19 37.8,28.2 42.5,43 30,34.2 17.5,43 22.2,28.2 9.5,19 25.2,19" fill="url(#vs-rg-star)" filter="url(#vs-f-star)" stroke="rgba(0,212,255,.4)" stroke-width=".8"/><polygon points="30,8 34,20.5 47,20.5 36.8,27.8 40.8,40 30,33.2 19.2,40 23.2,27.8 13,20.5 26,20.5" fill="url(#vs-rg-star)"/><circle cx="30" cy="30" r="4.5" fill="rgba(255,255,255,.9)" filter="url(#vs-f-star)"/></svg>',
-  crown:'<svg viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="vs-lg-cr" x1="0" y1="0" x2="60" y2="60" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#ffe566"/><stop offset="50%" stop-color="#ffd700"/><stop offset="100%" stop-color="#ff9900"/></linearGradient><filter id="vs-f-cr"><feGaussianBlur stdDeviation="2.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs><path d="M8 42 L12 22 L22 34 L30 14 L38 34 L48 22 L52 42 Z" fill="url(#vs-lg-cr)" filter="url(#vs-f-cr)" stroke="rgba(255,215,0,.25)" stroke-width=".8" stroke-linejoin="round"/><rect x="8" y="43" width="44" height="6" rx="2" fill="url(#vs-lg-cr)" filter="url(#vs-f-cr)"/><circle cx="12" cy="22" r="3.5" fill="#fff" filter="url(#vs-f-cr)"/><circle cx="30" cy="14" r="3.5" fill="#fff" filter="url(#vs-f-cr)"/><circle cx="48" cy="22" r="3.5" fill="#fff" filter="url(#vs-f-cr)"/><circle cx="19" cy="46" r="2" fill="rgba(255,255,255,.65)"/><circle cx="30" cy="46" r="2" fill="rgba(255,255,255,.65)"/><circle cx="41" cy="46" r="2" fill="rgba(255,255,255,.65)"/></svg>',
-  gem:'<svg viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="vs-lg-gem" x1="0" y1="0" x2="60" y2="60" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#80ffee"/><stop offset="45%" stop-color="#00e676"/><stop offset="100%" stop-color="#006633"/></linearGradient><filter id="vs-f-gem"><feGaussianBlur stdDeviation="2.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs><polygon points="30,5 52,22 52,40 30,56 8,40 8,22" fill="url(#vs-lg-gem)" filter="url(#vs-f-gem)" stroke="rgba(0,230,118,.35)" stroke-width=".8"/><polygon points="30,5 52,22 30,32" fill="rgba(255,255,255,.22)"/><polygon points="30,5 8,22 30,32" fill="rgba(255,255,255,.1)"/><polygon points="8,22 52,22 30,32" fill="rgba(0,0,0,.12)"/><polygon points="30,56 8,40 30,32" fill="rgba(0,0,0,.18)"/><line x1="30" y1="8" x2="30" y2="16" stroke="rgba(255,255,255,.6)" stroke-width="2.5" stroke-linecap="round"/></svg>',
-  bomb:'<svg viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg"><defs><radialGradient id="vs-rg-bomb" cx="38%" cy="30%" r="62%"><stop offset="0%" stop-color="#3d0818"/><stop offset="70%" stop-color="#0d0005"/><stop offset="100%" stop-color="#060002"/></radialGradient><filter id="vs-f-bomb"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs><path d="M39 17 Q50 8 46 4" stroke="#ff8800" stroke-width="3" stroke-linecap="round" fill="none"/><circle cx="46" cy="4" r="4" fill="#ffcc00" filter="url(#vs-f-bomb)"/><circle cx="27" cy="36" r="20" fill="url(#vs-rg-bomb)" stroke="#ff2dce" stroke-width="1.5" filter="url(#vs-f-bomb)"/><ellipse cx="21" cy="28" rx="5.5" ry="3.5" fill="rgba(255,255,255,.1)" transform="rotate(-25 21 28)"/><line x1="27" y1="16" x2="27" y2="12" stroke="#ff2dce" stroke-width="2" stroke-linecap="round"/><line x1="7" y1="36" x2="3" y2="36" stroke="#ff2dce" stroke-width="2" stroke-linecap="round"/><line x1="47" y1="36" x2="51" y2="36" stroke="#ff2dce" stroke-width="2" stroke-linecap="round"/><line x1="12" y1="21" x2="8.5" y2="17.5" stroke="#ff2dce" stroke-width="2" stroke-linecap="round"/><line x1="42" y1="21" x2="45.5" y2="17.5" stroke="#ff2dce" stroke-width="2" stroke-linecap="round"/></svg>',
-  seven:'<svg viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="vs-lg-7" x1="0" y1="0" x2="60" y2="60" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#ffe566"/><stop offset="55%" stop-color="#ff6600"/><stop offset="100%" stop-color="#ff0055"/></linearGradient><filter id="vs-f-7"><feGaussianBlur stdDeviation="3.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs><text x="30" y="43" text-anchor="middle" font-family="Georgia,serif" font-size="38" font-weight="900" font-style="italic" fill="url(#vs-lg-7)" filter="url(#vs-f-7)">7</text><line x1="12" y1="50" x2="48" y2="50" stroke="rgba(255,102,0,.35)" stroke-width="2.5" stroke-linecap="round"/></svg>'
-};
-var VS_DEFS=[
-  {id:'star', label:'Vortex Star', mul3:50,bomb:false},
-  {id:'crown',label:'Golden Crown',mul3:20,bomb:false},
-  {id:'gem',  label:'Emerald Gem', mul3:10,bomb:false},
-  {id:'seven',label:'Neon 7',      mul3:5, bomb:false},
-  {id:'bomb', label:'Bomb',        mul3:0, bomb:true}
+
+/* ═══════════════════════════════════════════════════════════
+   VORTEX CIRCULAR ENGINE v3
+   · Each ring segment displays its multiplier INSIDE the ring
+   · Cubic-bezier(0, 0, 0.2, 1) heavy-brake physics
+   · Per-ring light-up  →  auto cashout after inner ring stops
+   · 3-ring multiplicative: outer × middle × inner = total mult
+   · Zero emoji — geometric SVG + neon text labels only
+═══════════════════════════════════════════════════════════ */
+
+/* ── RING DATA: each segment has its own multiplier ── */
+var VCE_RINGS=[
+ { n:16, rf:0.76, wf:0.16, segs:[
+   {sym:'VORTEX',mult:2.0},{sym:'GEM',mult:1.2},{sym:'CROWN',mult:1.5},{sym:'COIN',mult:0.8},
+   {sym:'STAR',  mult:1.8},{sym:'BOMB', mult:0 },{sym:'GEM',  mult:1.0},{sym:'VORTEX',mult:1.5},
+   {sym:'CROWN', mult:1.2},{sym:'STAR', mult:2.0},{sym:'COIN',mult:1.5},{sym:'BOMB',  mult:0 },
+   {sym:'VORTEX',mult:1.8},{sym:'GEM',  mult:0.8},{sym:'CROWN',mult:1.0},{sym:'STAR', mult:1.2}
+ ]},
+ { n:12, rf:0.57, wf:0.14, segs:[
+   {sym:'CROWN', mult:2.0},{sym:'VORTEX',mult:3.5},{sym:'GEM',  mult:2.5},{sym:'COIN',  mult:1.5},
+   {sym:'STAR',  mult:2.0},{sym:'VORTEX',mult:4.0},{sym:'CROWN',mult:2.5},{sym:'BOMB',  mult:0  },
+   {sym:'VORTEX',mult:3.0},{sym:'GEM',   mult:2.0},{sym:'STAR', mult:1.5},{sym:'BOMB',  mult:0  }
+ ]},
+ { n:8,  rf:0.39, wf:0.13, segs:[
+   {sym:'VORTEX',mult:5 },{sym:'CROWN',mult:8 },{sym:'GEM',  mult:6 },{sym:'VORTEX',mult:12},
+   {sym:'BOMB',  mult:0 },{sym:'STAR', mult:7 },{sym:'VORTEX',mult:25},{sym:'BOMB',  mult:0 }
+ ]}
 ];
-var VS={spinning:false,result:['star','gem','crown'],spins:0,wins:0,best:0,totalBet:0,totalReturn:0};
 
-function vsSetSym(i,id){var el=document.getElementById('vsSym'+i);if(el)el.innerHTML=VSYM[id]||'';}
-function vsBuildPays(){
-  var row=document.getElementById('vsPaysRow');if(!row)return;
-  var html='';
-  VS_DEFS.forEach(function(d){
-    var mult=d.bomb?'<span class="vs-pay-mult red">LOSS</span>':'<span class="vs-pay-mult">'+d.mul3+'&times;</span>';
-    html+='<div class="vs-pay"><div class="vs-pay-icon">'+VSYM[d.id]+'</div><div style="display:flex;flex-direction:column;line-height:1.2;gap:1px;"><span class="vs-pay-combo">'+(d.bomb?'any':'3&times;')+'</span>'+mult+'</div></div>';
-  });
-  html+='<div class="vs-pay"><span style="font-size:.7rem;font-family:var(--font-m);color:var(--text3);">2 same</span><span class="vs-pay-mult" style="margin-left:5px;">2&times;</span></div>';
-  row.innerHTML=html;
-}
-function vsUpdateBal(){var el=document.getElementById('vsBalDisp');if(el&&typeof balance!=='undefined')el.textContent='$'+balance.toFixed(2);}
-
-/* ── Sounds ── */
-function vsWhir(on){
-  try{
-    var ctx=getAudio();if(ctx.state==='suspended')ctx.resume();
-    if(on){
-      if(window._vsW)return;
-      var o1=ctx.createOscillator(),o2=ctx.createOscillator(),g=ctx.createGain();
-      o1.type='sawtooth';o1.frequency.value=88;o2.type='square';o2.frequency.value=132;
-      g.gain.value=0.038;o1.connect(g);o2.connect(g);g.connect(ctx.destination);
-      o1.start();o2.start();window._vsW={o1,o2,g};
-    }else{
-      if(window._vsW){try{window._vsW.o1.stop();}catch(e){}try{window._vsW.o2.stop();}catch(e){} window._vsW=null;}
-    }
-  }catch(e){}
-}
-function vsClick(){
-  try{var ctx=getAudio();if(ctx.state==='suspended')ctx.resume();var t=ctx.currentTime;[0,.055,.11].forEach(function(d){var o=ctx.createOscillator(),g=ctx.createGain();o.connect(g);g.connect(ctx.destination);o.type='square';o.frequency.setValueAtTime(200,t+d);o.frequency.exponentialRampToValueAtTime(75,t+d+.055);g.gain.setValueAtTime(0,t+d);g.gain.linearRampToValueAtTime(.1,t+d+.005);g.gain.exponentialRampToValueAtTime(0.001,t+d+.07);o.start(t+d);o.stop(t+d+.09);});}catch(e){}
-}
-function vsJackpotBells(){
-  try{var ctx=getAudio();if(ctx.state==='suspended')ctx.resume();var t=ctx.currentTime;[523,659,784,1047,1319,1568,2093,2637].forEach(function(f,i){var o=ctx.createOscillator(),g=ctx.createGain();o.connect(g);g.connect(ctx.destination);o.type=i%3===0?'triangle':'sine';o.frequency.setValueAtTime(f,t+i*.07);g.gain.setValueAtTime(0,t+i*.07);g.gain.linearRampToValueAtTime(.13,t+i*.07+.02);g.gain.exponentialRampToValueAtTime(0.001,t+i*.07+.48);o.start(t+i*.07);o.stop(t+i*.07+.5);});[3136,4186,6272].forEach(function(f,i){var o=ctx.createOscillator(),g=ctx.createGain();o.connect(g);g.connect(ctx.destination);o.type='sine';o.frequency.value=f;g.gain.setValueAtTime(0,t+.52+i*.05);g.gain.linearRampToValueAtTime(.06,t+.54+i*.05);g.gain.exponentialRampToValueAtTime(0.001,t+.52+i*.05+.3);o.start(t+.52+i*.05);o.stop(t+.84+i*.05);});}catch(e){}
-}
-function vsWinSnd(){try{var ctx=getAudio();if(ctx.state==='suspended')ctx.resume();var t=ctx.currentTime;[784,1047,1319,1568].forEach(function(f,i){var o=ctx.createOscillator(),g=ctx.createGain();o.connect(g);g.connect(ctx.destination);o.type='triangle';o.frequency.value=f;g.gain.setValueAtTime(0,t+i*.08);g.gain.linearRampToValueAtTime(.1,t+i*.08+.02);g.gain.exponentialRampToValueAtTime(0.001,t+i*.08+.3);o.start(t+i*.08);o.stop(t+i*.08+.32);});}catch(e){}}
-function vsLossSnd(){try{var ctx=getAudio();if(ctx.state==='suspended')ctx.resume();var t=ctx.currentTime;var o=ctx.createOscillator(),g=ctx.createGain();o.connect(g);g.connect(ctx.destination);o.type='sawtooth';o.frequency.setValueAtTime(220,t);o.frequency.exponentialRampToValueAtTime(55,t+.38);g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(.12,t+.02);g.gain.exponentialRampToValueAtTime(0.001,t+.42);o.start(t);o.stop(t+.44);}catch(e){}}
-
-/* ── Confetti ── */
-function vsConfetti(){
-  var colors=['#ffd700','#00d4ff','#ff2dce','#00ff88','#ffffff','#7b2fff','#ffaa00'];
-  for(var i=0;i<130;i++){(function(i){setTimeout(function(){
-    var el=document.createElement('div');el.className='vs-confetti';
-    var w=(5+Math.random()*8)+'px';
-    var x0=(Math.random()*100)+'vw',y0='-15px';
-    var x1=(Math.random()*200-100)+'px',y1=(55+Math.random()*40)+'vh';
-    var rot=(Math.random()*1440-720)+'deg';
-    var dur=(1.6+Math.random()*1.8)+'s',delay=(i*.014)+'s';
-    var c=colors[Math.floor(Math.random()*colors.length)];
-    var br=Math.random()>.5?'50%':'2px';
-    el.style.cssText='left:'+x0+';top:'+y0+';width:'+w+';height:'+w+';background:'+c+';border-radius:'+br+';--cd:'+dur+';--delay:'+delay+';--x0:0;--y0:0;--x1:'+x1+';--y1:'+y1+';--rot:'+rot+';';
-    document.body.appendChild(el);
-    setTimeout(function(){el.remove();},(parseFloat(dur)+parseFloat(delay))*1000+400);
-  },i*14);})(i);}
-}
-
-/* ── Payout logic ── */
-function vsCalcPayout(result,bet){
-  if(result.indexOf('bomb')!==-1)return{mult:0,label:'&#x1F4A3; BOMB &mdash; Lost $'+bet.toFixed(2),cls:'bomb-loss'};
-  var a=result[0],b=result[1],c=result[2];
-  if(a===b&&b===c){var d=VS_DEFS.filter(function(x){return x.id===a;})[0];if(d)return{mult:d.mul3,label:(a==='star'?'&#x2B50;&#x2B50;&#x2B50; JACKPOT! '+d.mul3+'&times;!':d.label+' &times;3 &mdash; '+d.mul3+'&times;'),cls:a==='star'?'jackpot':'win',jackpot:a==='star'};}
-  var cnt={};result.forEach(function(s){cnt[s]=(cnt[s]||0)+1;});
-  if(Object.keys(cnt).some(function(k){return cnt[k]>=2;}))return{mult:2,label:'Two of a kind &mdash; 2&times;',cls:'win'};
-  return{mult:0,label:'No match',cls:'loss'};
-}
-
-/* ── SPIN ── */
-window.vsSpin=function(){
-  if(VS.spinning)return;
-  var inp=document.getElementById('vsBetInput');
-  var bet=parseFloat(inp?inp.value:10);
-  if(!bet||bet<1){if(typeof toast==='function')toast('Minimum bet $1','error');return;}
-  if(typeof balance==='undefined'||bet>balance){if(typeof toast==='function')toast('Insufficient balance','error');return;}
-  VS.spinning=true;VS.spins++;VS.totalBet+=bet;
-  updateBalance(-bet);vsUpdateBal();
-  var btn=document.getElementById('vsSpinBtn'),res=document.getElementById('vsResultTxt'),cab=document.getElementById('vsCabinet');
-  if(btn){btn.disabled=true;btn.classList.add('vs-spinning');}
-  if(res){res.className='vs-result-txt idle';res.textContent='Spinning...';}
-  if(cab)cab.classList.remove('vs-flash');
-  [0,1,2].forEach(function(i){var r=document.getElementById('vsReel'+i);if(r)r.classList.remove('vs-reel-win','vs-reel-loss');});
-  vsWhir(true);vsClick();
-  [0,1,2].forEach(function(i){var s=document.getElementById('vsStrip'+i);if(s){s.classList.remove('vs-reel-land');s.classList.add('vs-spin-blur');}});
-  var pool=['star','crown','gem','seven','bomb'],wt=[.08,.15,.22,.28,.27];
-  function pick(){var r=Math.random(),a=0;for(var i=0;i<pool.length;i++){a+=wt[i];if(r<a)return pool[i];}return pool[pool.length-1];}
-  var sr=[pick(),pick(),pick()];
-  [580,940,1300].forEach(function(stopAt,idx){
-    setTimeout(function(){
-      vsWhir(false);vsClick();
-      var s=document.getElementById('vsStrip'+idx);
-      if(s){s.classList.remove('vs-spin-blur');vsSetSym(idx,sr[idx]);void s.offsetWidth;s.classList.add('vs-reel-land');}
-    },stopAt);
-  });
-  setTimeout(function(){
-    VS.result=sr;vsWhir(false);
-    var p=vsCalcPayout(sr,bet);
-    if(p.mult>0){
-      var winAmt=bet*p.mult,profit=winAmt-bet;
-      updateBalance(winAmt);vsUpdateBal();
-      VS.wins++;VS.totalReturn+=winAmt;if(profit>VS.best)VS.best=profit;
-      var triple=(sr[0]===sr[1]&&sr[1]===sr[2]);
-      sr.forEach(function(s,i){if(triple||(sr.filter(function(x){return x===s;}).length>=2)){var r=document.getElementById('vsReel'+i);if(r)r.classList.add('vs-reel-win');}});
-      if(cab)cab.classList.add('vs-flash');
-      if(p.jackpot){vsJackpotBells();vsConfetti();if(typeof spawnParticles==='function'){var wr=document.getElementById('vsCabinet');if(wr){var rc=wr.getBoundingClientRect();spawnParticles(rc.left+rc.width/2,rc.top+rc.height/2,60,['#ffd700','#fff','#00d4ff'],'gem');}}}
-      else vsWinSnd();
-      if(typeof toast==='function')toast('&#x2728; +$'+profit.toFixed(2)+' &mdash; '+p.mult+'&times;','success');
-      if(typeof recordBet==='function')recordBet('vortex-spin',bet,p.mult,profit);
-      if(typeof addTx==='function')addTx('Spin Win',profit,'won');
-    }else{
-      sr.forEach(function(s,i){var r=document.getElementById('vsReel'+i);if(r)r.classList.add('vs-reel-loss');});
-      VS.totalReturn+=0;vsLossSnd();
-      if(p.cls==='bomb-loss'&&typeof toast==='function')toast('&#x1F4A3; BOMB!','error');
-      if(typeof recordBet==='function')recordBet('vortex-spin',bet,0,-bet);
-      if(typeof addTx==='function')addTx('Spin Loss',-bet,'lost');
-    }
-    if(res){res.className='vs-result-txt '+p.cls;res.innerHTML=p.label;}
-    var ss=document.getElementById('vsStatSpins'),sw=document.getElementById('vsStatWins'),sb=document.getElementById('vsStatBest'),sr2=document.getElementById('vsStatRtp');
-    if(ss)ss.textContent=VS.spins;if(sw)sw.textContent=VS.wins;if(sb)sb.textContent='$'+(VS.best>0?VS.best.toFixed(2):'0');
-    if(sr2)sr2.textContent=VS.totalBet>0?((VS.totalReturn/VS.totalBet)*100).toFixed(0)+'%':'--%';
-    VS.spinning=false;if(btn){btn.disabled=false;btn.classList.remove('vs-spinning');}
-  },1300+320);
+/* ── SYMBOL DRAW FUNCTIONS (100% canvas, zero emoji) ── */
+var VCE_SYMS={
+ VORTEX:{color:'#00d4ff',glow:'rgba(0,212,255,.85)', draw:drawVortexSym},
+ CROWN: {color:'#ffd700',glow:'rgba(255,215,0,.75)',  draw:drawCrownSym},
+ GEM:   {color:'#a855f7',glow:'rgba(168,85,247,.7)',  draw:drawGemSym},
+ COIN:  {color:'#00ff88',glow:'rgba(0,255,136,.65)',  draw:drawCoinSym},
+ STAR:  {color:'#ff9900',glow:'rgba(255,153,0,.65)',  draw:drawStarSym},
+ BOMB:  {color:'#ff2dce',glow:'rgba(255,45,206,.8)',  draw:drawBoltSym}  // lightning bolt = professional icon
 };
-window.vsAdjBet=function(f){var i=document.getElementById('vsBetInput');if(i)i.value=Math.max(1,parseFloat(i.value||10)*f).toFixed(2);};
-window.vsSetBet=function(v){var i=document.getElementById('vsBetInput');if(i)i.value=parseFloat(v).toFixed(2);};
 
-function vsInit(){vsSetSym(0,'star');vsSetSym(1,'gem');vsSetSym(2,'crown');vsBuildPays();vsUpdateBal();}
-if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',vsInit);}else{vsInit();}
-var _vsO=window.updateBalance;
-window.updateBalance=function(d){_vsO.apply(this,arguments);vsUpdateBal();};
+/* Lightning bolt for BOMB (neon, no emoji) */
+function drawBoltSym(ctx,r,col,glow,hl){
+ if(hl>0.3){ctx.shadowColor=glow;ctx.shadowBlur=r*1.1;}
+ ctx.fillStyle=col;
+ ctx.beginPath();
+ ctx.moveTo( r*0.12,-r*0.9);
+ ctx.lineTo(-r*0.32,-r*0.05);
+ ctx.lineTo( r*0.05,-r*0.05);
+ ctx.lineTo(-r*0.12, r*0.9);
+ ctx.lineTo( r*0.38, r*0.0);
+ ctx.lineTo( r*0.01, r*0.0);
+ ctx.closePath();
+ ctx.fill();
+ ctx.shadowBlur=0;
+}
+
+function drawVortexSym(ctx,r,col,glow,hl){
+ if(hl>0.3){ctx.shadowColor=glow;ctx.shadowBlur=r*0.9;}
+ ctx.strokeStyle=col;ctx.lineWidth=r*0.18;ctx.lineCap='round';
+ var steps=40;ctx.beginPath();
+ for(var i=0;i<=steps;i++){
+  var t=i/steps,ang=t*Math.PI*4,rad=r*0.85*(1-t*0.6);
+  i===0?ctx.moveTo(rad*Math.cos(ang),rad*Math.sin(ang)):ctx.lineTo(rad*Math.cos(ang),rad*Math.sin(ang));
+ }
+ ctx.stroke();ctx.shadowBlur=0;
+}
+
+function drawCrownSym(ctx,r,col,glow,hl){
+ if(hl>0.3){ctx.shadowColor=glow;ctx.shadowBlur=r*0.8;}
+ ctx.fillStyle=col;
+ var h=r*0.72,b=r*0.78;
+ ctx.beginPath();
+ ctx.moveTo(-b,-h*0.05);ctx.lineTo(-b*0.62,h*0.45);ctx.lineTo(-b*0.2,-h*0.55);
+ ctx.lineTo(0,h*0.35);ctx.lineTo(b*0.2,-h*0.55);ctx.lineTo(b*0.62,h*0.45);
+ ctx.lineTo(b,-h*0.05);ctx.lineTo(b,h*0.55);ctx.lineTo(-b,h*0.55);
+ ctx.closePath();ctx.fill();
+ ctx.fillStyle='rgba(255,255,255,.65)';
+ [-b*0.68,0,b*0.68].forEach(function(cx){ctx.beginPath();ctx.arc(cx,h*0.38,r*0.1,0,Math.PI*2);ctx.fill();});
+ ctx.shadowBlur=0;
+}
+
+function drawGemSym(ctx,r,col,glow,hl){
+ if(hl>0.3){ctx.shadowColor=glow;ctx.shadowBlur=r*0.85;}
+ var pts=[];for(var i=0;i<6;i++){var a=i/6*Math.PI*2-Math.PI/2;pts.push([r*0.82*Math.cos(a),r*0.82*Math.sin(a)]);}
+ ctx.beginPath();ctx.moveTo(pts[0][0],pts[0][1]);
+ for(var j=1;j<6;j++)ctx.lineTo(pts[j][0],pts[j][1]);
+ ctx.closePath();
+ var g=ctx.createRadialGradient(0,-r*0.2,0,0,0,r*0.85);
+ g.addColorStop(0,'rgba(255,255,255,.9)');g.addColorStop(0.4,col);g.addColorStop(1,'rgba(0,0,0,.2)');
+ ctx.fillStyle=g;ctx.fill();
+ ctx.strokeStyle='rgba(255,255,255,.3)';ctx.lineWidth=r*0.08;ctx.stroke();
+ ctx.beginPath();ctx.moveTo(pts[0][0],pts[0][1]);ctx.lineTo(0,-r*0.55);ctx.lineTo(pts[1][0],pts[1][1]);
+ ctx.fillStyle='rgba(255,255,255,.22)';ctx.fill();ctx.shadowBlur=0;
+}
+
+function drawCoinSym(ctx,r,col,glow,hl){
+ if(hl>0.3){ctx.shadowColor=glow;ctx.shadowBlur=r*0.8;}
+ var g=ctx.createRadialGradient(-r*0.2,-r*0.2,0,0,0,r*0.85);
+ g.addColorStop(0,'rgba(255,255,255,.9)');g.addColorStop(0.35,col);g.addColorStop(1,'rgba(0,180,60,.3)');
+ ctx.beginPath();ctx.arc(0,0,r*0.82,0,Math.PI*2);ctx.fillStyle=g;ctx.fill();
+ ctx.strokeStyle='rgba(255,255,255,.2)';ctx.lineWidth=r*0.1;ctx.stroke();
+ ctx.beginPath();ctx.arc(0,0,r*0.56,0,Math.PI*2);ctx.strokeStyle='rgba(255,255,255,.35)';ctx.lineWidth=r*0.07;ctx.stroke();
+ ctx.beginPath();ctx.arc(0,0,r*0.16,0,Math.PI*2);ctx.fillStyle='rgba(255,255,255,.7)';ctx.fill();ctx.shadowBlur=0;
+}
+
+function drawStarSym(ctx,r,col,glow,hl){
+ if(hl>0.3){ctx.shadowColor=glow;ctx.shadowBlur=r*0.8;}
+ var n=5,OR=r*0.82,IR=r*0.34;
+ ctx.beginPath();
+ for(var i=0;i<n*2;i++){
+  var a=i/n*Math.PI-Math.PI/2,rad=i%2===0?OR:IR;
+  i===0?ctx.moveTo(rad*Math.cos(a),rad*Math.sin(a)):ctx.lineTo(rad*Math.cos(a),rad*Math.sin(a));
+ }
+ ctx.closePath();
+ var sg=ctx.createRadialGradient(0,-r*0.25,0,0,0,OR);
+ sg.addColorStop(0,'rgba(255,255,255,.95)');sg.addColorStop(0.5,col);sg.addColorStop(1,'rgba(180,90,0,.2)');
+ ctx.fillStyle=sg;ctx.fill();
+ ctx.strokeStyle='rgba(255,255,255,.18)';ctx.lineWidth=r*0.07;ctx.stroke();ctx.shadowBlur=0;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   DISCO-CASINO SOUND ENGINE (unchanged from v2)
+═══════════════════════════════════════════════════════════ */
+var _actx=null;
+function gAC(){
+ if(!_actx)_actx=new(window.AudioContext||window.webkitAudioContext)();
+ if(_actx.state==='suspended')_actx.resume();
+ return _actx;
+}
+function mkComp(ctx){
+ var c=ctx.createDynamicsCompressor();
+ c.threshold.value=-16;c.knee.value=6;c.ratio.value=4;c.attack.value=0.003;c.release.value=0.18;
+ c.connect(ctx.destination);return c;
+}
+function sndSpinStart(){
+ try{
+  var ctx=gAC(),comp=mkComp(ctx),now=ctx.currentTime;
+  var kick=ctx.createOscillator(),kGain=ctx.createGain();
+  kick.type='sine';kick.frequency.setValueAtTime(180,now);kick.frequency.exponentialRampToValueAtTime(38,now+0.14);
+  kGain.gain.setValueAtTime(0.9,now);kGain.gain.exponentialRampToValueAtTime(0.001,now+0.22);
+  kick.connect(kGain);kGain.connect(comp);kick.start(now);kick.stop(now+0.25);
+  function throb(t){
+   var b=ctx.createOscillator(),bg=ctx.createGain();
+   b.type='sawtooth';b.frequency.value=58;
+   var flt=ctx.createBiquadFilter();flt.type='lowpass';flt.frequency.value=180;
+   bg.gain.setValueAtTime(0.38,t);bg.gain.setValueAtTime(0.28,t+0.12);bg.gain.setValueAtTime(0,t+0.22);
+   b.connect(flt);flt.connect(bg);bg.connect(comp);b.start(t);b.stop(t+0.26);
+  }
+  for(var i=0;i<18;i++)throb(now+i*0.22+0.1);
+  for(var j=0;j<9;j++){
+   var buf=ctx.createBuffer(1,Math.round(ctx.sampleRate*0.04),ctx.sampleRate);
+   var d=buf.getChannelData(0);for(var k=0;k<d.length;k++)d[k]=Math.random()*2-1;
+   var src=ctx.createBufferSource();src.buffer=buf;
+   var hf=ctx.createBiquadFilter();hf.type='highpass';hf.frequency.value=7200;
+   var hg=ctx.createGain();hg.gain.value=0.08;
+   src.connect(hf);hf.connect(hg);hg.connect(comp);
+   var ht=now+j*0.22+0.11;src.start(ht);src.stop(ht+0.05);
+  }
+ }catch(e){}
+}
+function sndRingLand(ri){
+ try{
+  var ctx=gAC(),now=ctx.currentTime;
+  var freqs=[1100,780,560];var f=freqs[ri]||800;
+  var o=ctx.createOscillator(),g=ctx.createGain();
+  o.type='triangle';
+  o.frequency.setValueAtTime(f,now);o.frequency.exponentialRampToValueAtTime(f*0.18,now+0.28);
+  g.gain.setValueAtTime(0.28,now);g.gain.exponentialRampToValueAtTime(0.001,now+0.32);
+  o.connect(g);g.connect(ctx.destination);o.start(now);o.stop(now+0.36);
+ }catch(e){}
+}
+function sndChord5x(){
+ try{
+  var ctx=gAC(),comp=mkComp(ctx),now=ctx.currentTime;
+  var notes=[261.6,329.6,392,523.2];
+  notes.forEach(function(f,i){
+   var o=ctx.createOscillator(),g=ctx.createGain();
+   o.type=i%2===0?'sawtooth':'square';o.frequency.value=f;
+   var flt=ctx.createBiquadFilter();flt.type='lowpass';flt.frequency.setValueAtTime(800,now);flt.frequency.exponentialRampToValueAtTime(3200,now+0.4);
+   g.gain.setValueAtTime(0,now+i*0.04);g.gain.linearRampToValueAtTime(0.13,now+i*0.04+0.06);g.gain.exponentialRampToValueAtTime(0.001,now+i*0.04+0.55);
+   o.connect(flt);flt.connect(g);g.connect(comp);o.start(now+i*0.04);o.stop(now+i*0.04+0.62);
+  });
+ }catch(e){}
+}
+function sndChord25x(){
+ try{
+  var ctx=gAC(),comp=mkComp(ctx),now=ctx.currentTime;
+  var root=130.8,chord=[1,1.25,1.5,2,2.5,3];
+  chord.forEach(function(r,i){
+   var o=ctx.createOscillator(),o2=ctx.createOscillator(),g=ctx.createGain();
+   o.type='sawtooth';o.frequency.value=root*r;o2.type='square';o2.frequency.value=root*r*1.004;
+   var flt=ctx.createBiquadFilter();flt.type='lowpass';
+   flt.frequency.setValueAtTime(400,now);flt.frequency.exponentialRampToValueAtTime(4800,now+0.6);
+   g.gain.setValueAtTime(0,now+i*0.05);g.gain.linearRampToValueAtTime(0.14,now+i*0.05+0.06);g.gain.exponentialRampToValueAtTime(0.001,now+i*0.05+0.8);
+   o.connect(flt);o2.connect(flt);flt.connect(g);g.connect(comp);
+   o.start(now+i*0.05);o.stop(now+i*0.05+0.88);o2.start(now+i*0.05);o2.stop(now+i*0.05+0.88);
+  });
+ }catch(e){}
+}
+function sndJackpotBells(){
+ try{
+  var ctx=gAC(),comp=mkComp(ctx),now=ctx.currentTime;
+  var bellFreqs=[1320,1760,2093,2637,3136,2637,2093,1760,1320];
+  bellFreqs.forEach(function(f,i){
+   var o=ctx.createOscillator(),o2=ctx.createOscillator(),g=ctx.createGain();
+   o.type='sine';o.frequency.value=f;o2.type='sine';o2.frequency.value=f*3.85;
+   g.gain.setValueAtTime(0.22,now+i*0.1);g.gain.exponentialRampToValueAtTime(0.001,now+i*0.1+0.55);
+   var g2=ctx.createGain();g2.gain.value=0.12;
+   o.connect(g);o2.connect(g2);g2.connect(g);g.connect(comp);
+   o.start(now+i*0.1);o.stop(now+i*0.1+0.62);o2.start(now+i*0.1);o2.stop(now+i*0.1+0.62);
+  });
+ }catch(e){}
+}
+function sndBomb(){
+ try{
+  var ctx=gAC(),now=ctx.currentTime;
+  var o=ctx.createOscillator(),g=ctx.createGain();
+  var dist=ctx.createWaveShaper();
+  var cv=new Float32Array(256);
+  for(var i=0;i<256;i++)cv[i]=(i<128?-1:1)*Math.pow(Math.abs(2*i/256-1),0.38);
+  dist.curve=cv;
+  o.type='sawtooth';o.frequency.setValueAtTime(320,now);o.frequency.exponentialRampToValueAtTime(48,now+0.6);
+  g.gain.setValueAtTime(0.26,now);g.gain.exponentialRampToValueAtTime(0.001,now+0.72);
+  o.connect(dist);dist.connect(g);g.connect(ctx.destination);o.start(now);o.stop(now+0.78);
+ }catch(e){}
+}
+function sndCashout(){
+ try{
+  var ctx=gAC(),comp=mkComp(ctx),now=ctx.currentTime;
+  var notes=[440,554,659,880,1108];
+  notes.forEach(function(f,i){
+   var o=ctx.createOscillator(),g=ctx.createGain();
+   o.type='sine';o.frequency.value=f;
+   g.gain.setValueAtTime(0,now+i*0.055);g.gain.linearRampToValueAtTime(0.18,now+i*0.055+0.04);g.gain.exponentialRampToValueAtTime(0.001,now+i*0.055+0.4);
+   o.connect(g);g.connect(comp);o.start(now+i*0.055);o.stop(now+i*0.055+0.46);
+  });
+ }catch(e){}
+}
+
+/* ═══════════════════════════════════════════════════════════
+   ENGINE STATE
+═══════════════════════════════════════════════════════════ */
+var VCE={
+ open:false,spinning:false,level:0,
+ angles:[0,0,0],done:[false,false,false],
+ litSegs:[null,null,null],ringMults:[0,0,0],resultIdxs:[0,0,0],
+ spinData:[{},{},{}],
+ cashoutPending:false,
+ spins:0,wins:0,best:0,totalBet:0,totalReturn:0,
+ canvas:null,ctx:null,size:0,
+ rafId:null,lastTs:0,initialized:false,
+ currentBet:10,orbAngle:0,orbSpeed:0.8,
+ autoSpin:false,autoSpinActive:false,
+ autoSpinProfit:200,autoSpinLoss:100,autoSpinStartBal:0
+};
+
+/* ════ CUBIC-BEZIER EASING — heavy brake ════
+   Approximates CSS cubic-bezier(0, 0, 0.2, 1)
+   Fast initial velocity, smooth heavy deceleration ═══ */
+function easeOutHeavy(t){
+ // Ease-out-quint: 1-(1-t)^5 — very fast start, smooth stop
+ var u=1-t;return 1-(u*u*u*u*u);
+}
+
+/* ════ OPEN/CLOSE ════ */
+window.openVortexCircular=function(){
+ var modal=document.getElementById('vceModal');if(!modal)return;
+ modal.style.display='flex';VCE.open=true;
+ if(!VCE.initialized)initVCE();else{resizeVCE();vceUpdateBal();}
+ startVCELoop();
+};
+window.closeVortexCircular=function(){
+ var modal=document.getElementById('vceModal');if(modal)modal.style.display='none';
+ VCE.open=false;VCE.autoSpinActive=false;
+ if(VCE.rafId){cancelAnimationFrame(VCE.rafId);VCE.rafId=null;}
+};
+document.addEventListener('click',function(e){
+ var m=document.getElementById('vceModal');
+ if(m&&m.style.display!=='none'&&e.target===m)closeVortexCircular();
+});
+document.addEventListener('keydown',function(e){if(e.key==='Escape'&&VCE.open)closeVortexCircular();});
+
+/* ════ INIT ════ */
+function initVCE(){
+ VCE.initialized=true;
+ VCE.canvas=document.getElementById('vceCanvas');if(!VCE.canvas)return;
+ VCE.ctx=VCE.canvas.getContext('2d');
+ VCE.canvas.style.cssText+='transform:translateZ(0);will-change:transform;backface-visibility:hidden;';
+ resizeVCE();
+ window.addEventListener('resize',resizeVCE);
+ vceUpdateBal();
+ VCE.angles=[Math.PI*0.3,Math.PI*1.1,Math.PI*0.7];
+}
+
+function resizeVCE(){
+ if(!VCE.canvas)return;
+ var wrap=document.getElementById('vceCanvasWrap');if(!wrap)return;
+ var dpr=Math.min(window.devicePixelRatio||1,2.5);
+ var sz=Math.min(wrap.clientWidth-28,310);if(sz<80)sz=290;
+ VCE.size=sz;
+ VCE.canvas.style.width=sz+'px';VCE.canvas.style.height=sz+'px';
+ VCE.canvas.width=Math.round(sz*dpr);VCE.canvas.height=Math.round(sz*dpr);
+ VCE.ctx.setTransform(dpr,0,0,dpr,0,0);
+}
+
+/* ════ RAF LOOP 144Hz ════ */
+function startVCELoop(){
+ if(VCE.rafId)cancelAnimationFrame(VCE.rafId);
+ VCE.lastTs=performance.now();
+ function loop(ts){
+  if(!VCE.open)return;
+  var dt=Math.min(ts-VCE.lastTs,50);VCE.lastTs=ts;
+  if(VCE.spinning)updateRings();
+  // Orb: speed scales with level
+  var orbTarget=0.4+VCE.level*0.45;
+  VCE.orbSpeed+=(orbTarget-VCE.orbSpeed)*0.035;
+  VCE.orbAngle+=VCE.orbSpeed*(dt/1000)*Math.PI*2;
+  drawVCE();
+  VCE.rafId=requestAnimationFrame(loop);
+ }
+ VCE.rafId=requestAnimationFrame(loop);
+}
+
+/* ════ RING PHYSICS — cubic-bezier heavy brake ════ */
+function updateRings(){
+ var now=performance.now();
+ VCE_RINGS.forEach(function(_,ri){
+  if(VCE.done[ri])return;
+  var sd=VCE.spinData[ri];
+  var t=Math.min(1,(now-sd.startTs)/sd.dur);
+  var eased=easeOutHeavy(t);
+  VCE.angles[ri]=sd.startAngle+sd.totalRot*eased;
+  if(t>=1){
+   VCE.angles[ri]=sd.startAngle+sd.totalRot;
+   VCE.done[ri]=true;
+   resolveRing(ri);
+  }
+ });
+ if(VCE.done[0]&&VCE.done[1]&&VCE.done[2])VCE.spinning=false;
+}
+
+/* ════ DRAW ENGINE ════ */
+function drawVCE(){
+ if(!VCE.ctx||!VCE.size)return;
+ var ctx=VCE.ctx,S=VCE.size,cx=S/2,cy=S/2;
+ ctx.clearRect(0,0,S,S);
+
+ // Deep space bg
+ var bg=ctx.createRadialGradient(cx,cy*0.65,0,cx,cy,S*0.5);
+ bg.addColorStop(0,'#071228');bg.addColorStop(0.6,'#030a18');bg.addColorStop(1,'#010408');
+ ctx.beginPath();ctx.arc(cx,cy,S*0.494,0,Math.PI*2);ctx.fillStyle=bg;ctx.fill();
+ ctx.beginPath();ctx.arc(cx,cy,S*0.492,0,Math.PI*2);
+ ctx.strokeStyle='rgba(0,212,255,0.1)';ctx.lineWidth=1;ctx.stroke();
+
+ var orR=[0.76,0.57,0.40];
+ var wR =[0.16,0.14,0.13];
+
+ VCE_RINGS.forEach(function(ring,ri){
+  var OR=S/2*orR[ri],IR=OR-S/2*wR[ri],N=ring.n,ang=VCE.angles[ri];
+
+  for(var i=0;i<N;i++){
+   var seg=ring.segs[i];
+   var sd=VCE_SYMS[seg.sym];
+   var a0=ang+i/N*Math.PI*2-Math.PI/2;
+   var a1=ang+(i+1)/N*Math.PI*2-Math.PI/2;
+   var mid=ang+(i+0.5)/N*Math.PI*2-Math.PI/2;
+   var rgb=hexRGB(sd.color);
+
+   // Proximity highlight (segment at top indicator)
+   var norm=((mid%(Math.PI*2))+Math.PI*2)%(Math.PI*2);
+   var dt2=Math.min(norm,Math.PI*2-norm);
+   var hl=Math.max(0,1-dt2/(Math.PI/2.6));
+
+   var isLit=(VCE.litSegs[ri]===i);
+
+   // Segment fill
+   ctx.beginPath();ctx.arc(cx,cy,OR,a0,a1);ctx.arc(cx,cy,IR,a1,a0,true);ctx.closePath();
+
+   if(isLit){
+    // Glowing lit segment background
+    var pulse=0.14+0.07*Math.sin(performance.now()*0.006);
+    ctx.fillStyle='rgba('+rgb+','+pulse+')';
+    ctx.shadowColor=sd.color;ctx.shadowBlur=22;
+    ctx.fill();ctx.shadowBlur=0;
+   }else{
+    ctx.fillStyle='rgba('+rgb+','+(i%2===0?0.055:0.028)+hl*0.18+')';ctx.fill();
+   }
+   ctx.strokeStyle='rgba('+rgb+','+(isLit?(0.55+0.2*Math.sin(performance.now()*0.005)):(0.08+hl*0.25))+')';
+   ctx.lineWidth=isLit?1.6:0.8;ctx.stroke();
+
+   // Symbol + multiplier label
+   if(S>100){
+    var iR=(OR+IR)/2;
+    var ix=cx+iR*Math.cos(mid),iy=cy+iR*Math.sin(mid);
+    var sr=S/2*wR[ri]*0.38;
+    var symAlpha=VCE.spinning?(0.18+hl*0.45):(isLit?1.0:0.38+hl*0.5);
+
+    ctx.save();
+    ctx.translate(ix,iy);
+    ctx.rotate(mid+Math.PI/2);
+
+    // Symbol (slightly smaller to make room for label)
+    ctx.save();
+    ctx.globalAlpha=symAlpha;
+    ctx.translate(0,-sr*0.18);
+    sd.draw(ctx,sr*0.52,sd.color,sd.glow,isLit?1:hl);
+    ctx.restore();
+
+    // Multiplier label
+    var label=seg.mult>0?seg.mult+'x':'VOID';
+    var fSize=Math.max(5,Math.round(sr*0.56));
+    var textAlpha=VCE.spinning?(0.1+hl*0.4):(isLit?1.0:0.32+hl*0.45);
+    ctx.globalAlpha=textAlpha;
+    ctx.font='700 '+fSize+'px "Orbitron","Share Tech Mono",monospace';
+    ctx.textAlign='center';
+    ctx.textBaseline='middle';
+    if(isLit){ctx.shadowColor=sd.color;ctx.shadowBlur=10;}
+    ctx.fillStyle=isLit?sd.color:(seg.sym==='BOMB'?'rgba(255,45,206,.8)':'rgba(255,255,255,.85)');
+    ctx.fillText(label,0,sr*0.55);
+    ctx.restore();
+    ctx.shadowBlur=0;ctx.globalAlpha=1;
+   }
+  }
+
+  // Ring outlines
+  ctx.beginPath();ctx.arc(cx,cy,OR,0,Math.PI*2);
+  ctx.strokeStyle=VCE.done[ri]?'rgba(0,212,255,.3)':'rgba(0,212,255,.08)';
+  ctx.lineWidth=VCE.done[ri]?2:0.8;ctx.stroke();
+  ctx.beginPath();ctx.arc(cx,cy,IR,0,Math.PI*2);
+  ctx.strokeStyle='rgba(0,212,255,.06)';ctx.lineWidth=0.7;ctx.stroke();
+
+  // Gold tick indicator at 12-o'clock
+  var tickOX=cx+OR*Math.cos(-Math.PI/2),tickOY=cy+OR*Math.sin(-Math.PI/2);
+  var tickIX=cx+IR*Math.cos(-Math.PI/2),tickIY=cy+IR*Math.sin(-Math.PI/2);
+  ctx.save();
+  ctx.strokeStyle=VCE.done[ri]?'#ffd700':'rgba(255,215,0,.28)';
+  ctx.lineWidth=VCE.done[ri]?3:1.5;
+  if(VCE.done[ri]){ctx.shadowColor='#ffd700';ctx.shadowBlur=12;}
+  ctx.beginPath();ctx.moveTo(tickOX,tickOY);ctx.lineTo(tickIX,tickIY);ctx.stroke();
+  ctx.restore();ctx.shadowBlur=0;
+ });
+
+ // Crystalline center orb
+ drawCenterOrb(ctx,cx,cy,S);
+
+ // Arrow pointer
+ ctx.save();ctx.translate(cx,cy-S/2*orR[0]-9);
+ ctx.beginPath();ctx.moveTo(-6,-9);ctx.lineTo(6,-9);ctx.lineTo(0,4);ctx.closePath();
+ ctx.fillStyle='#ffd700';ctx.shadowColor='#ffd700';ctx.shadowBlur=14;ctx.fill();
+ ctx.restore();ctx.shadowBlur=0;
+
+ // Spin pulse aura
+ if(VCE.spinning){
+  var pa=0.05+0.04*Math.sin(performance.now()*0.007);
+  ctx.beginPath();ctx.arc(cx,cy,S*0.49,0,Math.PI*2);
+  ctx.strokeStyle='rgba(0,212,255,'+pa+')';ctx.lineWidth=11;ctx.stroke();
+ }
+}
+
+function drawCenterOrb(ctx,cx,cy,S){
+ var r=S/2*0.22;
+ var cg=ctx.createRadialGradient(cx-r*0.2,cy-r*0.22,0,cx,cy,r*1.1);
+ cg.addColorStop(0,'#0e2040');cg.addColorStop(0.5,'#060e1c');cg.addColorStop(1,'#020710');
+ ctx.beginPath();ctx.arc(cx,cy,r,0,Math.PI*2);ctx.fillStyle=cg;ctx.fill();
+ ctx.strokeStyle='rgba(0,212,255,0.25)';ctx.lineWidth=1.5;ctx.stroke();
+
+ var lvlCol=getOrbColor();var lvlRGB=hexRGB(lvlCol);
+ var armCount=3+VCE.level;
+ for(var a=0;a<armCount;a++){
+  var aOff=VCE.orbAngle+a*(Math.PI*2/armCount);
+  ctx.save();ctx.translate(cx,cy);ctx.rotate(aOff);
+  ctx.beginPath();
+  for(var s=0;s<=30;s++){
+   var t=s/30,armR=r*0.85*t,armA=t*Math.PI*1.8;
+   var px=armR*Math.cos(armA),py=armR*Math.sin(armA);
+   s===0?ctx.moveTo(px,py):ctx.lineTo(px,py);
+  }
+  ctx.strokeStyle='rgba('+lvlRGB+','+(0.32+0.18*Math.sin(VCE.orbAngle*2+a))+')';
+  ctx.lineWidth=1.4;ctx.shadowColor=lvlCol;ctx.shadowBlur=4;ctx.stroke();
+  ctx.restore();ctx.shadowBlur=0;
+ }
+ for(var f=0;f<6;f++){
+  var fa=VCE.orbAngle*0.5+f/6*Math.PI*2;
+  var fx=cx+r*0.5*Math.cos(fa),fy=cy+r*0.5*Math.sin(fa);
+  var fg=ctx.createRadialGradient(fx,fy,0,fx,fy,r*0.2);
+  fg.addColorStop(0,'rgba('+lvlRGB+',0.5)');fg.addColorStop(1,'rgba('+lvlRGB+',0)');
+  ctx.beginPath();ctx.arc(fx,fy,r*0.18,0,Math.PI*2);ctx.fillStyle=fg;ctx.fill();
+ }
+ var hg=ctx.createRadialGradient(cx,cy,0,cx,cy,r*0.28);
+ hg.addColorStop(0,'rgba(255,255,255,.95)');hg.addColorStop(0.4,lvlCol);hg.addColorStop(1,'rgba(0,0,0,0)');
+ ctx.beginPath();ctx.arc(cx,cy,r*0.28,0,Math.PI*2);
+ ctx.fillStyle=hg;ctx.shadowColor=lvlCol;ctx.shadowBlur=16;ctx.fill();ctx.shadowBlur=0;
+ ctx.beginPath();ctx.arc(cx,cy,r,0,Math.PI*2);
+ ctx.strokeStyle='rgba('+lvlRGB+',0.32)';ctx.lineWidth=2;
+ ctx.shadowColor=lvlCol;ctx.shadowBlur=13;ctx.stroke();ctx.shadowBlur=0;
+}
+
+function getOrbColor(){
+ var totalMult=VCE.ringMults[0]+VCE.ringMults[1]+VCE.ringMults[2];
+ if(totalMult>=20)return '#ffffff';
+ if(totalMult>=12)return '#ff2dce';
+ if(totalMult>=7) return '#ffd700';
+ if(totalMult>=3) return '#00ff88';
+ return '#00d4ff';
+}
+
+function hexRGB(hex){
+ if(!hex||hex.length<7)return '0,212,255';
+ return parseInt(hex.slice(1,3),16)+','+parseInt(hex.slice(3,5),16)+','+parseInt(hex.slice(5,7),16);
+}
+
+/* ════ SPIN TRIGGER ════ */
+window.vceSpinBtnClick=function(){
+ try{gAC();}catch(e){}
+ if(VCE.spinning||VCE.cashoutPending)return;
+ var betInput=document.getElementById('vceBetInput');
+ var bet=parseFloat(betInput?betInput.value:10)||10;bet=Math.max(0.01,bet);
+ if(typeof balance==='undefined'||balance<bet){
+  if(typeof toast==='function')toast('Insufficient balance!','error');
+  VCE.autoSpinActive=false;updateAutoSpinUI();return;
+ }
+ updateBalance(-bet);vceUpdateBal();
+ VCE.spins++;VCE.currentBet=bet;VCE.totalBet+=bet;
+ vceUpdateStats();vceSpin();
+};
+
+function vceSpin(){
+ VCE.spinning=true;VCE.done=[false,false,false];
+ VCE.litSegs=[null,null,null];VCE.ringMults=[0,0,0];VCE.cashoutPending=false;
+
+ // Reset display
+ resetRingAccDisplay();
+ var mEl=document.getElementById('vceCenterMult');
+ if(mEl){mEl.className='vce-mult-val';mEl.textContent='...';}
+ var res=document.getElementById('vceResultTxt');
+ if(res){res.className='vce-result-txt idle';res.textContent='Rings spinning...';}
+
+ var btn=document.getElementById('vceSpinBtn');
+ if(btn){btn.disabled=true;btn.classList.add('spinning');}
+
+ // Generate landed segment indices
+ VCE.resultIdxs=VCE_RINGS.map(function(ring){return Math.floor(Math.random()*ring.n);});
+
+ // Bias: ring 0 — avoid too many bombs; ring 2 — weight toward vortex segs
+ var r0BombCount=VCE_RINGS[0].segs.filter(function(s){return s.sym==='BOMB';}).length;
+ if(Math.random()<0.6&&VCE_RINGS[0].segs[VCE.resultIdxs[0]].sym==='BOMB'){
+  var nonBomb=[];VCE_RINGS[0].segs.forEach(function(s,i){if(s.sym!=='BOMB')nonBomb.push(i);});
+  if(nonBomb.length)VCE.resultIdxs[0]=nonBomb[Math.floor(Math.random()*nonBomb.length)];
+ }
+
+ // Durations: outer stops first, inner last — cubic-bezier heavy brake
+ var durations=[1850,2700,3800];
+ var numTurns=7; // 7 full rotations before settling — feels heavy
+
+ VCE_RINGS.forEach(function(ring,ri){
+  var landedIdx=VCE.resultIdxs[ri];
+  var N=ring.n;
+  // Target: indicator at 12 o'clock (-PI/2), segment mid angle matches
+  // ang + (i+0.5)/N * 2PI - PI/2 = -PI/2  →  ang = -(i+0.5)/N * 2PI
+  var finalAng=-(landedIdx+0.5)/N*Math.PI*2;
+  var curAngle=VCE.angles[ri];
+  var curPhase=((curAngle%(Math.PI*2))+Math.PI*2)%(Math.PI*2);
+  var finalPhase=((finalAng%(Math.PI*2))+Math.PI*2)%(Math.PI*2);
+  var delta=finalPhase-curPhase;
+  if(delta<0)delta+=Math.PI*2; // always spin forward
+  var totalRot=numTurns*Math.PI*2+delta;
+  VCE.spinData[ri]={startAngle:curAngle,totalRot:totalRot,dur:durations[ri],startTs:performance.now()};
+ });
+
+ sndSpinStart();
+}
+
+/* ════ PER-RING RESOLUTION ════ */
+function resolveRing(ri){
+ sndRingLand(ri);
+ var seg=VCE_RINGS[ri].segs[VCE.resultIdxs[ri]];
+ var sd=VCE_SYMS[seg.sym];
+ VCE.litSegs[ri]=VCE.resultIdxs[ri];
+ VCE.ringMults[ri]=seg.mult;
+
+ var cell=document.getElementById('vceRC'+ri);
+ var valEl=document.getElementById('vceRCVal'+ri);
+
+ if(seg.sym==='BOMB'){
+  if(cell)cell.className='vce-ring-cell bomb-landed';
+  if(valEl)valEl.textContent='VOID';
+  sndBomb();
+ }else{
+  var isJackpot=seg.mult>=10;
+  if(cell)cell.className='vce-ring-cell '+(isJackpot?'jackpot-landed':'landed');
+  if(valEl)valEl.textContent=seg.mult+'x';
+  if(isJackpot)sndChord25x(); else if(seg.mult>=3)sndChord5x();
+ }
+
+ updateRingTotalDisplay();
+
+ // Update center orb display
+ var runningTotal=VCE.ringMults[0]+VCE.ringMults[1]+VCE.ringMults[2];
+ var mEl=document.getElementById('vceCenterMult'),lEl=document.getElementById('vceCenterLbl');
+ if(mEl){
+  mEl.textContent=runningTotal>0?runningTotal.toFixed(1)+'x':'VOID';
+  mEl.className='vce-mult-val'+(runningTotal>=10?' gold':runningTotal===0?' bomb-color':'');
+  void mEl.offsetWidth;mEl.classList.add('animate-pop');
+  setTimeout(function(){if(mEl)mEl.classList.remove('animate-pop');},500);
+ }
+ if(lEl)lEl.textContent=ri===2?'CASHING OUT':('RING '+(ri+1)+' DONE');
+
+ // Ring 2 = inner = trigger auto-cashout
+ if(ri===2){
+  VCE.cashoutPending=true;
+  VCE.spinning=false;
+  setTimeout(autoCashout,850);
+ }
+}
+
+function updateRingTotalDisplay(){
+ var total=VCE.ringMults.reduce(function(a,b){return a+b;},0);
+ var win=VCE.currentBet*total;
+ var el=document.getElementById('vceRCTotal');
+ var acc=document.getElementById('vceRingAcc');
+ if(el)el.textContent='$'+win.toFixed(2);
+ if(total>0&&acc)acc.classList.add('active');
+}
+
+/* ════ AUTO CASHOUT ════ */
+function autoCashout(){
+ var total=VCE.ringMults.reduce(function(a,b){return a+b;},0);
+ var bet=VCE.currentBet;
+ var win=parseFloat((bet*total).toFixed(2));
+ var profit=parseFloat((win-bet).toFixed(2)); // bet already deducted
+
+ var mEl=document.getElementById('vceCenterMult');
+ if(mEl){mEl.textContent=total>0?total.toFixed(1)+'x':'BUST';mEl.className='vce-mult-val'+(total>=10?' gold':total===0?' bomb-color':'');}
+ var lEl=document.getElementById('vceCenterLbl');if(lEl)lEl.textContent='PAID OUT';
+
+ if(win>0){
+  updateBalance(win);vceUpdateBal();
+  VCE.wins++;VCE.totalReturn+=win;
+  if(profit>VCE.best)VCE.best=profit;
+  var isJackpot=VCE.ringMults[2]>=10;
+  isJackpot?sndJackpotBells():sndCashout();
+  // Upgrade orb level on good spin
+  if(total>=15)VCE.level=Math.min(6,VCE.level+2);
+  else if(total>=7)VCE.level=Math.min(6,VCE.level+1);
+
+  var res=document.getElementById('vceResultTxt');
+  if(res){
+   var cls=isJackpot?'jackpot':'cashout';
+   res.className='vce-result-txt '+cls;
+   res.innerHTML='AUTO CASHOUT &mdash; '+total.toFixed(1)+'&times; &mdash; <strong>+$'+profit.toFixed(2)+'</strong>';
+  }
+  if(typeof toast==='function')toast('CASHOUT +$'+profit.toFixed(2)+' ('+total.toFixed(1)+'x)','success');
+  if(typeof recordBet==='function')recordBet('vortex-circular',bet,total,profit);
+  if(typeof addTx==='function')addTx('VCE Cashout',profit,'won');
+
+  // Cashout burst effect on ring-acc
+  var acc=document.getElementById('vceRingAcc');
+  if(acc){
+   var burst=document.createElement('div');burst.className='vce-cashout-burst';
+   acc.style.position='relative';acc.appendChild(burst);
+   setTimeout(function(){if(burst.parentNode)burst.parentNode.removeChild(burst);},600);
+  }
+ }else{
+  // All rings bombed
+  var res=document.getElementById('vceResultTxt');
+  if(res){res.className='vce-result-txt bomb';res.textContent='VOID SPIN — All rings hit VOID!';}
+  if(typeof toast==='function')toast('VOID SPIN — $'+bet.toFixed(2)+' lost','error');
+  if(typeof recordBet==='function')recordBet('vortex-circular',bet,0,-bet);
+  if(typeof addTx==='function')addTx('VCE Loss',-bet,'lost');
+  VCE.level=Math.max(0,VCE.level-1);
+ }
+
+ VCE.cashoutPending=false;VCE.spinning=false;
+ vceUpdateStats();
+ var btn=document.getElementById('vceSpinBtn');
+ if(btn){btn.disabled=false;btn.classList.remove('spinning');}
+
+ // Clear lit segments + reset after display delay
+ setTimeout(function(){
+  VCE.litSegs=[null,null,null];
+  resetRingAccDisplay();
+  var lEl2=document.getElementById('vceCenterLbl');
+  var mEl2=document.getElementById('vceCenterMult');
+  if(mEl2){mEl2.textContent='&#x26A1;';mEl2.className='vce-mult-val';}
+  if(lEl2)lEl2.textContent='TOTAL';
+ },2800);
+
+ if(VCE.autoSpinActive)setTimeout(vceAutoSpinCheck,700);
+}
+
+function resetRingAccDisplay(){
+ [0,1,2].forEach(function(ri){
+  var cell=document.getElementById('vceRC'+ri);
+  var val=document.getElementById('vceRCVal'+ri);
+  if(cell)cell.className='vce-ring-cell pending';
+  if(val)val.innerHTML='&mdash;';
+ });
+ var total=document.getElementById('vceRCTotal');if(total)total.textContent='$0.00';
+ var acc=document.getElementById('vceRingAcc');if(acc)acc.classList.remove('active');
+}
+
+/* ════ AUTO-SPIN ════ */
+window.vceToggleAutoSpin=function(){
+ VCE.autoSpin=!VCE.autoSpin;
+ var settings=document.getElementById('vceAutoSpinSettings');
+ if(settings)settings.classList.toggle('visible',VCE.autoSpin);
+ updateAutoSpinUI();
+ if(!VCE.autoSpin){VCE.autoSpinActive=false;updateAutoSpinUI();}
+};
+function updateAutoSpinUI(){
+ var track=document.getElementById('vceToggleTrack'),lbl=document.getElementById('vceAutoSpinLbl'),btn=document.getElementById('vceSpinBtn');
+ if(track)track.className='vce-toggle-track'+(VCE.autoSpin?' on':'');
+ if(lbl){lbl.textContent=VCE.autoSpinActive?'AUTO: ON':'Auto-Spin';lbl.className='vce-autospin-lbl'+(VCE.autoSpin?' on':'');}
+ if(btn){btn.className='vce-spin-btn'+(VCE.autoSpinActive?' autospin-active':'');btn.textContent=VCE.autoSpinActive?'AUTO SPINNING...':'SPIN THE VORTEX';}
+}
+function vceAutoSpinCheck(){
+ var profitLim=parseFloat((document.getElementById('vceASpinProfit')||{value:200}).value)||200;
+ var lossLim=parseFloat((document.getElementById('vceASpinLoss')||{value:100}).value)||100;
+ var bal=typeof balance!=='undefined'?balance:0;
+ var pnl=bal-VCE.autoSpinStartBal;
+ if(pnl>=profitLim){VCE.autoSpinActive=false;updateAutoSpinUI();if(typeof toast==='function')toast('Auto-Spin stopped — Profit hit! +$'+pnl.toFixed(2),'success');return;}
+ if(pnl<=-lossLim){VCE.autoSpinActive=false;updateAutoSpinUI();if(typeof toast==='function')toast('Auto-Spin stopped — Loss limit.','error');return;}
+ if(VCE.autoSpinActive&&!VCE.spinning&&!VCE.cashoutPending)window.vceSpinBtnClick();
+}
+var _origClick=window.vceSpinBtnClick;
+window.vceSpinBtnClick=function(){
+ if(VCE.autoSpin&&!VCE.autoSpinActive){VCE.autoSpinActive=true;VCE.autoSpinStartBal=typeof balance!=='undefined'?balance:0;updateAutoSpinUI();}
+ else if(VCE.autoSpinActive){VCE.autoSpinActive=false;updateAutoSpinUI();return;}
+ _origClick();
+};
+
+/* ════ HELPERS ════ */
+function vceUpdateBal(){
+ var el=document.getElementById('vceBalDisp');
+ if(el&&typeof balance!=='undefined')el.textContent='$'+balance.toFixed(2);
+}
+function vceUpdateStats(){
+ var ss=document.getElementById('vceStatSpins'),sw=document.getElementById('vceStatWins');
+ var sb=document.getElementById('vceStatBest'),sr=document.getElementById('vceStatRtp');
+ if(ss)ss.textContent=VCE.spins;if(sw)sw.textContent=VCE.wins;
+ if(sb)sb.textContent='$'+(VCE.best>0?VCE.best.toFixed(2):'0');
+ if(sr)sr.textContent=VCE.totalBet>0?((VCE.totalReturn/VCE.totalBet)*100).toFixed(0)+'%':'--%';
+}
+window.vceAdjBet=function(f){var i=document.getElementById('vceBetInput');if(i)i.value=Math.max(0.01,parseFloat(i.value||10)*f).toFixed(2);};
+window.vceSetBet=function(v){var i=document.getElementById('vceBetInput');if(i)i.value=parseFloat(v).toFixed(2);};
+var _vceOB=window.updateBalance;
+window.updateBalance=function(d){_vceOB.apply(this,arguments);vceUpdateBal();};
+
 })();
 </script>
-<!-- ═══ END VORTEX SPIN ENGINE ═══ -->
+<!-- ═══ END VORTEX CIRCULAR ENGINE v3 ═══ -->
 
 <!-- ══════════════ CANVAS DIMENSION GUARDIAN — FINAL, CORRECT POSITION ══════════════ -->
 <!-- This script is intentionally placed LAST so all game functions are defined above -->
