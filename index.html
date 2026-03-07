@@ -798,6 +798,15 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;heigh
 .mine-tile:hover:not(.revealed):not(.inactive){transform:translateY(-3px) scale(1.05);border-color:rgba(0,212,255,0.4);box-shadow:0 6px 20px rgba(0,0,0,0.5),0 0 16px rgba(0,212,255,0.1);}
 .mine-tile.gem{background:linear-gradient(145deg,rgba(0,30,26,0.95),rgba(0,18,16,0.98));border-color:rgba(0,255,136,0.5);box-shadow:0 0 20px rgba(0,255,136,0.2),0 0 0 1px rgba(0,255,136,0.12);animation:gem-glow 1.5s ease-in-out infinite alternate;}
 @keyframes gem-glow{from{box-shadow:0 0 18px rgba(0,255,136,0.18);}to{box-shadow:0 0 30px rgba(0,255,136,0.35);}}
+/* God-Level SVG Icons — sizing & animation */
+.mine-gem-svg{animation:mine-gem-float 2.2s ease-in-out infinite;transform-origin:center;}
+@keyframes mine-gem-float{0%,100%{filter:drop-shadow(0 0 8px #00ff88);transform:scale(1);}50%{filter:drop-shadow(0 0 14px #00ff88);transform:scale(1.07);}}
+.mine-boom-svg{animation:mine-boom-shake .45s cubic-bezier(.34,1.56,.64,1) both;transform-origin:center;}
+@keyframes mine-boom-shake{0%{transform:scale(0.4) rotate(-15deg);opacity:0;}35%{transform:scale(1.25) rotate(8deg);}65%{transform:scale(0.92) rotate(-4deg);}100%{transform:scale(1) rotate(0);opacity:1;}}
+/* Mines grid — 100% width mobile, centered desktop */
+.mines-layout{width:100%;}
+.mines-arena{width:100%;}
+.mines-grid{width:100%;transform:translateZ(0);will-change:transform;}
 .mine-tile.boom{background:linear-gradient(145deg,rgba(60,8,16,0.98),rgba(38,4,10,1));border-color:rgba(255,51,102,0.6);box-shadow:0 0 25px rgba(255,51,102,0.4);animation:mine-blast .5s ease;}
 @keyframes mine-blast{0%{transform:scale(1);}30%{transform:scale(1.2);}60%{transform:scale(0.95);}100%{transform:scale(1);}}
 .mine-tile.other-mine{background:rgba(20,4,8,.9);border-color:rgba(255,51,102,0.2);cursor:default;}
@@ -2021,120 +2030,73 @@ input[type=number], input[type=text], input[type=email] {
 <!-- ═══════════ HYPER-REALISTIC VORTEX MESH GRADIENT ═══════════ -->
 <canvas id="meshGradientCanvas"></canvas>
 <script>
-/* ═══════════════════════════════════════════════════════
-   VORTEX LOW-END DEVICE DETECTOR + ADAPTIVE BACKGROUND
-   Detects Chromebooks, low-RAM, or low-CPU devices and
-   switches to solid #000 background — saves 60MB+ GPU RAM
-   ═══════════════════════════════════════════════════════ */
-(function adaptiveBackground(){
- // ── Detection heuristics ──
- var ua    = navigator.userAgent || '';
- var isCrOS        = /CrOS/.test(ua);                           // ChromeOS UA flag
- var isLowCPU      = (navigator.hardwareConcurrency || 8) <= 4; // ≤4 logical cores
- var isLowRAM      = (navigator.deviceMemory       || 8) <= 4; // ≤4 GB RAM
- var isMobile      = /Android|iPhone|iPad/i.test(ua);
- var prefersReduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
- // Also do a quick frame-budget probe: if the first frame takes >50ms, bail
- var LOW_END = isCrOS || isLowCPU || isLowRAM || prefersReduced;
-
- var c   = document.getElementById('meshGradientCanvas');
- if (!c) return;
-
- if (LOW_END) {
-  // ── Low-end path: solid background, no canvas ──
-  console.info('[VORTEX] Low-end device detected — mesh disabled for 60FPS');
-  c.style.display = 'none';
-  document.body.style.background = '#000';
-  // Also strip the grain overlay cost
-  var style = document.createElement('style');
-  style.textContent = 'body::after{display:none!important;}';
-  document.head.appendChild(style);
-  return; // Don't start the animation loop
- }
-
- // ── High-end path: full animated mesh ──
- var ctx = c.getContext('2d');
- var HEX_PALETTE = [
-  '#00e676','#00c960','#009448','#00703a','#00522c',
-  '#00d4ff','#0099cc','#006699','#004466','#002233',
-  '#ff2dce','#d900aa','#aa0085','#7a0060','#4a003a',
-  '#050810','#070b14','#0a0f1e','#0d1428','#111830',
-  '#00e676','#00d4ff','#ff2dce','#00e676','#00d4ff',
-  '#003322','#004433','#001a33','#002244','#001122',
-  '#002040','#001530','#000a20','#000520','#000010',
+(function(){
+ const c = document.getElementById('meshGradientCanvas');
+ if(!c) return;
+ const ctx = c.getContext('2d');
+ // Deep Neon Dark palette — Emerald, Midnight Blue, Deep Violet — easy on eyes, no lag
+ // ── 5-COLOR MESH GRADIENT: Black · Emerald · Magenta · Blue · White
+ const HEX_PALETTE = [
+ '#00e676','#00c960','#009448','#00703a','#00522c', // Emerald family
+ '#00d4ff','#0099cc','#006699','#004466','#002233', // Crystal blue family
+ '#ff2dce','#d900aa','#aa0085','#7a0060','#4a003a', // Magenta family
+ '#050810','#070b14','#0a0f1e','#0d1428','#111830', // Deep black family
+ '#00e676','#00d4ff','#ff2dce','#00e676','#00d4ff', // Color-pop emphasis
+ '#003322','#004433','#001a33','#002244','#001122', // Deep dark anchors
+ '#002040','#001530','#000a20','#000520','#000010', // Ultra-deep navy
  ];
- function hexToRgb(h){ var r=parseInt(h.slice(1,3),16),g=parseInt(h.slice(3,5),16),b=parseInt(h.slice(5,7),16); return [r,g,b]; }
- // 35 orbs, reduced alpha
- var ORBS = Array.from({length:35}, function(_, i) {
-  var hex = HEX_PALETTE[i % HEX_PALETTE.length];
-  return {
-   rgb: hexToRgb(hex),
-   r: 0.18 + Math.random()*0.30,
-   speed: (0.00006 + Math.random()*0.00018) * (Math.random()>0.5?1:-1),
-   phase: Math.random()*Math.PI*2,
-   orbit: 0.08 + Math.random()*0.38,
-   tilt: Math.random()*Math.PI*2,
-   alpha: 0.04 + Math.random()*0.07,
-   wobble: Math.random()*Math.PI*2,
-   wobbleSpeed: 0.0002 + Math.random()*0.0005,
-  };
+ function hexToRgb(h){ const r=parseInt(h.slice(1,3),16),g=parseInt(h.slice(3,5),16),b=parseInt(h.slice(5,7),16); return [r,g,b]; }
+ // 35 orbs with reduced alpha — smooth 60fps, no eye strain
+ const ORBS = Array.from({length:35}, (_, i) => {
+ const hex = HEX_PALETTE[i % HEX_PALETTE.length];
+ return {
+ rgb: hexToRgb(hex),
+ r: 0.18 + Math.random()*0.30,
+ speed: (0.00006 + Math.random()*0.00018) * (Math.random()>0.5?1:-1),
+ phase: Math.random()*Math.PI*2,
+ orbit: 0.08 + Math.random()*0.38,
+ tilt: Math.random()*Math.PI*2,
+ alpha: 0.04 + Math.random()*0.07,
+ wobble: Math.random()*Math.PI*2,
+ wobbleSpeed: 0.0002 + Math.random()*0.0005,
+ };
  });
- var W, H, t=0, rafId=null, frameBudgetChecked=false;
+ let W, H, t=0;
  function resize(){ W = c.width = window.innerWidth; H = c.height = window.innerHeight; }
  resize();
  window.addEventListener('resize', resize);
- function frame(timestamp){
-  // Frame-budget safety valve: if first frame takes >80ms, switch to low-end mode
-  if (!frameBudgetChecked) {
-   frameBudgetChecked = true;
-   var start = performance.now();
-   // draw once synchronously to measure
-   drawFrame();
-   var elapsed = performance.now() - start;
-   if (elapsed > 80) {
-    console.warn('[VORTEX] Frame budget exceeded (' + elapsed.toFixed(0) + 'ms) — switching to low-end mode');
-    c.style.display = 'none';
-    document.body.style.background = '#000';
-    cancelAnimationFrame(rafId);
-    return;
-   }
-  } else {
-   drawFrame();
-  }
-  rafId = requestAnimationFrame(frame);
+ function frame(){
+ t += 1;
+ ctx.fillStyle = '#030508';
+ ctx.fillRect(0, 0, W, H);
+ for(const orb of ORBS){
+ const angle = orb.phase + t * orb.speed;
+ const wob = Math.sin(orb.wobble + t * orb.wobbleSpeed) * 0.08;
+ const cx = (0.5 + Math.sin(angle) * orb.orbit + Math.cos(angle*0.6+orb.tilt)*orb.orbit*0.4 + wob) * W;
+ const cy = (0.5 + Math.cos(angle*1.2) * orb.orbit*0.75 + Math.sin(angle*0.8)*orb.orbit*0.3 + wob*0.5) * H;
+ const radius = Math.min(W,H) * orb.r;
+ const grd = ctx.createRadialGradient(cx, cy, 0, cx, cy, radius);
+ const [r,g,b] = orb.rgb;
+ grd.addColorStop(0, `rgba(${r},${g},${b},${orb.alpha})`);
+ grd.addColorStop(0.45, `rgba(${r},${g},${b},${(orb.alpha*0.4).toFixed(3)})`);
+ grd.addColorStop(1, `rgba(${r},${g},${b},0)`);
+ ctx.globalCompositeOperation = 'screen';
+ ctx.beginPath();
+ ctx.arc(cx, cy, radius, 0, Math.PI*2);
+ ctx.fillStyle = grd;
+ ctx.fill();
  }
- function drawFrame(){
-  t += 1;
-  ctx.fillStyle = '#030508';
-  ctx.fillRect(0, 0, W, H);
-  for(var i=0; i<ORBS.length; i++){
-   var orb = ORBS[i];
-   var angle = orb.phase + t * orb.speed;
-   var wob = Math.sin(orb.wobble + t * orb.wobbleSpeed) * 0.08;
-   var cx = (0.5 + Math.sin(angle) * orb.orbit + Math.cos(angle*0.6+orb.tilt)*orb.orbit*0.4 + wob) * W;
-   var cy = (0.5 + Math.cos(angle*1.2) * orb.orbit*0.75 + Math.sin(angle*0.8)*orb.orbit*0.3 + wob*0.5) * H;
-   var radius = Math.min(W,H) * orb.r;
-   var grd = ctx.createRadialGradient(cx, cy, 0, cx, cy, radius);
-   var rgb = orb.rgb;
-   grd.addColorStop(0, 'rgba('+rgb[0]+','+rgb[1]+','+rgb[2]+','+orb.alpha+')');
-   grd.addColorStop(0.45, 'rgba('+rgb[0]+','+rgb[1]+','+rgb[2]+','+(orb.alpha*0.4).toFixed(3)+')');
-   grd.addColorStop(1, 'rgba('+rgb[0]+','+rgb[1]+','+rgb[2]+',0)');
-   ctx.globalCompositeOperation = 'screen';
-   ctx.beginPath();
-   ctx.arc(cx, cy, radius, 0, Math.PI*2);
-   ctx.fillStyle = grd;
-   ctx.fill();
-  }
-  ctx.globalCompositeOperation = 'multiply';
-  var vig = ctx.createRadialGradient(W/2,H/2,0, W/2,H/2, Math.min(W,H)*0.85);
-  vig.addColorStop(0,'rgba(4,6,15,0.0)');
-  vig.addColorStop(0.55,'rgba(4,6,15,0.3)');
-  vig.addColorStop(1,'rgba(4,6,15,0.82)');
-  ctx.fillStyle = vig;
-  ctx.fillRect(0,0,W,H);
-  ctx.globalCompositeOperation = 'source-over';
+ ctx.globalCompositeOperation = 'multiply';
+ const vig = ctx.createRadialGradient(W/2,H/2,0, W/2,H/2, Math.min(W,H)*0.85);
+ vig.addColorStop(0,'rgba(4,6,15,0.0)');
+ vig.addColorStop(0.55,'rgba(4,6,15,0.3)');
+ vig.addColorStop(1,'rgba(4,6,15,0.82)');
+ ctx.fillStyle = vig;
+ ctx.fillRect(0,0,W,H);
+ ctx.globalCompositeOperation = 'source-over';
+ requestAnimationFrame(frame);
  }
- rafId = requestAnimationFrame(frame);
+ requestAnimationFrame(frame);
 })();
 </script>
 
@@ -2332,25 +2294,25 @@ input[type=number], input[type=text], input[type=email] {
  <div class="sb-section">
   <div class="sb-section-label">Casino</div>
   <div class="sb-item active" id="sb-home" onclick="goPage('home')">
-   <svg viewBox="0 0 24 24" width="15" height="15" fill="none"><defs><linearGradient id="sbh1" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#00e676"/><stop offset="100%" stop-color="#00d4ff"/></linearGradient></defs><path d="M3 10.5L12 3l9 7.5V21a1 1 0 01-1 1H5a1 1 0 01-1-1V10.5z" fill="url(#sbh1)" opacity=".25" stroke="url(#sbh1)" stroke-width="1.5" stroke-linejoin="round"/><path d="M9 22V15h6v7" stroke="url(#sbh1)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="10" r="2" fill="url(#sbh1)" opacity=".7"/></svg>Home
+   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Home
   </div>
   <div class="sb-item" id="sb-games" onclick="goPage('games')">
-   <svg viewBox="0 0 24 24" width="15" height="15" fill="none"><defs><linearGradient id="sbg1" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#ff2dce"/><stop offset="100%" stop-color="#00d4ff"/></linearGradient></defs><rect x="2" y="6" width="9" height="6" rx="1.5" fill="url(#sbg1)" opacity=".3" stroke="url(#sbg1)" stroke-width="1.2"/><rect x="13" y="6" width="9" height="6" rx="1.5" fill="url(#sbg1)" opacity=".3" stroke="url(#sbg1)" stroke-width="1.2"/><rect x="2" y="14" width="9" height="4" rx="1.5" fill="url(#sbg1)" opacity=".2" stroke="url(#sbg1)" stroke-width="1.2"/><rect x="13" y="14" width="9" height="4" rx="1.5" fill="url(#sbg1)" opacity=".2" stroke="url(#sbg1)" stroke-width="1.2"/><circle cx="6" cy="9" r="1.2" fill="#ff2dce"/><circle cx="18" cy="9" r="1.2" fill="#00d4ff"/></svg>All Games
+   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>All Games
    <span class="sb-badge">25+</span>
   </div>
   <div class="sb-item" id="sb-crash" onclick="goPage('crash')">
-   <svg viewBox="0 0 24 24" width="15" height="15" fill="none"><defs><linearGradient id="sbcr" x1="0%" y1="100%" x2="100%" y2="0%"><stop offset="0%" stop-color="#ff2dce"/><stop offset="60%" stop-color="#ff8800"/><stop offset="100%" stop-color="#ffe000"/></linearGradient></defs><path d="M12 2l-2 6h-5l4 3.5-1.5 5.5L12 13l4.5 4L15 11.5 19 8h-5L12 2z" fill="url(#sbcr)" opacity=".9" filter="url(#glow-r)"/><line x1="12" y1="18" x2="12" y2="23" stroke="url(#sbcr)" stroke-width="2" stroke-linecap="round" opacity=".6"/><line x1="9" y1="21" x2="15" y2="21" stroke="#ff2dce" stroke-width="1.5" stroke-linecap="round" opacity=".5"/></svg>Crash
+   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>Crash
    <span class="sb-badge hot">HOT</span>
   </div>
   <div class="sb-item" id="sb-mines" onclick="goPage('mines')">
-   <svg viewBox="0 0 24 24" width="15" height="15" fill="none"><defs><linearGradient id="sbm1" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#00e676"/><stop offset="50%" stop-color="#00ffcc"/><stop offset="100%" stop-color="#00d4ff"/></linearGradient></defs><polygon points="12,2 14.5,7.5 21,8.5 16.5,13 17.7,19.5 12,16.5 6.3,19.5 7.5,13 3,8.5 9.5,7.5" fill="url(#sbm1)" opacity=".9" stroke="#00e676" stroke-width=".5"/><circle cx="12" cy="12" r="2.5" fill="#00e676" opacity=".7"/><line x1="12" y1="2" x2="12" y2=".5" stroke="#00e676" stroke-width="1.5" stroke-linecap="round"/></svg>Mines
+   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="2" x2="12" y2="5"/><line x1="12" y1="19" x2="12" y2="22"/><line x1="2" y1="12" x2="5" y2="12"/><line x1="19" y1="12" x2="22" y2="12"/></svg>Mines
    <div class="sb-item-dot"></div>
   </div>
   <div class="sb-item" id="sb-dice" onclick="goPage('dice')">
-   <svg viewBox="0 0 24 24" width="15" height="15" fill="none"><defs><linearGradient id="sbdi" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#00d4ff"/><stop offset="100%" stop-color="#0055ff"/></linearGradient></defs><rect x="3" y="3" width="18" height="18" rx="3.5" fill="url(#sbdi)" opacity=".25" stroke="#00d4ff" stroke-width="1.5"/><circle cx="8" cy="8" r="1.8" fill="#00d4ff"/><circle cx="16" cy="8" r="1.8" fill="#00d4ff"/><circle cx="8" cy="16" r="1.8" fill="#00d4ff"/><circle cx="16" cy="16" r="1.8" fill="#00d4ff"/><circle cx="12" cy="12" r="1.8" fill="#00d4ff" opacity=".6"/></svg>Dice
+   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="3"/><circle cx="8" cy="8" r="1.5" fill="currentColor"/><circle cx="16" cy="16" r="1.5" fill="currentColor"/><circle cx="12" cy="12" r="1.5" fill="currentColor"/></svg>Dice
   </div>
   <div class="sb-item" id="sb-roulette" onclick="goPage('roulette')">
-   <svg viewBox="0 0 24 24" width="15" height="15" fill="none"><defs><linearGradient id="sbro" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#ff2dce"/><stop offset="100%" stop-color="#00d4ff"/></linearGradient></defs><circle cx="12" cy="12" r="9.5" fill="none" stroke="url(#sbro)" stroke-width="1.5"/><circle cx="12" cy="12" r="6.5" fill="none" stroke="rgba(0,212,255,.3)" stroke-width="1" stroke-dasharray="4 2"/><circle cx="12" cy="12" r="3" fill="url(#sbro)" opacity=".5"/><circle cx="12" cy="12" r="1.5" fill="#fff"/><line x1="12" y1="2.5" x2="12" y2="6" stroke="#ff2dce" stroke-width="2" stroke-linecap="round"/><line x1="21.5" y1="12" x2="18" y2="12" stroke="#00d4ff" stroke-width="2" stroke-linecap="round"/></svg>Roulette
+   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="4"/><line x1="12" y1="2" x2="12" y2="8"/><line x1="12" y1="16" x2="12" y2="22"/></svg>Roulette
   </div>
  </div>
 
@@ -2358,15 +2320,15 @@ input[type=number], input[type=text], input[type=email] {
  <div class="sb-section">
   <div class="sb-section-label">Originals</div>
   <div class="sb-item" id="sb-singularity" onclick="goPage('singularity')">
-   <svg viewBox="0 0 24 24" width="15" height="15" fill="none"><defs><radialGradient id="sbsg" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#7b2fff"/><stop offset="60%" stop-color="rgba(123,47,255,.3)"/><stop offset="100%" stop-color="transparent"/></radialGradient></defs><circle cx="12" cy="12" r="10" fill="none" stroke="rgba(123,47,255,.5)" stroke-width="1.2" stroke-dasharray="3 1.5"/><circle cx="12" cy="12" r="7" fill="none" stroke="rgba(0,212,255,.4)" stroke-width="1" stroke-dasharray="5 3"/><circle cx="12" cy="12" r="4" fill="url(#sbsg)"/><circle cx="12" cy="12" r="2" fill="#7b2fff"/><circle cx="12" cy="12" r="1" fill="#c084fc"/></svg>Singularity
+   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="4"/><line x1="4.93" y1="4.93" x2="9.17" y2="9.17"/><line x1="14.83" y1="14.83" x2="19.07" y2="19.07"/></svg>Singularity
    <span class="sb-badge new">NEW</span>
   </div>
   <div class="sb-item" id="sb-rush" onclick="goPage('rush')">
-   <svg viewBox="0 0 24 24" width="15" height="15" fill="none"><defs><linearGradient id="sbrush" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#ffe000"/><stop offset="50%" stop-color="#ff8800"/><stop offset="100%" stop-color="#ff2dce"/></linearGradient></defs><polygon points="13,2 5,13 11,13 11,22 19,11 13,11" fill="url(#sbrush)" opacity=".9"/><line x1="3" y1="8" x2="1" y2="6" stroke="#ffe000" stroke-width="1.5" stroke-linecap="round" opacity=".5"/><line x1="3" y1="12" x2="0.5" y2="12" stroke="#ff8800" stroke-width="1.5" stroke-linecap="round" opacity=".4"/></svg>Vortex Rush
+   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>Vortex Rush
    <span class="sb-badge new">NEW</span>
   </div>
   <div class="sb-item" id="sb-spinmaster" onclick="goPage('spinmaster')">
-   <svg viewBox="0 0 24 24" width="15" height="15" fill="none"><defs><linearGradient id="sbspin" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#c084fc"/><stop offset="100%" stop-color="#7b2fff"/></linearGradient></defs><circle cx="12" cy="12" r="9.5" fill="none" stroke="url(#sbspin)" stroke-width="1.5"/><circle cx="12" cy="12" r="6" fill="none" stroke="rgba(192,132,252,.3)" stroke-width="1"/><path d="M12 4v4M20 12h-4M12 20v-4M4 12h4" stroke="#c084fc" stroke-width="1.8" stroke-linecap="round"/><circle cx="12" cy="12" r="2.5" fill="url(#sbspin)"/><circle cx="12" cy="12" r="1" fill="#fff"/></svg>Spin Master
+   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>Spin Master
   </div>
  </div>
 
@@ -2374,18 +2336,18 @@ input[type=number], input[type=text], input[type=email] {
  <div class="sb-section">
   <div class="sb-section-label">Rewards</div>
   <div class="sb-item" id="sb-luckyspin" onclick="goPage('luckyspin')" style="position:relative;">
-   <svg viewBox="0 0 24 24" width="15" height="15" fill="none"><defs><linearGradient id="sbls" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#ffd700"/><stop offset="100%" stop-color="#ff8800"/></linearGradient></defs><path d="M12 2l2.4 4.8L20 8l-4 3.9L17 18l-5-2.6L7 18l1-6.1L4 8l5.6-1.2L12 2z" fill="url(#sbls)" opacity=".9" stroke="#ffd700" stroke-width=".5"/></svg>Daily Spin
+   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>Daily Spin
    <span class="sb-badge" id="sbSpinBadge" style="background:rgba(255,215,0,.15);color:#ffd700;border-color:rgba(255,215,0,.2);">FREE</span>
   </div>
   <div class="sb-item" id="sb-tasks" onclick="goPage('tasks')">
-   <svg viewBox="0 0 24 24" width="15" height="15" fill="none"><defs><linearGradient id="sbts" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#00e676"/><stop offset="100%" stop-color="#00d4ff"/></linearGradient></defs><rect x="4" y="3" width="16" height="18" rx="2" fill="none" stroke="url(#sbts)" stroke-width="1.5"/><line x1="8" y1="8" x2="16" y2="8" stroke="url(#sbts)" stroke-width="1.5" stroke-linecap="round"/><line x1="8" y1="12" x2="14" y2="12" stroke="url(#sbts)" stroke-width="1.5" stroke-linecap="round"/><path d="M7 16l2 2 4-4" stroke="#00e676" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>Daily Tasks
+   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>Daily Tasks
   </div>
   <div class="sb-item" onclick="toast('VIP Club — Exclusive rewards as you level up!','info',3000)">
-   <svg viewBox="0 0 24 24" width="15" height="15" fill="none"><defs><linearGradient id="sbvip" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#ffd700"/><stop offset="50%" stop-color="#ffaa00"/><stop offset="100%" stop-color="#cc7700"/></linearGradient></defs><path d="M4 8l3 8h10l3-8-5 3-3-6-3 6L4 8z" fill="url(#sbvip)" opacity=".9" stroke="#ffd700" stroke-width=".8" stroke-linejoin="round"/><rect x="7" y="17" width="10" height="2" rx="1" fill="url(#sbvip)" opacity=".7"/></svg>VIP Club
+   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>VIP Club
    <span class="sb-badge vip">VIP</span>
   </div>
   <div class="sb-item" onclick="toast('Referral — Earn 5% on every referral!','info',3000)">
-   <svg viewBox="0 0 24 24" width="15" height="15" fill="none"><defs><linearGradient id="sbref" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#00e676"/><stop offset="100%" stop-color="#00d4ff"/></linearGradient></defs><circle cx="5" cy="6" r="2.5" fill="url(#sbref)" opacity=".8"/><circle cx="19" cy="6" r="2.5" fill="url(#sbref)" opacity=".8"/><circle cx="12" cy="18" r="2.5" fill="url(#sbref)" opacity=".8"/><line x1="7" y1="7.5" x2="17" y2="7.5" stroke="url(#sbref)" stroke-width="1.2"/><line x1="5.5" y1="8.5" x2="11" y2="16" stroke="url(#sbref)" stroke-width="1.2"/><line x1="18.5" y1="8.5" x2="13" y2="16" stroke="url(#sbref)" stroke-width="1.2"/></svg>Referral
+   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>Referral
   </div>
  </div>
 
@@ -2393,26 +2355,31 @@ input[type=number], input[type=text], input[type=email] {
  <div class="sb-section">
   <div class="sb-section-label">Platform</div>
   <div class="sb-item" id="sb-leaderboard" onclick="goPage('leaderboard')">
-   <svg viewBox="0 0 24 24" width="15" height="15" fill="none"><defs><linearGradient id="sblb" x1="0%" y1="100%" x2="0%" y2="0%"><stop offset="0%" stop-color="#00d4ff"/><stop offset="100%" stop-color="#ff2dce"/></linearGradient></defs><rect x="2" y="12" width="4" height="10" rx="1" fill="url(#sblb)" opacity=".7"/><rect x="10" y="6" width="4" height="16" rx="1" fill="url(#sblb)" opacity=".9"/><rect x="18" y="9" width="4" height="13" rx="1" fill="url(#sblb)" opacity=".8"/><path d="M10 4l2-3 2 3-2-1z" fill="#ffd700"/></svg>Leaderboard
+   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="18 20 18 10"/><polyline points="12 20 12 4"/><polyline points="6 20 6 14"/></svg>Leaderboard
   </div>
   <div class="sb-item" id="sb-mybets" onclick="goPage('mybets')">
-   <svg viewBox="0 0 24 24" width="15" height="15" fill="none"><defs><linearGradient id="sbmb" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#00d4ff"/><stop offset="100%" stop-color="#7b2fff"/></linearGradient></defs><rect x="4" y="2" width="16" height="20" rx="2" fill="none" stroke="url(#sbmb)" stroke-width="1.5"/><line x1="8" y1="7" x2="16" y2="7" stroke="#00d4ff" stroke-width="1.3" stroke-linecap="round"/><line x1="8" y1="11" x2="16" y2="11" stroke="#00d4ff" stroke-width="1.3" stroke-linecap="round"/><line x1="8" y1="15" x2="13" y2="15" stroke="rgba(0,212,255,.5)" stroke-width="1.3" stroke-linecap="round"/><circle cx="16" cy="17" r="3" fill="#7b2fff" opacity=".7" stroke="#c084fc" stroke-width=".8"/></svg>My Bets
+   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>My Bets
   </div>
   <div class="sb-item" id="sb-wallet" onclick="goPage('wallet')">
-   <svg viewBox="0 0 24 24" width="15" height="15" fill="none"><defs><linearGradient id="sbwl" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#00e676"/><stop offset="100%" stop-color="#00d4ff"/></linearGradient></defs><rect x="2" y="6" width="20" height="14" rx="2.5" fill="none" stroke="url(#sbwl)" stroke-width="1.5"/><path d="M2 10h20" stroke="url(#sbwl)" stroke-width="1.2"/><rect x="15" y="13" width="5" height="4" rx="1" fill="url(#sbwl)" opacity=".7"/><circle cx="17.5" cy="15" r="1" fill="#fff" opacity=".8"/></svg>Wallet
+   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>Wallet
   </div>
   <div class="sb-item" onclick="toast('Provably Fair — All outcomes are verifiable on-chain.','info',3500)">
-   <svg viewBox="0 0 24 24" width="15" height="15" fill="none"><defs><linearGradient id="sbpf" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#00e676"/><stop offset="100%" stop-color="#00d4ff"/></linearGradient></defs><path d="M12 2l7 3v6c0 5-3.5 9-7 10C8.5 20 5 16 5 11V5l7-3z" fill="none" stroke="url(#sbpf)" stroke-width="1.5" stroke-linejoin="round"/><path d="M12 3.5l5.5 2.3V11c0 3.7-2.6 6.7-5.5 7.7-2.9-1-5.5-4-5.5-7.7V5.8L12 3.5z" fill="url(#sbpf)" opacity=".12"/><path d="M9 11.5l2 2 4-4" stroke="#00e676" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Provably Fair
+   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>Provably Fair
   </div>
  </div>
 
- <!-- PARTNER SITES -->
+ <!-- OUR NETWORK -->
  <div class="sb-section">
-  <div class="sb-section-label">Partners</div>
-  <div class="sb-item" onclick="openVipBlackRoom()">
-   <svg viewBox="0 0 24 24" width="15" height="15" fill="none"><defs><linearGradient id="sbvbr" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#ffd700"/><stop offset="50%" stop-color="#cc9900"/><stop offset="100%" stop-color="#ffd700"/></linearGradient></defs><rect x="3" y="3" width="18" height="18" rx="3" fill="none" stroke="url(#sbvbr)" stroke-width="1.5"/><path d="M8 10h8M8 14h5" stroke="rgba(255,215,0,.5)" stroke-width="1.2" stroke-linecap="round"/><path d="M3 7h18" stroke="url(#sbvbr)" stroke-width="1.5"/><circle cx="17" cy="14" r="2.5" fill="url(#sbvbr)" opacity=".8"/><path d="M16.3 13.5l.7.8 1.4-1.2" stroke="#000" stroke-width=".9" stroke-linecap="round" stroke-linejoin="round"/></svg>
-   <span style="background:linear-gradient(135deg,#ffd700,#cc9900);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;font-weight:800;">VIP BLACK-ROOM</span>
-   <span class="sb-badge" style="background:linear-gradient(135deg,rgba(255,215,0,.2),rgba(180,130,0,.1));color:#ffd700;border-color:rgba(255,215,0,.35);font-size:.45rem;">ELITE</span>
+  <div class="sb-section-label" style="color:rgba(255,215,0,.6);letter-spacing:.12em;">Our Network</div>
+  <div class="sb-item" onclick="window.open('https://crypto-flip.io','_blank')" style="cursor:pointer;">
+   <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="#00d4ff" stroke-width="2"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/><path d="M8 12l2 2 4-4"/><path d="M12 6v2M12 16v2M6 12h2M16 12h2"/></svg>
+   <span style="color:rgba(255,255,255,.8);">Site 2: Crypto-Flip</span>
+   <span style="margin-left:auto;font-size:.5rem;background:rgba(0,212,255,.12);color:#00d4ff;border:1px solid rgba(0,212,255,.2);padding:2px 5px;border-radius:6px;font-weight:700;">NEW</span>
+  </div>
+  <div class="sb-item" onclick="showVipBlackRoom()" style="cursor:pointer;background:linear-gradient(90deg,rgba(255,215,0,.06),transparent);border-left:2px solid rgba(255,215,0,.4)!important;">
+   <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="#ffd700" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/><circle cx="12" cy="16" r="1" fill="#ffd700"/></svg>
+   <span style="color:#ffd700;font-weight:700;font-family:var(--font-d);font-size:.7rem;letter-spacing:.05em;">VIP BLACK-ROOM</span>
+   <span style="margin-left:auto;font-size:.5rem;background:rgba(255,215,0,.15);color:#ffd700;border:1px solid rgba(255,215,0,.3);padding:2px 5px;border-radius:6px;font-weight:900;">VIP</span>
   </div>
  </div>
 
@@ -2425,154 +2392,6 @@ input[type=number], input[type=text], input[type=email] {
  </div>
 
 </div>
-
-<!-- ══════════════ VIP BLACK-ROOM PAYWALL ══════════════ -->
-<style>
-#vipBlackRoomOverlay{
- display:none;position:fixed;inset:0;z-index:8000;
- background:rgba(0,0,0,0.94);backdrop-filter:blur(22px);
- -webkit-backdrop-filter:blur(22px);
- align-items:center;justify-content:center;padding:20px;
-}
-#vipBlackRoomOverlay.show{display:flex;}
-.vbr-modal{
- max-width:460px;width:100%;position:relative;
- animation:vbr-in .45s cubic-bezier(.34,1.56,.64,1);
-}
-@keyframes vbr-in{from{opacity:0;transform:scale(0.88) translateY(30px);}to{opacity:1;transform:scale(1) translateY(0);}}
-.vbr-border-wrap{
- position:relative;border-radius:24px;overflow:hidden;
-}
-.vbr-border-wrap::before{
- content:'';position:absolute;inset:-2px;border-radius:26px;z-index:0;
- background:linear-gradient(135deg,#ffd700,#b8860b,#ffd700,#cc9900,#ffe066,#b8860b);
- background-size:300% 300%;
- animation:gold-border-spin 3s linear infinite;
-}
-@keyframes gold-border-spin{0%{background-position:0% 50%;}50%{background-position:100% 50%;}100%{background-position:0% 50%;}}
-.vbr-inner{
- position:relative;z-index:1;
- background:linear-gradient(160deg,#0a0800 0%,#050400 60%,#0d0900 100%);
- border-radius:23px;overflow:hidden;
-}
-.vbr-header{
- background:linear-gradient(135deg,rgba(255,215,0,.12),rgba(180,130,0,.06));
- border-bottom:1px solid rgba(255,215,0,.18);
- padding:28px 28px 20px;text-align:center;position:relative;
-}
-.vbr-crown{
- width:64px;height:64px;margin:0 auto 14px;
- background:linear-gradient(135deg,rgba(255,215,0,.15),rgba(180,130,0,.08));
- border:1px solid rgba(255,215,0,.3);border-radius:50%;
- display:flex;align-items:center;justify-content:center;
- animation:vbr-crown-glow 2.5s ease-in-out infinite;
-}
-@keyframes vbr-crown-glow{0%,100%{box-shadow:0 0 20px rgba(255,215,0,.3),0 0 40px rgba(180,130,0,.15);}50%{box-shadow:0 0 35px rgba(255,215,0,.5),0 0 70px rgba(180,130,0,.25);}}
-.vbr-title{
- font-family:'Orbitron',sans-serif;font-size:1.4rem;font-weight:900;
- background:linear-gradient(135deg,#ffe066,#ffd700,#cc9900,#ffd700);
- background-size:200% auto;
- -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
- letter-spacing:.12em;animation:gold-shimmer 3s linear infinite;
-}
-@keyframes gold-shimmer{0%{background-position:0% 50%;}100%{background-position:200% 50%;}}
-.vbr-sub{font-size:.7rem;color:rgba(255,215,0,.45);letter-spacing:.18em;text-transform:uppercase;margin-top:6px;}
-.vbr-body{padding:24px 28px;}
-.vbr-desc{
- font-size:.82rem;color:rgba(255,255,255,.65);line-height:1.75;
- text-align:center;margin-bottom:20px;
-}
-.vbr-features{
- display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:22px;
-}
-.vbr-feat{
- padding:11px 13px;
- background:rgba(255,215,0,.05);border:1px solid rgba(255,215,0,.12);
- border-radius:10px;display:flex;align-items:center;gap:9px;
-}
-.vbr-feat-dot{
- width:7px;height:7px;border-radius:50%;
- background:linear-gradient(135deg,#ffd700,#cc9900);
- box-shadow:0 0 6px rgba(255,215,0,.5);flex-shrink:0;
-}
-.vbr-feat-txt{font-size:.7rem;color:rgba(255,255,255,.75);font-weight:600;}
-.vbr-price-box{
- background:linear-gradient(135deg,rgba(255,215,0,.1),rgba(180,130,0,.05));
- border:1px solid rgba(255,215,0,.25);border-radius:14px;
- padding:18px;text-align:center;margin-bottom:18px;
-}
-.vbr-price-lbl{font-size:.62rem;color:rgba(255,215,0,.5);text-transform:uppercase;letter-spacing:.12em;margin-bottom:6px;}
-.vbr-price-amt{
- font-family:'Orbitron',sans-serif;font-size:2.2rem;font-weight:900;
- color:#ffd700;text-shadow:0 0 24px rgba(255,215,0,.5);line-height:1;
-}
-.vbr-price-period{font-size:.72rem;color:rgba(255,215,0,.45);margin-top:4px;}
-.vbr-cta{
- width:100%;padding:15px;border-radius:50px;border:none;cursor:pointer;
- background:linear-gradient(130deg,#ffd700,#cc9900,#ffd700);
- background-size:200% auto;
- color:#040200;font-family:'Orbitron',sans-serif;font-size:.85rem;font-weight:900;
- letter-spacing:.08em;box-shadow:0 4px 28px rgba(255,215,0,.45);
- transition:all .2s;animation:gold-shimmer 3s linear infinite;
-}
-.vbr-cta:hover{transform:translateY(-2px);box-shadow:0 8px 40px rgba(255,215,0,.65);}
-.vbr-close-btn{
- position:absolute;top:12px;right:14px;z-index:2;
- width:30px;height:30px;border-radius:50%;
- background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);
- color:rgba(255,255,255,.4);font-size:14px;cursor:pointer;
- display:flex;align-items:center;justify-content:center;transition:all .2s;
-}
-.vbr-close-btn:hover{background:rgba(255,215,0,.15);color:#ffd700;border-color:rgba(255,215,0,.3);}
-</style>
-<div id="vipBlackRoomOverlay">
- <div class="vbr-modal">
-  <div class="vbr-border-wrap">
-   <div class="vbr-inner">
-    <div class="vbr-header">
-     <button class="vbr-close-btn" onclick="document.getElementById('vipBlackRoomOverlay').classList.remove('show')">✕</button>
-     <div class="vbr-crown">
-      <svg viewBox="0 0 40 40" width="36" height="36" fill="none">
-       <path d="M6 28l4-16 8 10 8-10 4 16H6z" fill="url(#crowng1)" stroke="#ffd700" stroke-width="1" stroke-linejoin="round"/>
-       <defs><linearGradient id="crowng1" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#ffe066"/><stop offset="100%" stop-color="#b8860b"/></linearGradient></defs>
-       <rect x="4" y="28" width="32" height="5" rx="2.5" fill="url(#crowng1)"/>
-       <circle cx="6" cy="12" r="2.5" fill="#ffd700" opacity=".9"/>
-       <circle cx="20" cy="8" r="3" fill="#ffd700"/>
-       <circle cx="34" cy="12" r="2.5" fill="#ffd700" opacity=".9"/>
-      </svg>
-     </div>
-     <div class="vbr-title">VIP BLACK-ROOM</div>
-     <div class="vbr-sub">Exclusive Members Only</div>
-    </div>
-    <div class="vbr-body">
-     <div class="vbr-desc">The most exclusive private room on Vortex.IO. Access elite strategies, private tables & VIP-only bonuses reserved for our highest-tier members.</div>
-     <div class="vbr-features">
-      <div class="vbr-feat"><div class="vbr-feat-dot"></div><div class="vbr-feat-txt">Private Tables</div></div>
-      <div class="vbr-feat"><div class="vbr-feat-dot"></div><div class="vbr-feat-txt">Elite Signals</div></div>
-      <div class="vbr-feat"><div class="vbr-feat-dot"></div><div class="vbr-feat-txt">100× Limits</div></div>
-      <div class="vbr-feat"><div class="vbr-feat-dot"></div><div class="vbr-feat-txt">VIP Cashback</div></div>
-      <div class="vbr-feat"><div class="vbr-feat-dot"></div><div class="vbr-feat-txt">Priority Support</div></div>
-      <div class="vbr-feat"><div class="vbr-feat-dot"></div><div class="vbr-feat-txt">No-limit Spins</div></div>
-     </div>
-     <div class="vbr-price-box">
-      <div class="vbr-price-lbl">Monthly Pass</div>
-      <div class="vbr-price-amt">₹499</div>
-      <div class="vbr-price-period">/ month · Cancel anytime</div>
-     </div>
-     <button class="vbr-cta" onclick="document.getElementById('vipBlackRoomOverlay').classList.remove('show');toast('🔐 VIP BLACK-ROOM — Activating Monthly Pass...','gold',4000);">
-      ACTIVATE MONTHLY PASS
-     </button>
-     <div style="text-align:center;margin-top:12px;font-size:.62rem;color:rgba(255,215,0,.3);letter-spacing:.05em;">By continuing you agree to Vortex.IO VIP Terms</div>
-    </div>
-   </div>
-  </div>
- </div>
-</div>
-<script>
-function openVipBlackRoom(){
- document.getElementById('vipBlackRoomOverlay').classList.add('show');
-}
-</script>
 
 <!-- ══════════════ MAIN AREA ══════════════ -->
 <div class="app-layout" id="mainApp" style="display:none">
@@ -3134,6 +2953,15 @@ function openVipBlackRoom(){
  <span id="mCoLabel">CASH OUT</span>
  </button>
  <div class="btn-mine-co-sub" id="mCoSub">★ CLICK TO COLLECT INSTANTLY ★</div>
+        <!-- VIP Strategy Button — triggers main VIP BLACK-ROOM modal -->
+        <div onclick="typeof showVipBlackRoom==='function'?showVipBlackRoom():document.getElementById('vipBlackRoomModal')?.classList.add('show')"
+          style="margin-top:10px;width:100%;padding:11px 14px;border-radius:10px;cursor:pointer;text-align:center;background:linear-gradient(90deg,rgba(255,215,0,.06),rgba(255,215,0,.03));border:1px solid rgba(255,215,0,.28);display:flex;align-items:center;justify-content:center;gap:8px;transition:all .2s;"
+          onmouseover="this.style.background='linear-gradient(90deg,rgba(255,215,0,.13),rgba(255,215,0,.07))';this.style.borderColor='rgba(255,215,0,.5)'"
+          onmouseout="this.style.background='linear-gradient(90deg,rgba(255,215,0,.06),rgba(255,215,0,.03))';this.style.borderColor='rgba(255,215,0,.28)'"
+        >
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#ffd700" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/><circle cx="12" cy="16" r="1" fill="#ffd700"/></svg>
+          <span style="font-family:var(--font-d);font-size:.65rem;font-weight:800;letter-spacing:.1em;color:#ffd700;text-transform:uppercase;">👑 VIP Strategy</span>
+        </div>
  </div>
  </div>
  </div>
@@ -3906,15 +3734,6 @@ function openVipBlackRoom(){
  All systems: Auth, Games, Chat, Admin, Wallet
 ════════════════════════════════════════════════════ */
 
-/* ─── ICON BUILDER — hoisted first so NEON_ICONS/CAT_ICONS can reference it ─── */
-function neonSvg(path, color, extra='') {
- return `<svg viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="2" style="width:46%;height:46%;filter:drop-shadow(0 0 7px ${color}) drop-shadow(0 0 16px ${color}55);" ${extra}>${path}</svg>`;
-}
-
-/* ─── ACTIVE GAMES SET — hoisted to TOP to prevent ReferenceError ─── */
-/* This must live before ANY function that checks if a game is active    */
-var ACTIVE_GAMES_SET = new Set(['crash','mines','tower','singularity','rush','roulette','dice']);
-
 /* ─── STATE ─── */
 let balance = 5000;
 let isLoggedIn = false;
@@ -4147,16 +3966,16 @@ else initVoiceEngine();
  ══════════════════════════════════════════════════ */
 /* ═══ CRYPTO SVG ICONS — Engraved Tech-Coin Style ═══ */
 const CRYPTO_SVGS = {
- btc: `<svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg"><defs><radialGradient id="btcBg" cx="38%" cy="28%" r="72%"><stop offset="0%" stop-color="#4a2200"/><stop offset="50%" stop-color="#250f00"/><stop offset="100%" stop-color="#0d0400"/></radialGradient><linearGradient id="btcGold" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#ffd080"/><stop offset="40%" stop-color="#f7931a"/><stop offset="100%" stop-color="#c05500"/></linearGradient><filter id="btcGlow"><feGaussianBlur stdDeviation="1.2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs><circle cx="20" cy="20" r="19.5" fill="url(#btcBg)"/><circle cx="20" cy="20" r="18.5" fill="none" stroke="url(#btcGold)" stroke-width="1.2" opacity=".7"/><circle cx="20" cy="20" r="16" fill="none" stroke="rgba(247,147,26,.15)" stroke-width=".7"/><path d="M15.5 9.5h7.8c2.8 0 4.5 1.4 4.5 3.6 0 1.5-.9 2.7-2.2 3.3 1.8.5 2.9 1.9 2.9 3.7 0 2.5-2 4-5.2 4H15.5V9.5zm2.8 6h4.5c1.1 0 1.9-.7 1.9-1.7s-.8-1.7-1.9-1.7h-4.5v3.4zm0 6.6h5.1c1.3 0 2.1-.8 2.1-1.9 0-1.1-.8-1.9-2.1-1.9h-5.1v3.8z" fill="url(#btcGold)" filter="url(#btcGlow)"/><line x1="19" y1="7" x2="19" y2="10" stroke="url(#btcGold)" stroke-width="1.8" stroke-linecap="round"/><line x1="23" y1="7" x2="23" y2="10" stroke="url(#btcGold)" stroke-width="1.8" stroke-linecap="round"/><line x1="19" y1="24" x2="19" y2="27" stroke="url(#btcGold)" stroke-width="1.8" stroke-linecap="round"/><line x1="23" y1="24" x2="23" y2="27" stroke="url(#btcGold)" stroke-width="1.8" stroke-linecap="round"/><circle cx="20" cy="20" r="19.5" fill="none" stroke="rgba(247,147,26,.08)" stroke-width="3"/></svg>`,
- eth: `<svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg"><defs><radialGradient id="ethBg" cx="38%" cy="28%" r="72%"><stop offset="0%" stop-color="#0d1550"/><stop offset="50%" stop-color="#060c2e"/><stop offset="100%" stop-color="#020510"/></radialGradient><linearGradient id="ethBlue" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#a0b4ff"/><stop offset="50%" stop-color="#627eea"/><stop offset="100%" stop-color="#3050cc"/></linearGradient><filter id="ethGlow"><feGaussianBlur stdDeviation="1" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs><circle cx="20" cy="20" r="19.5" fill="url(#ethBg)"/><circle cx="20" cy="20" r="18.5" fill="none" stroke="url(#ethBlue)" stroke-width="1.2" opacity=".7"/><polygon points="20,8 27.5,20.5 20,24.5 12.5,20.5" fill="rgba(98,126,234,.25)" stroke="url(#ethBlue)" stroke-width="1.2" stroke-linejoin="round" filter="url(#ethGlow)"/><polygon points="20,25.5 27.5,20.5 20,32" fill="rgba(98,126,234,.55)" stroke="url(#ethBlue)" stroke-width="1.2" stroke-linejoin="round"/><polygon points="20,25.5 12.5,20.5 20,32" fill="rgba(98,126,234,.35)" stroke="url(#ethBlue)" stroke-width="1.2" stroke-linejoin="round"/><line x1="20" y1="8" x2="20" y2="24.5" stroke="rgba(160,180,255,.3)" stroke-width=".8"/><circle cx="20" cy="20" r="19.5" fill="none" stroke="rgba(98,126,234,.07)" stroke-width="3"/></svg>`,
- sol: `<svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg"><defs><radialGradient id="solBg" cx="38%" cy="28%" r="72%"><stop offset="0%" stop-color="#200035"/><stop offset="50%" stop-color="#100020"/><stop offset="100%" stop-color="#050010"/></radialGradient><linearGradient id="solG1" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#00d4ff"/><stop offset="100%" stop-color="#9945ff"/></linearGradient><linearGradient id="solG2" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#9945ff"/><stop offset="100%" stop-color="#00d4ff"/></linearGradient><filter id="solGlow"><feGaussianBlur stdDeviation=".8" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs><circle cx="20" cy="20" r="19.5" fill="url(#solBg)"/><circle cx="20" cy="20" r="18.5" fill="none" stroke="url(#solG1)" stroke-width="1.2" opacity=".7"/><rect x="9" y="12" width="22" height="3.5" rx="1.75" fill="url(#solG1)" filter="url(#solGlow)"/><rect x="9" y="18.5" width="22" height="3.5" rx="1.75" fill="url(#solG2)" filter="url(#solGlow)"/><rect x="9" y="25" width="22" height="3.5" rx="1.75" fill="url(#solG1)" filter="url(#solGlow)"/><circle cx="20" cy="20" r="19.5" fill="none" stroke="rgba(153,69,255,.07)" stroke-width="3"/></svg>`,
- usdt: `<svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg"><defs><radialGradient id="usdtBg" cx="38%" cy="28%" r="72%"><stop offset="0%" stop-color="#002a1a"/><stop offset="50%" stop-color="#00140d"/><stop offset="100%" stop-color="#000806"/></radialGradient><linearGradient id="usdtG" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#4cffb8"/><stop offset="50%" stop-color="#26a17b"/><stop offset="100%" stop-color="#0e7055"/></linearGradient><filter id="usdtGlow"><feGaussianBlur stdDeviation="1" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs><circle cx="20" cy="20" r="19.5" fill="url(#usdtBg)"/><circle cx="20" cy="20" r="18.5" fill="none" stroke="url(#usdtG)" stroke-width="1.2" opacity=".7"/><rect x="11" y="10" width="18" height="3.5" rx="1.75" fill="url(#usdtG)" filter="url(#usdtGlow)"/><rect x="18" y="13.5" width="4" height="16" rx="2" fill="url(#usdtG)"/><ellipse cx="20" cy="21" rx="8" ry="3" fill="none" stroke="url(#usdtG)" stroke-width="1.5" filter="url(#usdtGlow)"/><ellipse cx="20" cy="24" rx="7" ry="2.5" fill="none" stroke="rgba(38,161,123,.4)" stroke-width="1"/><circle cx="20" cy="20" r="19.5" fill="none" stroke="rgba(38,161,123,.07)" stroke-width="3"/></svg>`,
- bnb: `<svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg"><defs><radialGradient id="bnbBg" cx="38%" cy="28%" r="72%"><stop offset="0%" stop-color="#2e2400"/><stop offset="50%" stop-color="#181200"/><stop offset="100%" stop-color="#080500"/></radialGradient><linearGradient id="bnbG" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#ffe87a"/><stop offset="50%" stop-color="#f3ba2f"/><stop offset="100%" stop-color="#b87800"/></linearGradient><filter id="bnbGlow"><feGaussianBlur stdDeviation=".9" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs><circle cx="20" cy="20" r="19.5" fill="url(#bnbBg)"/><circle cx="20" cy="20" r="18.5" fill="none" stroke="url(#bnbG)" stroke-width="1.2" opacity=".7"/><polygon points="20,11 22.4,13.5 20,16 17.6,13.5" fill="url(#bnbG)" filter="url(#bnbGlow)"/><polygon points="20,24 22.4,26.5 20,29 17.6,26.5" fill="url(#bnbG)" filter="url(#bnbGlow)"/><polygon points="12,17.5 14.4,20 12,22.5 9.6,20" fill="url(#bnbG)" filter="url(#bnbGlow)"/><polygon points="28,17.5 30.4,20 28,22.5 25.6,20" fill="url(#bnbG)" filter="url(#bnbGlow)"/><polygon points="20,17 22.4,19.5 20,22 17.6,19.5" fill="url(#bnbG)" opacity=".7"/><circle cx="20" cy="20" r="19.5" fill="none" stroke="rgba(243,186,47,.07)" stroke-width="3"/></svg>`,
- xrp: `<svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg"><defs><radialGradient id="xrpBg" cx="38%" cy="28%" r="72%"><stop offset="0%" stop-color="#001f35"/><stop offset="50%" stop-color="#000f1c"/><stop offset="100%" stop-color="#00060e"/></radialGradient><linearGradient id="xrpG" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#80e8ff"/><stop offset="50%" stop-color="#00aae4"/><stop offset="100%" stop-color="#0055a0"/></linearGradient><filter id="xrpGlow"><feGaussianBlur stdDeviation="1" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs><circle cx="20" cy="20" r="19.5" fill="url(#xrpBg)"/><circle cx="20" cy="20" r="18.5" fill="none" stroke="url(#xrpG)" stroke-width="1.2" opacity=".7"/><path d="M11 10l4 5c2.8 3 4.2 3 5 3s2.2 0 5-3l4-5" stroke="url(#xrpG)" stroke-width="2.2" stroke-linecap="round" fill="none" filter="url(#xrpGlow)"/><path d="M11 30l4-5c2.8-3 4.2-3 5-3s2.2 0 5 3l4 5" stroke="url(#xrpG)" stroke-width="2.2" stroke-linecap="round" fill="none" filter="url(#xrpGlow)"/><circle cx="20" cy="20" r="2.5" fill="url(#xrpG)"/><circle cx="20" cy="20" r="19.5" fill="none" stroke="rgba(0,170,228,.07)" stroke-width="3"/></svg>`,
- doge: `<svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg"><defs><radialGradient id="dogeBg" cx="38%" cy="28%" r="72%"><stop offset="0%" stop-color="#302200"/><stop offset="50%" stop-color="#1a1200"/><stop offset="100%" stop-color="#080600"/></radialGradient><linearGradient id="dogeG" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#ffe88a"/><stop offset="50%" stop-color="#c2a633"/><stop offset="100%" stop-color="#856b0c"/></linearGradient><filter id="dogeGlow"><feGaussianBlur stdDeviation="1" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs><circle cx="20" cy="20" r="19.5" fill="url(#dogeBg)"/><circle cx="20" cy="20" r="18.5" fill="none" stroke="url(#dogeG)" stroke-width="1.2" opacity=".7"/><path d="M13 10h7c5.5 0 9 3.5 9 10s-3.5 10-9 10h-7V10zm3 3.5v13h4c3.5 0 5.5-2.5 5.5-6.5S23.5 13.5 20 13.5h-4z" fill="url(#dogeG)" filter="url(#dogeGlow)"/><line x1="13" y1="20" x2="22" y2="20" stroke="url(#dogeG)" stroke-width="2" stroke-linecap="round" opacity=".6"/><circle cx="20" cy="20" r="19.5" fill="none" stroke="rgba(194,166,51,.07)" stroke-width="3"/></svg>`,
- trx: `<svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg"><defs><radialGradient id="trxBg" cx="38%" cy="28%" r="72%"><stop offset="0%" stop-color="#380008"/><stop offset="50%" stop-color="#1c0004"/><stop offset="100%" stop-color="#0a0002"/></radialGradient><linearGradient id="trxG" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#ff7070"/><stop offset="50%" stop-color="#ef0027"/><stop offset="100%" stop-color="#a00018"/></linearGradient><filter id="trxGlow"><feGaussianBlur stdDeviation="1" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs><circle cx="20" cy="20" r="19.5" fill="url(#trxBg)"/><circle cx="20" cy="20" r="18.5" fill="none" stroke="url(#trxG)" stroke-width="1.2" opacity=".7"/><polygon points="20,8.5 31,27.5 9,27.5" fill="none" stroke="url(#trxG)" stroke-width="1.8" stroke-linejoin="round" filter="url(#trxGlow)"/><polygon points="20,13.5 27,25.5 13,25.5" fill="rgba(239,0,39,.2)" stroke="url(#trxG)" stroke-width="1.2" stroke-linejoin="round"/><line x1="20" y1="8.5" x2="13" y2="25.5" stroke="rgba(239,0,39,.25)" stroke-width=".8"/><circle cx="20" cy="20" r="19.5" fill="none" stroke="rgba(239,0,39,.07)" stroke-width="3"/></svg>`,
- vtx: `<svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg"><defs><radialGradient id="vtxBg" cx="38%" cy="28%" r="72%"><stop offset="0%" stop-color="#001e30"/><stop offset="50%" stop-color="#000f18"/><stop offset="100%" stop-color="#00060e"/></radialGradient><linearGradient id="vtxG" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#80f0ff"/><stop offset="50%" stop-color="#00d4ff"/><stop offset="100%" stop-color="#0088cc"/></linearGradient><filter id="vtxGlow"><feGaussianBlur stdDeviation="1.2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs><circle cx="20" cy="20" r="19.5" fill="url(#vtxBg)"/><circle cx="20" cy="20" r="18.5" fill="none" stroke="url(#vtxG)" stroke-width="1.2" opacity=".8"/><path d="M20 7 Q33 14 30 22 Q27 30 20 33 Q13 30 10 22 Q7 14 20 7" fill="none" stroke="url(#vtxG)" stroke-width="1.5" opacity=".4"/><path d="M20 11 Q29 17 27 22 Q25 27 20 29 Q15 27 13 22 Q11 17 20 11" fill="none" stroke="url(#vtxG)" stroke-width="1" opacity=".3"/><text x="20" y="24.5" text-anchor="middle" font-family="Orbitron,sans-serif" font-size="12" font-weight="900" fill="url(#vtxG)" filter="url(#vtxGlow)">V</text><circle cx="20" cy="20" r="19.5" fill="none" stroke="rgba(0,212,255,.07)" stroke-width="3"/></svg>`,
- inr: `<svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg"><defs><radialGradient id="inrBg" cx="38%" cy="28%" r="72%"><stop offset="0%" stop-color="#1e1000"/><stop offset="50%" stop-color="#0f0800"/><stop offset="100%" stop-color="#060300"/></radialGradient><linearGradient id="inrG" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#ffa040"/><stop offset="50%" stop-color="#ff9900"/><stop offset="100%" stop-color="#cc6600"/></linearGradient><filter id="inrGlow"><feGaussianBlur stdDeviation="1" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs><circle cx="20" cy="20" r="19.5" fill="url(#inrBg)"/><circle cx="20" cy="20" r="18.5" fill="none" stroke="url(#inrG)" stroke-width="1.2" opacity=".7"/><line x1="13" y1="12" x2="27" y2="12" stroke="url(#inrG)" stroke-width="2.2" stroke-linecap="round" filter="url(#inrGlow)"/><line x1="13" y1="17" x2="24" y2="17" stroke="url(#inrG)" stroke-width="2" stroke-linecap="round"/><path d="M13 17 Q20 17 20 22 Q20 27 13 27" stroke="url(#inrG)" stroke-width="1.8" stroke-linecap="round" fill="none"/><line x1="13" y1="22" x2="21" y2="22" stroke="rgba(255,153,0,.4)" stroke-width="1.5" stroke-linecap="round"/><line x1="13" y1="12" x2="20" y2="28" stroke="url(#inrG)" stroke-width="1.8" stroke-linecap="round" opacity=".6"/><circle cx="20" cy="20" r="19.5" fill="none" stroke="rgba(255,153,0,.07)" stroke-width="3"/></svg>`,
+ btc:  `<svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">  <circle cx="20" cy="20" r="19" fill="url(#btcBg)" stroke="#f7931a" stroke-width="1"/>  <defs>    <radialGradient id="btcBg" cx="35%" cy="30%" r="70%">      <stop offset="0%" stop-color="#3d1f00"/>      <stop offset="100%" stop-color="#1a0900"/>    </radialGradient>  </defs>  <path d="M15 10h7.5c2.5 0 4 1.2 4 3.2 0 1.4-.8 2.5-2 3 1.5.4 2.5 1.7 2.5 3.3 0 2.2-1.8 3.5-4.5 3.5H15V10zm2.5 5.5h4.5c1 0 1.7-.6 1.7-1.5s-.7-1.5-1.7-1.5h-4.5v3zm0 6h5c1.2 0 2-.7 2-1.7S23.7 18 22.5 18h-5v3.5z" fill="#f7931a"/>  <line x1="18" y1="8" x2="18" y2="10" stroke="#f7931a" stroke-width="1.5" stroke-linecap="round"/>  <line x1="22" y1="8" x2="22" y2="10" stroke="#f7931a" stroke-width="1.5" stroke-linecap="round"/>  <line x1="18" y1="23" x2="18" y2="25" stroke="#f7931a" stroke-width="1.5" stroke-linecap="round"/>  <line x1="22" y1="23" x2="22" y2="25" stroke="#f7931a" stroke-width="1.5" stroke-linecap="round"/>  <circle cx="20" cy="20" r="18.5" fill="none" stroke="rgba(247,147,26,0.25)" stroke-width=".5"/></svg>`,
+ eth:  `<svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">  <circle cx="20" cy="20" r="19" fill="url(#ethBg)" stroke="#627eea" stroke-width="1"/>  <defs>    <radialGradient id="ethBg" cx="35%" cy="30%" r="70%">      <stop offset="0%" stop-color="#0d1040"/>      <stop offset="100%" stop-color="#050820"/>    </radialGradient>  </defs>  <polygon points="20,8 28,20 20,24 12,20" fill="rgba(98,126,234,0.3)" stroke="#627eea" stroke-width="1" stroke-linejoin="round"/>  <polygon points="20,24 28,20 20,32 12,20" fill="rgba(98,126,234,0.5)" stroke="#627eea" stroke-width="1" stroke-linejoin="round"/>  <line x1="20" y1="8" x2="20" y2="32" stroke="rgba(98,126,234,0.4)" stroke-width=".8"/>  <circle cx="20" cy="20" r="18.5" fill="none" stroke="rgba(98,126,234,0.2)" stroke-width=".5"/></svg>`,
+ doge: `<svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">  <circle cx="20" cy="20" r="19" fill="url(#dogeBg)" stroke="#c2a633" stroke-width="1"/>  <defs>    <radialGradient id="dogeBg" cx="35%" cy="30%" r="70%">      <stop offset="0%" stop-color="#2a2000"/>      <stop offset="100%" stop-color="#120f00"/>    </radialGradient>  </defs>  <text x="20" y="26" text-anchor="middle" font-family="serif" font-size="18" font-weight="900" fill="#c2a633">Ð</text>  <circle cx="20" cy="20" r="15" fill="none" stroke="rgba(194,166,51,0.2)" stroke-width=".8" stroke-dasharray="3 2"/>  <circle cx="20" cy="20" r="18.5" fill="none" stroke="rgba(194,166,51,0.2)" stroke-width=".5"/></svg>`,
+ trx:  `<svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">  <circle cx="20" cy="20" r="19" fill="url(#trxBg)" stroke="#ef0027" stroke-width="1"/>  <defs>    <radialGradient id="trxBg" cx="35%" cy="30%" r="70%">      <stop offset="0%" stop-color="#300008"/>      <stop offset="100%" stop-color="#150003"/>    </radialGradient>  </defs>  <polygon points="20,9 30,26 10,26" fill="none" stroke="#ef0027" stroke-width="1.8" stroke-linejoin="round"/>  <polygon points="20,14 25.5,23 14.5,23" fill="rgba(239,0,39,0.25)" stroke="#ef0027" stroke-width="1" stroke-linejoin="round"/>  <circle cx="20" cy="20" r="18.5" fill="none" stroke="rgba(239,0,39,0.2)" stroke-width=".5"/></svg>`,
+ sol:  `<svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">  <circle cx="20" cy="20" r="19" fill="url(#solBg)" stroke="#9945ff" stroke-width="1"/>  <defs>    <radialGradient id="solBg" cx="35%" cy="30%" r="70%">      <stop offset="0%" stop-color="#1a0030"/>      <stop offset="100%" stop-color="#0a0018"/>    </radialGradient>  </defs>  <rect x="11" y="13" width="18" height="3" rx="1.5" fill="url(#solGrad)" transform="skewX(-8)"/>  <rect x="11" y="18.5" width="18" height="3" rx="1.5" fill="url(#solGrad2)" transform="skewX(-8)"/>  <rect x="11" y="24" width="18" height="3" rx="1.5" fill="url(#solGrad)" transform="skewX(-8)"/>  <defs>    <linearGradient id="solGrad" x1="0%" y1="0%" x2="100%" y2="0%">      <stop offset="0%" stop-color="#00d4ff"/>      <stop offset="100%" stop-color="#9945ff"/>    </linearGradient>    <linearGradient id="solGrad2" x1="0%" y1="0%" x2="100%" y2="0%">      <stop offset="0%" stop-color="#9945ff"/>      <stop offset="100%" stop-color="#00d4ff"/>    </linearGradient>  </defs>  <circle cx="20" cy="20" r="18.5" fill="none" stroke="rgba(153,69,255,0.2)" stroke-width=".5"/></svg>`,
+ bnb:  `<svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">  <circle cx="20" cy="20" r="19" fill="url(#bnbBg)" stroke="#f3ba2f" stroke-width="1"/>  <defs>    <radialGradient id="bnbBg" cx="35%" cy="30%" r="70%">      <stop offset="0%" stop-color="#2a2000"/>      <stop offset="100%" stop-color="#120f00"/>    </radialGradient>  </defs>  <polygon points="20,12 23,15 20,18 17,15" fill="#f3ba2f"/>  <polygon points="20,22 23,25 20,28 17,25" fill="#f3ba2f"/>  <polygon points="13,15 16,18 13,21 10,18" fill="#f3ba2f"/>  <polygon points="27,15 30,18 27,21 24,18" fill="#f3ba2f"/>  <polygon points="20,17 23,20 20,23 17,20" fill="#f3ba2f" opacity=".6"/>  <circle cx="20" cy="20" r="18.5" fill="none" stroke="rgba(243,186,47,0.2)" stroke-width=".5"/></svg>`,
+ usdt: `<svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">  <circle cx="20" cy="20" r="19" fill="url(#usdtBg)" stroke="#26a17b" stroke-width="1"/>  <defs>    <radialGradient id="usdtBg" cx="35%" cy="30%" r="70%">      <stop offset="0%" stop-color="#001a12"/>      <stop offset="100%" stop-color="#000d09"/>    </radialGradient>  </defs>  <rect x="13" y="11" width="14" height="3" rx="1.5" fill="#26a17b"/>  <rect x="18.5" y="14" width="3" height="13" rx="1.5" fill="#26a17b"/>  <ellipse cx="20" cy="21" rx="6" ry="2.5" fill="none" stroke="#26a17b" stroke-width="1.5"/>  <circle cx="20" cy="20" r="18.5" fill="none" stroke="rgba(38,161,123,0.2)" stroke-width=".5"/></svg>`,
+ vtx:  `<svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">  <circle cx="20" cy="20" r="19" fill="url(#vtxBg)" stroke="#00d4ff" stroke-width="1"/>  <defs>    <radialGradient id="vtxBg" cx="35%" cy="30%" r="70%">      <stop offset="0%" stop-color="#001a26"/>      <stop offset="100%" stop-color="#000d14"/>    </radialGradient>  </defs>  <path d="M20 8 Q32 16 28 24 Q24 32 20 32 Q16 32 12 24 Q8 16 20 8" fill="none" stroke="#00d4ff" stroke-width="1.5" stroke-linecap="round"/>  <path d="M20 12 Q28 18 25 24 Q22 30 20 30 Q18 30 15 24 Q12 18 20 12" fill="none" stroke="rgba(0,212,255,0.5)" stroke-width="1" stroke-linecap="round"/>  <text x="20" y="23" text-anchor="middle" font-family="Orbitron,sans-serif" font-size="10" font-weight="900" fill="#00d4ff">V</text>  <circle cx="20" cy="20" r="18.5" fill="none" stroke="rgba(0,212,255,0.2)" stroke-width=".5"/></svg>`,
+ xrp:  `<svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">  <circle cx="20" cy="20" r="19" fill="url(#xrpBg)" stroke="#00aae4" stroke-width="1"/>  <defs>    <radialGradient id="xrpBg" cx="35%" cy="30%" r="70%">      <stop offset="0%" stop-color="#001824"/>      <stop offset="100%" stop-color="#000c14"/>    </radialGradient>  </defs>  <path d="M12 12 L18 20 L12 28" stroke="#00aae4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>  <path d="M28 12 L22 20 L28 28" stroke="#00aae4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>  <circle cx="20" cy="20" r="18.5" fill="none" stroke="rgba(0,170,228,0.2)" stroke-width=".5"/></svg>`,
+ inr:  `<svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">  <circle cx="20" cy="20" r="19" fill="url(#inrBg)" stroke="#ff9900" stroke-width="1"/>  <defs>    <radialGradient id="inrBg" cx="35%" cy="30%" r="70%">      <stop offset="0%" stop-color="#1a0d00"/>      <stop offset="100%" stop-color="#0d0600"/>    </radialGradient>  </defs>  <text x="20" y="26" text-anchor="middle" font-family="sans-serif" font-size="16" font-weight="900" fill="#ff9900">₹</text>  <circle cx="20" cy="20" r="18.5" fill="none" stroke="rgba(255,153,0,0.2)" stroke-width=".5"/></svg>`,
 };
 function coinSVG(id){ return CRYPTO_SVGS[id] || CRYPTO_SVGS.usdt; }
 
@@ -4313,14 +4132,12 @@ function goPage(page) {
  if (bnEl) bnEl.classList.add('active');
  if (page === 'home') renderHome();
  if (page === 'games') renderGames();
- // Canvas games: 500ms setTimeout guarantees DOM is fully painted before
- // reading offsetWidth — fixes zero-dimension error on all devices
- if (page === 'crash')       { setTimeout(initCrash,       500); }
- if (page === 'mines')       { setTimeout(minesReset,      500); }
- if (page === 'singularity') { setTimeout(initSingularity, 500); }
- if (page === 'rush')        { setTimeout(initRush,        500); }
- if (page === 'roulette')    { setTimeout(initRoulette,    500); }
- if (page === 'dice')        { setTimeout(initDice,        500); }
+ if (page === 'crash') { initCrash(); }
+ if (page === 'mines') { minesReset(); }
+ if (page === 'singularity') initSingularity();
+ if (page === 'rush') initRush();
+ if (page === 'roulette') initRoulette();
+ if (page === 'dice') initDice();
  if (page === 'wallet') renderWallet();
  if (page === 'tasks') renderTasks();
  if (page === 'mailbox') renderMailbox();
@@ -4505,34 +4322,181 @@ function logoClick() {
 }
 
 /* ─── HOME ─── */
-/* Async SVG icon loader — built off the critical path via requestIdleCallback.
-   Falls back to CAT_ICONS placeholder until ready (~16ms on idle CPU).       */
-var NEON_ICONS = {};   // starts empty — icons injected async below
-(function buildIconsAsync() {
- var build = function() {
-  NEON_ICONS = {
-   crash: `<svg viewBox="0 0 64 64" width="64" height="64" fill="none" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="rocketBody" x1="50%" y1="0%" x2="50%" y2="100%"><stop offset="0%" stop-color="#ffffff"/><stop offset="40%" stop-color="#ff8888"/><stop offset="100%" stop-color="#ff2dce"/></linearGradient><radialGradient id="rocketGlow" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="rgba(255,45,206,.4)"/><stop offset="100%" stop-color="transparent"/></radialGradient><filter id="rg"><feGaussianBlur stdDeviation="2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs><circle cx="32" cy="32" r="30" fill="url(#rocketGlow)"/><path d="M32 6 C20 6 15 22 15 35 L20 38 L32 42 L44 38 L49 35 C49 22 44 6 32 6z" fill="url(#rocketBody)" filter="url(#rg)"/><ellipse cx="32" cy="6" rx="5" ry="7" fill="#ff2dce" opacity=".8"/><path d="M20 38 L14 46 L20 44z" fill="#ff6600" opacity=".9"/><path d="M44 38 L50 46 L44 44z" fill="#ff6600" opacity=".9"/><path d="M24 45 Q32 58 40 45 Q36 50 32 52 Q28 50 24 45z" fill="#ff4400" filter="url(#rg)" opacity=".9"/><path d="M26 52 Q32 62 38 52" stroke="#ffe000" stroke-width="2" stroke-linecap="round" fill="none" opacity=".7"/><circle cx="32" cy="30" r="5" fill="rgba(255,255,255,.15)" stroke="rgba(255,255,255,.5)" stroke-width="1.5"/><circle cx="32" cy="30" r="2.5" fill="rgba(0,212,255,.6)"/></svg>`,
-   mines: `<svg viewBox="0 0 64 64" width="64" height="64" fill="none" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="gemG" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#80fff0"/><stop offset="30%" stop-color="#00e676"/><stop offset="70%" stop-color="#00d4ff"/><stop offset="100%" stop-color="#7b2fff"/></linearGradient><radialGradient id="gemGlow" cx="40%" cy="30%" r="60%"><stop offset="0%" stop-color="rgba(0,255,136,.5)"/><stop offset="100%" stop-color="transparent"/></radialGradient><filter id="gmg"><feGaussianBlur stdDeviation="1.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs><circle cx="32" cy="32" r="30" fill="url(#gemGlow)"/><polygon points="32,8 48,24 40,52 24,52 16,24" fill="url(#gemG)" opacity=".85" filter="url(#gmg)"/><polygon points="32,8 48,24 32,20" fill="rgba(255,255,255,.35)"/><polygon points="32,8 16,24 32,20" fill="rgba(255,255,255,.15)"/><polygon points="48,24 40,52 32,34" fill="rgba(0,0,0,.2)"/><polygon points="16,24 24,52 32,34" fill="rgba(255,255,255,.1)"/><polygon points="32,20 48,24 32,34 16,24" fill="rgba(255,255,255,.12)"/><line x1="32" y1="8" x2="32" y2="20" stroke="rgba(255,255,255,.7)" stroke-width="1"/><line x1="16" y1="24" x2="48" y2="24" stroke="rgba(255,255,255,.3)" stroke-width="1"/></svg>`,
-   tower: `<svg viewBox="0 0 64 64" width="64" height="64" fill="none" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="towerG" x1="50%" y1="0%" x2="50%" y2="100%"><stop offset="0%" stop-color="#c084fc"/><stop offset="100%" stop-color="#7b2fff"/></linearGradient><filter id="tg"><feGaussianBlur stdDeviation="1.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs><rect x="22" y="8" width="20" height="48" rx="3" fill="url(#towerG)" opacity=".3" stroke="#c084fc" stroke-width="1.5" filter="url(#tg)"/><rect x="10" y="22" width="44" height="8" rx="3" fill="url(#towerG)" opacity=".7" filter="url(#tg)"/><rect x="10" y="36" width="44" height="8" rx="3" fill="url(#towerG)" opacity=".7" filter="url(#tg)"/><rect x="10" y="50" width="44" height="8" rx="3" fill="url(#towerG)" opacity=".9" filter="url(#tg)"/><rect x="22" y="8" width="20" height="8" rx="3" fill="#c084fc" opacity=".9"/><circle cx="32" cy="12" r="4" fill="#c084fc" filter="url(#tg)"/><line x1="32" y1="4" x2="32" y2="8" stroke="#c084fc" stroke-width="2" stroke-linecap="round" opacity=".6"/></svg>`,
-   singularity: `<svg viewBox="0 0 64 64" width="64" height="64" fill="none" xmlns="http://www.w3.org/2000/svg"><defs><radialGradient id="bhG" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#000"/><stop offset="30%" stop-color="#0d0030"/><stop offset="60%" stop-color="rgba(123,47,255,.2)"/><stop offset="100%" stop-color="transparent"/></radialGradient><filter id="bhf"><feGaussianBlur stdDeviation="1.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs><circle cx="32" cy="32" r="30" fill="url(#bhG)"/><ellipse cx="32" cy="32" rx="28" ry="10" fill="none" stroke="rgba(123,47,255,.5)" stroke-width="1.5" filter="url(#bhf)"/><ellipse cx="32" cy="32" rx="20" ry="8" fill="none" stroke="rgba(0,212,255,.4)" stroke-width="1.2" filter="url(#bhf)"/><ellipse cx="32" cy="32" rx="12" ry="5" fill="none" stroke="rgba(123,47,255,.6)" stroke-width="1" filter="url(#bhf)"/><circle cx="32" cy="32" r="8" fill="#0d0030" stroke="#7b2fff" stroke-width="2" filter="url(#bhf)"/><circle cx="32" cy="32" r="4" fill="#1a0060"/><circle cx="32" cy="32" r="2" fill="#c084fc" opacity=".8"/><line x1="4" y1="32" x2="18" y2="32" stroke="rgba(0,212,255,.4)" stroke-width="1" stroke-dasharray="3 2"/><line x1="46" y1="32" x2="60" y2="32" stroke="rgba(0,212,255,.4)" stroke-width="1" stroke-dasharray="3 2"/></svg>`,
-   rush: `<svg viewBox="0 0 64 64" width="64" height="64" fill="none" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="rushG" x1="50%" y1="0%" x2="50%" y2="100%"><stop offset="0%" stop-color="#ffe000"/><stop offset="50%" stop-color="#ff8800"/><stop offset="100%" stop-color="#ff2dce"/></linearGradient><filter id="ruf"><feGaussianBlur stdDeviation="2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs><circle cx="32" cy="32" r="30" fill="rgba(255,136,0,.05)"/><polygon points="34,6 14,36 28,36 26,58 50,28 36,28" fill="url(#rushG)" filter="url(#ruf)" opacity=".95"/><line x1="8" y1="22" x2="14" y2="16" stroke="#ffe000" stroke-width="2.5" stroke-linecap="round" opacity=".6"/><line x1="8" y1="32" x2="12" y2="32" stroke="#ff8800" stroke-width="2.5" stroke-linecap="round" opacity=".5"/><line x1="8" y1="42" x2="14" y2="48" stroke="#ff2dce" stroke-width="2" stroke-linecap="round" opacity=".4"/></svg>`,
-   roulette: `<svg viewBox="0 0 64 64" width="64" height="64" fill="none" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="roulG" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#ff9900"/><stop offset="50%" stop-color="#ff2dce"/><stop offset="100%" stop-color="#00d4ff"/></linearGradient><filter id="rlf"><feGaussianBlur stdDeviation="1.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs><circle cx="32" cy="32" r="29" fill="none" stroke="url(#roulG)" stroke-width="2.5" filter="url(#rlf)"/><circle cx="32" cy="32" r="22" fill="none" stroke="rgba(255,153,0,.3)" stroke-width="1.2" stroke-dasharray="4 2"/><circle cx="32" cy="32" r="14" fill="none" stroke="rgba(255,45,206,.3)" stroke-width="1.2" stroke-dasharray="6 3"/><circle cx="32" cy="32" r="7" fill="url(#roulG)" opacity=".4"/><circle cx="32" cy="32" r="3.5" fill="#fff" opacity=".9"/><line x1="32" y1="3" x2="32" y2="12" stroke="#ff9900" stroke-width="2.5" stroke-linecap="round"/><line x1="61" y1="32" x2="52" y2="32" stroke="#ff2dce" stroke-width="2.5" stroke-linecap="round"/><line x1="32" y1="61" x2="32" y2="52" stroke="#00d4ff" stroke-width="2.5" stroke-linecap="round"/><line x1="3" y1="32" x2="12" y2="32" stroke="#ff9900" stroke-width="2.5" stroke-linecap="round"/><circle cx="32" cy="3" r="2.5" fill="#ff9900" filter="url(#rlf)"/><circle cx="61" cy="32" r="2.5" fill="#ff2dce" filter="url(#rlf)"/></svg>`,
-   dice: `<svg viewBox="0 0 64 64" width="64" height="64" fill="none" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="diceG" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#a070ff"/><stop offset="100%" stop-color="#4820cc"/></linearGradient><linearGradient id="diceFaceG" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#1a0a40"/><stop offset="100%" stop-color="#0d0528"/></linearGradient><filter id="df"><feGaussianBlur stdDeviation="1.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs><rect x="8" y="10" width="46" height="46" rx="9" fill="url(#diceFaceG)" stroke="url(#diceG)" stroke-width="2" filter="url(#df)"/><rect x="8" y="10" width="46" height="46" rx="9" fill="none" stroke="rgba(192,132,252,.15)" stroke-width="5"/><circle cx="20" cy="22" r="4.5" fill="#c084fc" filter="url(#df)"/><circle cx="44" cy="22" r="4.5" fill="#c084fc" filter="url(#df)"/><circle cx="20" cy="44" r="4.5" fill="#c084fc" filter="url(#df)"/><circle cx="44" cy="44" r="4.5" fill="#c084fc" filter="url(#df)"/><circle cx="32" cy="33" r="4.5" fill="#a070ff" opacity=".7" filter="url(#df)"/></svg>`,
-   limbo: `<svg viewBox="0 0 64 64" width="64" height="64" fill="none" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="limboG" x1="0%" y1="100%" x2="100%" y2="0%"><stop offset="0%" stop-color="#ffd700"/><stop offset="100%" stop-color="#ff8800"/></linearGradient><filter id="lf"><feGaussianBlur stdDeviation="1.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs><polyline points="6,54 16,42 26,30 36,18 58,10" fill="none" stroke="url(#limboG)" stroke-width="3" stroke-linecap="round" filter="url(#lf)"/><circle cx="58" cy="10" r="5" fill="#ffd700" filter="url(#lf)"/><line x1="6" y1="54" x2="58" y2="54" stroke="rgba(255,215,0,.15)" stroke-width="1"/><line x1="6" y1="10" x2="6" y2="54" stroke="rgba(255,215,0,.15)" stroke-width="1"/><circle cx="26" cy="30" r="3" fill="#ff8800" opacity=".7"/><circle cx="16" cy="42" r="2.5" fill="#ffd700" opacity=".5"/><rect x="5" y="53" width="53" height="1.5" fill="url(#limboG)" rx=".75" opacity=".4"/></svg>`,
-   wheel: `<svg viewBox="0 0 64 64" width="64" height="64" fill="none" xmlns="http://www.w3.org/2000/svg"><defs><filter id="wf"><feGaussianBlur stdDeviation="1.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs><circle cx="32" cy="32" r="28" fill="none" stroke="#00ff88" stroke-width="2.5" filter="url(#wf)"/><line x1="32" y1="4" x2="32" y2="60" stroke="rgba(0,255,136,.3)" stroke-width="1.2"/><line x1="4" y1="32" x2="60" y2="32" stroke="rgba(0,255,136,.3)" stroke-width="1.2"/><line x1="12" y1="12" x2="52" y2="52" stroke="rgba(0,255,136,.2)" stroke-width="1"/><line x1="52" y1="12" x2="12" y2="52" stroke="rgba(0,255,136,.2)" stroke-width="1"/><circle cx="32" cy="32" r="12" fill="rgba(0,255,136,.08)" stroke="#00ff88" stroke-width="1.5"/><circle cx="32" cy="32" r="5" fill="rgba(0,255,136,.3)"/><circle cx="32" cy="32" r="2" fill="#00ff88"/><circle cx="32" cy="4" r="2.5" fill="#00ff88" opacity=".8"/><circle cx="60" cy="32" r="2.5" fill="#00ff88" opacity=".8"/></svg>`,
-   hilo: `<svg viewBox="0 0 64 64" width="64" height="64" fill="none" xmlns="http://www.w3.org/2000/svg"><defs><filter id="hlf"><feGaussianBlur stdDeviation="1" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs><rect x="6" y="10" width="52" height="36" rx="5" fill="rgba(255,77,106,.08)" stroke="#ff4d6a" stroke-width="2" filter="url(#hlf)"/><line x1="32" y1="10" x2="32" y2="46" stroke="rgba(255,77,106,.2)" stroke-width="1"/><path d="M14 36 L22 20 L30 28 L38 18 L46 26 L54 14" stroke="#ff4d6a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none" filter="url(#hlf)"/><circle cx="54" cy="14" r="3.5" fill="#ff4d6a"/><path d="M16 54 L32 48 L48 54" stroke="rgba(255,77,106,.4)" stroke-width="2" stroke-linecap="round"/></svg>`,
-   plinko: `<svg viewBox="0 0 64 64" width="64" height="64" fill="none" xmlns="http://www.w3.org/2000/svg"><defs><filter id="pf"><feGaussianBlur stdDeviation="1" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs><circle cx="32" cy="8" r="4.5" fill="#00d4ff" filter="url(#pf)"/><circle cx="20" cy="20" r="3" fill="rgba(0,212,255,.5)"/><circle cx="32" cy="20" r="3" fill="rgba(0,212,255,.5)"/><circle cx="44" cy="20" r="3" fill="rgba(0,212,255,.5)"/><circle cx="14" cy="32" r="3" fill="rgba(0,212,255,.4)"/><circle cx="26" cy="32" r="3" fill="rgba(0,212,255,.4)"/><circle cx="38" cy="32" r="3" fill="rgba(0,212,255,.4)"/><circle cx="50" cy="32" r="3" fill="rgba(0,212,255,.4)"/><circle cx="8" cy="44" r="3" fill="rgba(0,212,255,.3)"/><circle cx="20" cy="44" r="3" fill="rgba(0,212,255,.3)"/><circle cx="32" cy="44" r="3" fill="rgba(0,212,255,.3)"/><circle cx="44" cy="44" r="3" fill="rgba(0,212,255,.3)"/><circle cx="56" cy="44" r="3" fill="rgba(0,212,255,.3)"/><path d="M32 8 L26 20 L20 32 L14 44" stroke="#00d4ff" stroke-width="1.5" stroke-dasharray="3 3" opacity=".5"/><rect x="4" y="56" width="56" height="6" rx="3" fill="rgba(0,212,255,.2)" stroke="#00d4ff" stroke-width="1"/></svg>`,
-   spinmaster: `<svg viewBox="0 0 64 64" width="64" height="64" fill="none" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="smG" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#c084fc"/><stop offset="100%" stop-color="#7b2fff"/></linearGradient><filter id="smf"><feGaussianBlur stdDeviation="1.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs><circle cx="32" cy="32" r="28" fill="none" stroke="url(#smG)" stroke-width="2.5" filter="url(#smf)"/><circle cx="32" cy="32" r="20" fill="none" stroke="rgba(192,132,252,.25)" stroke-width="1.2"/><line x1="32" y1="4" x2="32" y2="14" stroke="#c084fc" stroke-width="3" stroke-linecap="round" filter="url(#smf)"/><line x1="56.4" y1="18" x2="48" y2="23" stroke="#7b2fff" stroke-width="3" stroke-linecap="round" filter="url(#smf)"/><line x1="56.4" y1="46" x2="48" y2="41" stroke="#c084fc" stroke-width="3" stroke-linecap="round" filter="url(#smf)"/><line x1="32" y1="60" x2="32" y2="50" stroke="#7b2fff" stroke-width="3" stroke-linecap="round" filter="url(#smf)"/><line x1="7.6" y1="46" x2="16" y2="41" stroke="#c084fc" stroke-width="3" stroke-linecap="round" filter="url(#smf)"/><line x1="7.6" y1="18" x2="16" y2="23" stroke="#7b2fff" stroke-width="3" stroke-linecap="round" filter="url(#smf)"/><circle cx="32" cy="32" r="8" fill="url(#smG)" opacity=".5"/><circle cx="32" cy="32" r="4" fill="#c084fc"/><circle cx="32" cy="32" r="2" fill="#fff" opacity=".8"/></svg>`,
-  };
- };
- // Use requestIdleCallback when available (Chrome, Edge) to stay off critical path.
- // Falls back to setTimeout(0) for Firefox/Safari — still async, just not idle-aware.
- if (typeof requestIdleCallback === 'function') {
-  requestIdleCallback(build, { timeout: 500 });
- } else {
-  setTimeout(build, 0);
- }
-})();
+/* ── Shared icon builder ── */
+function neonSvg(path, color, extra='') {
+ return `<svg viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="2" style="width:46%;height:46%;filter:drop-shadow(0 0 7px ${color}) drop-shadow(0 0 16px ${color}55);" ${extra}>${path}</svg>`;
+}
+const NEON_ICONS = {
+ // CRASH — Rocket with exhaust trail
+ crash: `<svg viewBox="0 0 48 48" width="52" height="52" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs><filter id="cg"><feGaussianBlur stdDeviation="2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
+  <g filter="url(#cg)">
+  <path d="M24 4C24 4 32 10 32 22L26 28H22L16 22C16 10 24 4 24 4Z" fill="#ff4d6a" opacity=".9"/>
+  <ellipse cx="24" cy="20" rx="4" ry="5" fill="#fff" opacity=".6"/>
+  <path d="M16 28L12 40L20 35L24 44L28 35L36 40L32 28" fill="#ff9933" opacity=".85"/>
+  <path d="M16 28L10 36" stroke="#ff6644" stroke-width="1.5" stroke-linecap="round" opacity=".5"/>
+  <path d="M32 28L38 36" stroke="#ff6644" stroke-width="1.5" stroke-linecap="round" opacity=".5"/>
+  <line x1="4" y1="42" x2="20" y2="26" stroke="#ff4d6a" stroke-width="1" opacity=".4" stroke-dasharray="2 3"/>
+  <polyline points="6 38 14 30 20 34" stroke="#ff4d6a" stroke-width="1.5" stroke-linecap="round" opacity=".6"/>
+  </g></svg>`,
+ // MINES — Stylized bomb with danger cross
+ mines: `<svg viewBox="0 0 48 48" width="52" height="52" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs><filter id="mg"><feGaussianBlur stdDeviation="2.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
+  <g filter="url(#mg)">
+  <circle cx="24" cy="26" r="14" fill="#00cc66" opacity=".15" stroke="#00ff88" stroke-width="1.5"/>
+  <circle cx="24" cy="26" r="10" fill="#00ff88" opacity=".2"/>
+  <circle cx="24" cy="26" r="6" fill="#00ff88" opacity=".7"/>
+  <rect x="21" y="10" width="6" height="8" rx="2" fill="#00cc66"/>
+  <line x1="24" y1="6" x2="24" y2="10" stroke="#00ff88" stroke-width="2" stroke-linecap="round"/>
+  <line x1="10" y1="26" x2="6" y2="26" stroke="#00ff88" stroke-width="2" stroke-linecap="round"/>
+  <line x1="38" y1="26" x2="42" y2="26" stroke="#00ff88" stroke-width="2" stroke-linecap="round"/>
+  <line x1="13.5" y1="13.5" x2="10.5" y2="10.5" stroke="#00ff88" stroke-width="2" stroke-linecap="round"/>
+  <line x1="34.5" y1="13.5" x2="37.5" y2="10.5" stroke="#00ff88" stroke-width="2" stroke-linecap="round"/>
+  <circle cx="21" cy="23" r="2" fill="#fff" opacity=".8"/>
+  </g></svg>`,
+ // TOWER — Neon tower/staircase climbing up
+ tower: `<svg viewBox="0 0 48 48" width="52" height="52" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs><filter id="tg"><feGaussianBlur stdDeviation="2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
+  <g filter="url(#tg)">
+  <rect x="6" y="36" width="36" height="6" rx="2" fill="#7b2fff" opacity=".9"/>
+  <rect x="10" y="28" width="28" height="6" rx="2" fill="#7b2fff" opacity=".8"/>
+  <rect x="14" y="20" width="20" height="6" rx="2" fill="#9944ff" opacity=".85"/>
+  <rect x="18" y="12" width="12" height="6" rx="2" fill="#bb66ff" opacity=".9"/>
+  <rect x="21" y="5" width="6" height="5" rx="2" fill="#dd88ff"/>
+  <line x1="24" y1="3" x2="24" y2="5" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
+  <polygon points="20,4 24,0 28,4" fill="#ffd700" opacity=".9"/>
+  </g></svg>`,
+ // SINGULARITY — Black hole vortex with spiral arms
+ singularity:`<svg viewBox="0 0 48 48" width="52" height="52" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+   <radialGradient id="sgrd" cx="50%" cy="50%" r="50%">
+    <stop offset="0%" stop-color="#000" stop-opacity="1"/>
+    <stop offset="60%" stop-color="#7b2fff" stop-opacity=".4"/>
+    <stop offset="100%" stop-color="#7b2fff" stop-opacity="0"/>
+   </radialGradient>
+   <filter id="sgg"><feGaussianBlur stdDeviation="2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+  </defs>
+  <g filter="url(#sgg)">
+  <circle cx="24" cy="24" r="20" fill="url(#sgrd)"/>
+  <ellipse cx="24" cy="24" rx="20" ry="8" stroke="#7b2fff" stroke-width="1" opacity=".6" fill="none"/>
+  <ellipse cx="24" cy="24" rx="14" ry="4" stroke="#9944ff" stroke-width="1.5" opacity=".7" fill="none"/>
+  <ellipse cx="24" cy="24" rx="7" ry="2" stroke="#bb66ff" stroke-width="1.5" opacity=".9" fill="none"/>
+  <circle cx="24" cy="24" r="4" fill="#1a0040"/>
+  <circle cx="24" cy="24" r="2" fill="#7b2fff"/>
+  <path d="M24 4C30 8 38 16 38 24" stroke="#7b2fff" stroke-width="1.5" stroke-linecap="round" opacity=".5" fill="none"/>
+  <path d="M24 44C18 40 10 32 10 24" stroke="#9944ff" stroke-width="1.5" stroke-linecap="round" opacity=".5" fill="none"/>
+  </g></svg>`,
+ // RUSH — Lightning bolt speed trail
+ rush: `<svg viewBox="0 0 48 48" width="52" height="52" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs><filter id="rg"><feGaussianBlur stdDeviation="2.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
+  <g filter="url(#rg)">
+  <polygon points="28,4 14,26 22,26 20,44 34,22 26,22 28,4" fill="#00d4ff" opacity=".9"/>
+  <line x1="4" y1="18" x2="12" y2="18" stroke="#00d4ff" stroke-width="2" stroke-linecap="round" opacity=".5"/>
+  <line x1="2" y1="24" x2="11" y2="24" stroke="#00aacc" stroke-width="1.5" stroke-linecap="round" opacity=".4"/>
+  <line x1="4" y1="30" x2="12" y2="30" stroke="#00d4ff" stroke-width="2" stroke-linecap="round" opacity=".5"/>
+  <line x1="34" y1="18" x2="44" y2="18" stroke="#00d4ff" stroke-width="1.5" stroke-linecap="round" opacity=".3"/>
+  <line x1="36" y1="30" x2="44" y2="30" stroke="#00d4ff" stroke-width="1.5" stroke-linecap="round" opacity=".3"/>
+  </g></svg>`,
+ // ROULETTE — Detailed roulette wheel with sectors
+ roulette:`<svg viewBox="0 0 48 48" width="52" height="52" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs><filter id="rogg"><feGaussianBlur stdDeviation="1.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
+  <g filter="url(#rogg)">
+  <circle cx="24" cy="24" r="20" stroke="#ff9900" stroke-width="1.5" fill="none" opacity=".7"/>
+  <circle cx="24" cy="24" r="16" stroke="#ff9900" stroke-width="1" fill="none" opacity=".5"/>
+  <path d="M24 8L24 16" stroke="#ff4444" stroke-width="3" stroke-linecap="round"/>
+  <path d="M40 24L32 24" stroke="#222" stroke-width="3" stroke-linecap="round"/>
+  <path d="M24 40L24 32" stroke="#ff4444" stroke-width="3" stroke-linecap="round"/>
+  <path d="M8 24L16 24" stroke="#222" stroke-width="3" stroke-linecap="round"/>
+  <path d="M35.3 12.7L29.7 18.3" stroke="#ff4444" stroke-width="2" stroke-linecap="round" opacity=".7"/>
+  <path d="M12.7 12.7L18.3 18.3" stroke="#222" stroke-width="2" stroke-linecap="round" opacity=".7"/>
+  <path d="M35.3 35.3L29.7 29.7" stroke="#222" stroke-width="2" stroke-linecap="round" opacity=".7"/>
+  <path d="M12.7 35.3L18.3 29.7" stroke="#ff4444" stroke-width="2" stroke-linecap="round" opacity=".7"/>
+  <circle cx="24" cy="24" r="7" fill="#cc7700" opacity=".4" stroke="#ff9900" stroke-width="1"/>
+  <circle cx="24" cy="24" r="3" fill="#fff" opacity=".9"/>
+  <circle cx="24" cy="14" r="2" fill="#fff" opacity=".8"/>
+  </g></svg>`,
+ // DICE — Isometric 3D die
+ dice: `<svg viewBox="0 0 48 48" width="52" height="52" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs><filter id="dg"><feGaussianBlur stdDeviation="1.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
+  <g filter="url(#dg)">
+  <polygon points="24,6 42,16 42,36 24,46 6,36 6,16" fill="#1a0a2e" stroke="#c084fc" stroke-width="1.5" opacity=".9"/>
+  <polygon points="24,6 42,16 24,26 6,16" fill="#2d1259" stroke="#c084fc" stroke-width="1"/>
+  <polygon points="24,26 42,16 42,36 24,46" fill="#1a0840" stroke="#c084fc" stroke-width="1"/>
+  <polygon points="24,26 6,16 6,36 24,46" fill="#120630" stroke="#c084fc" stroke-width="1"/>
+  <circle cx="24" cy="14" r="2.5" fill="#c084fc"/>
+  <circle cx="34" cy="22" r="2" fill="#c084fc"/>
+  <circle cx="34" cy="30" r="2" fill="#c084fc"/>
+  <circle cx="15" cy="22" r="2" fill="#c084fc" opacity=".7"/>
+  <circle cx="15" cy="30" r="2" fill="#c084fc" opacity=".7"/>
+  <circle cx="24" cy="38" r="2" fill="#c084fc" opacity=".5"/>
+  </g></svg>`,
+ // LIMBO — Rising multiplier bar
+ limbo: `<svg viewBox="0 0 48 48" width="52" height="52" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs><filter id="lg"><feGaussianBlur stdDeviation="1.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
+  <g filter="url(#lg)">
+  <polyline points="4,40 14,32 22,20 30,26 40,8" stroke="#ffd700" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <circle cx="40" cy="8" r="3.5" fill="#ffd700"/>
+  <line x1="4" y1="44" x2="44" y2="44" stroke="#ffd700" stroke-width="1.5" opacity=".4"/>
+  <line x1="4" y1="44" x2="4" y2="6" stroke="#ffd700" stroke-width="1.5" opacity=".4"/>
+  <line x1="4" y1="33" x2="8" y2="33" stroke="#ffd700" stroke-width="1" opacity=".3"/>
+  <line x1="4" y1="22" x2="8" y2="22" stroke="#ffd700" stroke-width="1" opacity=".3"/>
+  <text x="36" y="20" font-family="monospace" font-size="8" fill="#ffd700" font-weight="bold">∞×</text>
+  </g></svg>`,
+ // WHEEL — Segmented prize wheel
+ wheel: `<svg viewBox="0 0 48 48" width="52" height="52" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs><filter id="wg"><feGaussianBlur stdDeviation="1.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
+  <g filter="url(#wg)">
+  <path d="M24 4L28 20L24 24Z" fill="#00ff88"/>
+  <path d="M44 24L28 20L24 24Z" fill="#ffd700"/>
+  <path d="M24 44L28 20L24 24Z" fill="#ff4d6a" transform="rotate(90 24 24)"/>
+  <path d="M4 24L20 28L24 24Z" fill="#7b2fff"/>
+  <path d="M24 4L20 20L24 24Z" fill="#00d4ff" transform="rotate(45 24 24)"/>
+  <path d="M44 24L28 20L24 24Z" fill="#ff9900" transform="rotate(90 24 24)"/>
+  <path d="M24 44L20 28L24 24Z" fill="#00ff88" transform="rotate(135 24 24)"/>
+  <path d="M4 24L20 20L24 24Z" fill="#ff2dce" transform="rotate(180 24 24)"/>
+  <circle cx="24" cy="24" r="20" fill="none" stroke="#fff" stroke-width="1" opacity=".3"/>
+  <line x1="24" y1="4" x2="24" y2="44" stroke="#fff" stroke-width=".5" opacity=".2"/>
+  <line x1="4" y1="24" x2="44" y2="24" stroke="#fff" stroke-width=".5" opacity=".2"/>
+  <line x1="9.4" y1="9.4" x2="38.6" y2="38.6" stroke="#fff" stroke-width=".5" opacity=".2"/>
+  <line x1="38.6" y1="9.4" x2="9.4" y2="38.6" stroke="#fff" stroke-width=".5" opacity=".2"/>
+  <circle cx="24" cy="24" r="4" fill="#fff"/>
+  <polygon points="24,1 26,10 22,10" fill="#ffd700"/>
+  </g></svg>`,
+ // HILO — Playing cards
+ hilo: `<svg viewBox="0 0 48 48" width="52" height="52" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs><filter id="hg"><feGaussianBlur stdDeviation="1.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
+  <g filter="url(#hg)">
+  <rect x="6" y="10" width="24" height="32" rx="3" fill="#1a0830" stroke="#ff4d6a" stroke-width="1.5"/>
+  <rect x="18" y="6" width="24" height="32" rx="3" fill="#0a1830" stroke="#00d4ff" stroke-width="1.5"/>
+  <text x="22" y="26" font-family="Georgia,serif" font-size="14" fill="#00d4ff" font-weight="bold">A</text>
+  <text x="11" y="24" font-family="Georgia,serif" font-size="10" fill="#ff4d6a" font-weight="bold">K</text>
+  <text x="11" y="34" font-family="serif" font-size="10" fill="#ff4d6a">♠</text>
+  <text x="23" y="35" font-family="serif" font-size="10" fill="#00d4ff">♦</text>
+  </g></svg>`,
+ // PLINKO — Pins and ball drop
+ plinko:`<svg viewBox="0 0 48 48" width="52" height="52" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs><filter id="pg"><feGaussianBlur stdDeviation="1.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
+  <g filter="url(#pg)">
+  <circle cx="24" cy="5" r="3" fill="#00d4ff"/>
+  <circle cx="16" cy="13" r="2" fill="#00d4ff" opacity=".6"/>
+  <circle cx="24" cy="13" r="2" fill="#00d4ff" opacity=".6"/>
+  <circle cx="32" cy="13" r="2" fill="#00d4ff" opacity=".6"/>
+  <circle cx="12" cy="21" r="2" fill="#00d4ff" opacity=".5"/>
+  <circle cx="20" cy="21" r="2" fill="#00d4ff" opacity=".5"/>
+  <circle cx="28" cy="21" r="2" fill="#00d4ff" opacity=".5"/>
+  <circle cx="36" cy="21" r="2" fill="#00d4ff" opacity=".5"/>
+  <circle cx="8" cy="29" r="2" fill="#00d4ff" opacity=".35"/>
+  <circle cx="16" cy="29" r="2" fill="#00d4ff" opacity=".35"/>
+  <circle cx="24" cy="29" r="2" fill="#00d4ff" opacity=".35"/>
+  <circle cx="32" cy="29" r="2" fill="#00d4ff" opacity=".35"/>
+  <circle cx="40" cy="29" r="2" fill="#00d4ff" opacity=".35"/>
+  <path d="M20 21L18 33" stroke="#00d4ff" stroke-width="1" opacity=".5" stroke-dasharray="2 2"/>
+  <rect x="6" y="38" width="8" height="6" rx="2" fill="#ff4d6a" opacity=".7"/>
+  <rect x="16" y="36" width="8" height="8" rx="2" fill="#ffd700" opacity=".7"/>
+  <rect x="26" y="38" width="8" height="6" rx="2" fill="#00ff88" opacity=".7"/>
+  <rect x="36" y="37" width="6" height="7" rx="2" fill="#7b2fff" opacity=".7"/>
+  </g></svg>`,
+};
 /* Category icons for the 89 placeholder games */
 const CAT_ICONS = [
  neonSvg('<rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/>','#00d4ff'), // cards
@@ -4560,7 +4524,7 @@ const GAMES_DATA = [
  { id: 'hilo', name: 'HiLo', players: 498, badge: '', bgColor: '#0f0208' },
  { id: 'plinko', name: 'Plinko', players: 534, badge: '', bgColor: '#02080f' },
 ];
-/* ACTIVE_GAMES_SET is hoisted — defined at top of script */
+const ACTIVE_GAMES_SET = new Set(['crash','mines','tower','singularity','rush','roulette','dice']);
 const ALL_100_GAMES = (function(){
  const extras = ['Blackjack','Baccarat','Keno','Slots Pro','Dragon Tiger','Andar Bahar','Teen Patti','3 Card Poker','Sic Bo','Pai Gow','Fast Keno','Lightning Dice','Super Sic Bo','Dragon Drop','Money Wheel','Golden Bat','Speed Baccarat','Quantum Roulette','Monopoly Live','Deal or No Deal','Football Studio','Gonzo Quest','Book of Dead','Starburst','Reactoonz','Gates of Olympus','Sweet Bonanza','Big Bass Bonanza','Money Train','Dead or Alive','Razor Shark','Wolf Gold','Rise of Merlin','Jammin Jars','Fruit Party','Invaders Moon','Release the Kraken','Buffalo King','Primate King','Wild West Gold','Piggy Riches','Reel King','Eye of Horus','Fishin Frenzy','Rainbow Riches','Mega Moolah','Divine Fortune','Hall of Gods','Age of Gods','Jackpot Giant','Gladiator','Lara Croft','Sherlock','Batman','Jurassic Park','Terminator','Iron Man','Thor','Hulk','Captain America','Spider Man','X Men','Fantastic Four','Blade','Daredevil','Punisher','Ghost Rider','Elektra','Wolverine','Cyclops','Storm','Jean Grey','Rogue','Gambit','Avalon','Thunderstruck','Immortal Romance','Hitman','Tomb Raider','Playboy','Lucky Leprechaun','Tiki Bounce','Amazon Wild','Snow Leopard','Dolphin Coast','Mega Gems','Diamond Empire','Royal Charm'];
  const base = [...GAMES_DATA];
@@ -5094,8 +5058,11 @@ function minesBet() {
  if (!amt || amt < 1 || amt > balance) { toast('Invalid bet amount', 'error'); return; }
  mBet = amt; mState = 'active'; mRevealed = 0; mMult = 1.00;
  mGrid = Array.from({ length: 25 }, (_, i) => ({ idx: i, isMine: false, revealed: false }));
- // Place mines randomly
- const pos = [...Array(25).keys()].sort(() =>Math.random() - 0.5);
+ // Place mines — crypto.getRandomValues Fisher-Yates (provably fair)
+ const pos = Array.from({length:25},(_,i)=>i);
+ const rndBuf = new Uint32Array(pos.length);
+ crypto.getRandomValues(rndBuf);
+ for (let i = pos.length - 1; i > 0; i--) { const j = rndBuf[i] % (i + 1); [pos[i], pos[j]] = [pos[j], pos[i]]; }
  pos.slice(0, mMines).forEach(p => mGrid[p].isMine = true);
  renderMinesGrid();
  updateMinesUI();
@@ -5116,7 +5083,7 @@ function minesTile(idx) {
  if (tile.isMine) {
  // Mine hit
  el.className = 'mine-tile revealed boom';
- el.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="#ff3366" stroke-width="1.5" class="mine-boom-svg"><circle cx="12" cy="12" r="5" fill="rgba(255,51,102,.2)"/><line x1="12" y1="2" x2="12" y2="5"/><line x1="12" y1="19" x2="12" y2="22"/><line x1="2" y1="12" x2="5" y2="12"/><line x1="19" y1="12" x2="22" y2="12"/><line x1="4.93" y1="4.93" x2="7.05" y2="7.05"/><line x1="16.95" y1="16.95" x2="19.07" y2="19.07"/><line x1="19.07" y1="4.93" x2="16.95" y2="7.05"/><line x1="7.05" y1="16.95" x2="4.93" y2="19.07"/></svg>';
+ el.innerHTML = `<svg viewBox="0 0 48 48" width="58%" height="58%" fill="none" xmlns="http://www.w3.org/2000/svg" class="mine-boom-svg" style="filter:drop-shadow(0 0 12px #ff3366)"><defs><radialGradient id="bf${idx}" cx="38%" cy="32%" r="62%"><stop offset="0%" stop-color="#4a1020"/><stop offset="100%" stop-color="#1a0008"/></radialGradient></defs><path d="M30 13Q37 7 35 3" stroke="#ff8800" stroke-width="2.2" stroke-linecap="round" fill="none"/><circle cx="35" cy="3" r="2.2" fill="#ffaa00"/><circle cx="35" cy="3" r="4" fill="rgba(255,140,0,0.3)"/><circle cx="22" cy="27" r="14" fill="url(#bf${idx})" stroke="#ff3366" stroke-width="1.5"/><ellipse cx="17" cy="21" rx="4" ry="3" fill="rgba(255,255,255,0.1)" transform="rotate(-20 17 21)"/><line x1="22" y1="13" x2="22" y2="10" stroke="#ff2dce" stroke-width="1.5" stroke-linecap="round"/><line x1="8" y1="27" x2="5" y2="27" stroke="#ff2dce" stroke-width="1.5" stroke-linecap="round"/><line x1="36" y1="27" x2="39" y2="27" stroke="#ff2dce" stroke-width="1.5" stroke-linecap="round"/><line x1="12.5" y1="16.5" x2="10" y2="14" stroke="#ff2dce" stroke-width="1.5" stroke-linecap="round"/><line x1="31.5" y1="16.5" x2="34" y2="14" stroke="#ff2dce" stroke-width="1.5" stroke-linecap="round"/><line x1="12.5" y1="37.5" x2="10" y2="40" stroke="#ff3366" stroke-width="1" stroke-linecap="round" opacity=".6"/><line x1="31.5" y1="37.5" x2="34" y2="40" stroke="#ff3366" stroke-width="1" stroke-linecap="round" opacity=".6"/></svg>`;
  playSound('explosion');
  triggerExplosion(el);
  // Shake arena
@@ -5135,7 +5102,7 @@ function minesTile(idx) {
  if (t.isMine && i !== idx) {
  setTimeout(() => {
  const tel = document.getElementById('mine-' + i);
- if (tel) { tel.className = 'mine-tile revealed other-mine'; tel.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="#ff3366" stroke-width="1.5" style="width:50%;height:50%;opacity:.6;filter:drop-shadow(0 0 5px #ff3366)"><circle cx="12" cy="12" r="5" fill="rgba(255,51,102,.15)"/><line x1="12" y1="2" x2="12" y2="5"/><line x1="12" y1="19" x2="12" y2="22"/><line x1="2" y1="12" x2="5" y2="12"/><line x1="19" y1="12" x2="22" y2="12"/><line x1="4.93" y1="4.93" x2="7.05" y2="7.05"/><line x1="16.95" y1="16.95" x2="19.07" y2="19.07"/><line x1="19.07" y1="4.93" x2="16.95" y2="7.05"/><line x1="7.05" y1="16.95" x2="4.93" y2="19.07"/></svg>'; }
+ if (tel) { tel.className = 'mine-tile revealed other-mine'; tel.innerHTML = `<svg viewBox="0 0 48 48" width="52%" height="52%" fill="none" xmlns="http://www.w3.org/2000/svg" style="opacity:.7;filter:drop-shadow(0 0 6px #ff3366)"><defs><radialGradient id="bfc${i}" cx="38%" cy="32%" r="62%"><stop offset="0%" stop-color="#3a0a18"/><stop offset="100%" stop-color="#120006"/></radialGradient></defs><path d="M30 13Q37 7 35 3" stroke="#ff6600" stroke-width="2" stroke-linecap="round" fill="none"/><circle cx="35" cy="3" r="1.8" fill="#ff9900"/><circle cx="22" cy="27" r="14" fill="url(#bfc${i})" stroke="#ff3366" stroke-width="1.2"/><ellipse cx="17" cy="21" rx="3.5" ry="2.5" fill="rgba(255,255,255,0.08)" transform="rotate(-20 17 21)"/><line x1="22" y1="13" x2="22" y2="10" stroke="#ff2dce" stroke-width="1.2" stroke-linecap="round"/><line x1="8" y1="27" x2="5" y2="27" stroke="#ff2dce" stroke-width="1.2" stroke-linecap="round"/><line x1="36" y1="27" x2="39" y2="27" stroke="#ff2dce" stroke-width="1.2" stroke-linecap="round"/></svg>`; }
  }, delay);
  delay += 60;
  }
@@ -5149,7 +5116,7 @@ function minesTile(idx) {
  mRevealed++;
  mMult = minesCalcMult(mMines, mRevealed);
  el.className = 'mine-tile revealed gem';
- el.innerHTML = `<div class="gem-ring"></div><svg viewBox="0 0 24 24" fill="none" stroke="#00ff88" stroke-width="1.5" class="mine-gem-svg"><polygon points="12 2 19 7 19 17 12 22 5 17 5 7"/><line x1="12" y1="2" x2="12" y2="22" opacity=".4"/><line x1="5" y1="7" x2="19" y2="7" opacity=".4"/><line x1="5" y1="17" x2="19" y2="17" opacity=".4"/><circle cx="12" cy="12" r="2" fill="rgba(0,255,136,.2)"/></svg>`;
+ el.innerHTML = `<div class="gem-ring"></div><svg viewBox="0 0 48 48" width="55%" height="55%" fill="none" xmlns="http://www.w3.org/2000/svg" class="mine-gem-svg" style="filter:drop-shadow(0 0 8px #00ff88)"><defs><linearGradient id="gf${idx}" x1="0" y1="0" x2="48" y2="48" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#80ffb8"/><stop offset="50%" stop-color="#00e676"/><stop offset="100%" stop-color="#00b856"/></linearGradient></defs><polygon points="24,5 39,15 39,33 24,43 9,33 9,15" fill="url(#gf${idx})" stroke="#00ff88" stroke-width="1.2" opacity=".96"/><polygon points="24,5 39,15 24,24" fill="rgba(255,255,255,0.22)"/><polygon points="24,5 9,15 24,24" fill="rgba(255,255,255,0.10)"/><polygon points="9,15 39,15 24,24" fill="rgba(0,0,0,0.14)"/><line x1="24" y1="9" x2="24" y2="13" stroke="rgba(255,255,255,0.65)" stroke-width="1.5" stroke-linecap="round"/><line x1="19" y1="11" x2="21" y2="14" stroke="rgba(255,255,255,0.35)" stroke-width="1" stroke-linecap="round"/></svg>`;
  playSound('gem');
  triggerGemWin(el);
  updateMinesUI();
@@ -5211,9 +5178,12 @@ function renderMinesGrid() {
  const grid = document.getElementById('minesGrid');
  if (!grid) return;
  const inactive = mState === 'idle' ? 'inactive' : '';
- grid.innerHTML = Array.from({ length: 25 }, (_, i) =>
- `<div class="mine-tile ${inactive}" id="mine-${i}" onclick="minesTile(${i})"></div>`
- ).join('');
+ // requestAnimationFrame ensures smooth 60FPS tile rendering (Chromebook optimized)
+ requestAnimationFrame(() => {
+  grid.innerHTML = Array.from({ length: 25 }, (_, i) =>
+   `<div class="mine-tile ${inactive}" id="mine-${i}" onclick="minesTile(${i})"></div>`
+  ).join('');
+ });
 }
 
 function adjMines(m) { const i = document.getElementById('mBetAmt'); if (i) i.value = Math.max(1, parseFloat(i.value || 0) * m).toFixed(2); }
@@ -8326,7 +8296,7 @@ document.getElementById('spinBetAmt')?.addEventListener('input', updateSpinEst);
 const _origGoPage = window.goPage;
 window.goPage = function(pg) {
  if (_origGoPage) _origGoPage.apply(this, arguments);
- if (pg === 'spinmaster') setTimeout(initSpinWheel, 500);
+ if (pg === 'spinmaster') setTimeout(initSpinWheel, 80);
 };
 
 // Also register in the active games set so navigation works
@@ -9749,152 +9719,226 @@ input:focus, select:focus {
   will-change: transform;
   backface-visibility: hidden;
 }
-
-/* ── GAME CONTAINER GPU FIX — prevents blank screen/lag ── */
-.page, .game-page-wrap, .game-container, .ctrl-panel,
-.crash-panel, .mines-arena, .dice-wrap, .roulette-wrap,
-#page-crash, #page-mines, #page-dice, #page-roulette,
-#page-singularity, #page-rush, #page-spinmaster {
-  transform: translateZ(0);
-  will-change: transform;
-  backface-visibility: hidden;
-}
-
-/* ── Partner Sites sidebar item premium styling ── */
-.sb-section:last-of-type .sb-item {
-  background: linear-gradient(90deg,rgba(255,215,0,.04),transparent);
-  border-left: 2px solid rgba(255,215,0,.2);
-}
-.sb-section:last-of-type .sb-item:hover {
-  background: linear-gradient(90deg,rgba(255,215,0,.08),transparent) !important;
-  border-left-color: rgba(255,215,0,.5) !important;
-}
-
-/* ── Sidebar section label enhanced ── */
-.sb-section-label {
-  font-size: .5rem;
-  font-weight: 800;
-  color: rgba(0,212,255,.3);
-  text-transform: uppercase;
-  letter-spacing: .18em;
-  padding: 10px 16px 5px;
-  position: relative;
-}
-.sb-section-label::after {
-  content: '';
-  display: block;
-  height: 1px;
-  background: linear-gradient(90deg,rgba(0,212,255,.12),transparent);
-  margin-top: 5px;
-  margin-left: -16px;
-  margin-right: -16px;
-}
-
-/* Partners label gold */
-.sb-section:last-of-type .sb-section-label {
-  color: rgba(255,215,0,.35);
-}
-.sb-section:last-of-type .sb-section-label::after {
-  background: linear-gradient(90deg,rgba(255,215,0,.15),transparent);
-}
 </style>
+<!-- ══════════════ VIP BLACK-ROOM PAYWALL MODAL ══════════════ -->
+<div class="overlay" id="vipBlackRoomModal" style="z-index:9000;background:rgba(0,0,0,0.93);backdrop-filter:blur(24px);">
+ <div style="
+  background:linear-gradient(160deg,#0d0d00 0%,#000000 50%,#0d0900 100%);
+  border:1px solid rgba(255,215,0,0.35);
+  border-radius:28px;
+  padding:0;
+  width:100%;max-width:480px;
+  box-shadow:0 0 80px rgba(255,215,0,0.2),0 0 160px rgba(255,215,0,0.06),0 60px 120px rgba(0,0,0,0.8);
+  overflow:hidden;
+  animation:vip-modal-in .4s cubic-bezier(.34,1.56,.64,1);
+  position:relative;
+ ">
+  <!-- Gold shimmer top bar -->
+  <div style="height:3px;background:linear-gradient(90deg,transparent,#ffd700,#fff8dc,#ffd700,transparent);animation:vip-shimmer 2s ease-in-out infinite;"></div>
+
+  <!-- Header -->
+  <div style="padding:32px 32px 20px;text-align:center;position:relative;">
+   <!-- Close -->
+   <button onclick="closeVipBlackRoom()" style="position:absolute;top:18px;right:18px;width:32px;height:32px;border-radius:50%;background:rgba(255,215,0,.1);border:1px solid rgba(255,215,0,.2);color:rgba(255,215,0,.7);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;">✕</button>
+
+   <!-- Crown Icon -->
+   <div style="margin-bottom:16px;">
+    <svg viewBox="0 0 64 48" width="72" height="54" fill="none" xmlns="http://www.w3.org/2000/svg" style="filter:drop-shadow(0 0 20px rgba(255,215,0,0.6));">
+     <defs><linearGradient id="crownGrad" x1="0" y1="0" x2="64" y2="48" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#ffe066"/><stop offset="50%" stop-color="#ffd700"/><stop offset="100%" stop-color="#cc9900"/></linearGradient></defs>
+     <polygon points="4,44 4,20 18,32 32,4 46,32 60,20 60,44" fill="url(#crownGrad)" stroke="#fff8dc" stroke-width="1.5" stroke-linejoin="round"/>
+     <circle cx="32" cy="4" r="3.5" fill="#fff"/>
+     <circle cx="4" cy="20" r="3" fill="#fff8dc"/>
+     <circle cx="60" cy="20" r="3" fill="#fff8dc"/>
+     <rect x="4" y="44" width="56" height="4" rx="2" fill="url(#crownGrad)"/>
+     <circle cx="20" cy="36" r="2" fill="#fff" opacity=".7"/>
+     <circle cx="32" cy="32" r="2.5" fill="#fff"/>
+     <circle cx="44" cy="36" r="2" fill="#fff" opacity=".7"/>
+    </svg>
+   </div>
+
+   <div style="font-family:var(--font-d);font-size:1.5rem;font-weight:900;letter-spacing:.12em;
+    background:linear-gradient(135deg,#ffe066 0%,#ffd700 40%,#fff8dc 60%,#cc9900 100%);
+    -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+    margin-bottom:6px;">VIP BLACK-ROOM</div>
+   <div style="font-size:.8rem;color:rgba(255,215,0,.5);letter-spacing:.3em;text-transform:uppercase;margin-bottom:0;">Exclusive Access</div>
+  </div>
+
+  <!-- Divider -->
+  <div style="height:1px;background:linear-gradient(90deg,transparent,rgba(255,215,0,.3),transparent);margin:0 24px;"></div>
+
+  <!-- Body -->
+  <div style="padding:24px 32px;">
+   <!-- Features list -->
+   <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:22px;">
+    <div style="display:flex;align-items:center;gap:12px;padding:10px 14px;background:rgba(255,215,0,.04);border:1px solid rgba(255,215,0,.1);border-radius:12px;">
+     <span style="font-size:1.1rem;">👑</span>
+     <span style="font-size:.85rem;color:rgba(255,255,255,.85);">Private high-stakes tables — up to <b style="color:#ffd700">1000×</b> multipliers</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:12px;padding:10px 14px;background:rgba(255,215,0,.04);border:1px solid rgba(255,215,0,.1);border-radius:12px;">
+     <span style="font-size:1.1rem;">💰</span>
+     <span style="font-size:.85rem;color:rgba(255,255,255,.85);">Exclusive <b style="color:#ffd700">Weekly 5% Rakeback</b> on all wagers</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:12px;padding:10px 14px;background:rgba(255,215,0,.04);border:1px solid rgba(255,215,0,.1);border-radius:12px;">
+     <span style="font-size:1.1rem;">🔒</span>
+     <span style="font-size:.85rem;color:rgba(255,255,255,.85);">Zero-knowledge private games — <b style="color:#ffd700">fully anonymous</b></span>
+    </div>
+    <div style="display:flex;align-items:center;gap:12px;padding:10px 14px;background:rgba(255,215,0,.04);border:1px solid rgba(255,215,0,.1);border-radius:12px;">
+     <span style="font-size:1.1rem;">🎯</span>
+     <span style="font-size:.85rem;color:rgba(255,255,255,.85);">Dedicated VIP host + <b style="color:#ffd700">24/7 concierge support</b></span>
+    </div>
+   </div>
+
+   <!-- Price -->
+   <div style="text-align:center;padding:16px;background:linear-gradient(135deg,rgba(255,215,0,.08),rgba(255,215,0,.03));border:1px solid rgba(255,215,0,.2);border-radius:16px;margin-bottom:20px;">
+    <div style="font-size:.7rem;color:rgba(255,215,0,.5);text-transform:uppercase;letter-spacing:.2em;margin-bottom:4px;">Premium Pass Required</div>
+    <div style="font-family:var(--font-d);font-size:2rem;font-weight:900;color:#ffd700;line-height:1;">10,000</div>
+    <div style="font-size:.75rem;color:rgba(255,215,0,.6);margin-top:2px;">Coins / Month</div>
+   </div>
+
+   <!-- CTA -->
+   <button onclick="handleVipBuyNow()" style="
+    width:100%;padding:16px;
+    background:linear-gradient(135deg,#ffd700 0%,#ffb800 50%,#cc8800 100%);
+    color:#1a0d00;border:none;border-radius:14px;cursor:pointer;
+    font-family:var(--font-d);font-size:1rem;font-weight:900;letter-spacing:.08em;
+    box-shadow:0 0 40px rgba(255,215,0,.4),0 0 80px rgba(255,215,0,.1);
+    transition:all .2s;
+    animation:vip-btn-pulse 2s ease-in-out infinite;
+   ">
+    👑 BUY NOW — UNLOCK ACCESS
+   </button>
+   <div style="text-align:center;margin-top:12px;font-size:.65rem;color:rgba(255,255,255,.25);">Renews monthly · Cancel anytime · Exclusive to verified accounts</div>
+  </div>
+ </div>
+</div>
+
+<style>
+@keyframes vip-modal-in{from{opacity:0;transform:scale(0.88) translateY(30px);}to{opacity:1;transform:scale(1) translateY(0);}}
+@keyframes vip-shimmer{0%,100%{opacity:.6;}50%{opacity:1;}}
+@keyframes vip-btn-pulse{0%,100%{box-shadow:0 0 40px rgba(255,215,0,.4),0 0 80px rgba(255,215,0,.1);}50%{box-shadow:0 0 60px rgba(255,215,0,.7),0 0 120px rgba(255,215,0,.2);}}
+</style>
+
+<!-- ══════════════ CANVAS DIMENSION GUARDIAN — FINAL, CORRECT POSITION ══════════════ -->
+<!-- This script is intentionally placed LAST so all game functions are defined above -->
 <script>
-/* ═══════════════════════════════════════════════════════
-   VORTEX GAME ENGINE BOOT — Canvas Init + GPU Force
-   Fixes: zero-dimension canvases, ReferenceErrors, 60FPS
-   ═══════════════════════════════════════════════════════ */
-
-/* ── 1. CANVAS INIT MAP — all game canvases + inits ── */
-var CANVAS_INIT_MAP = {
-  'crashCanvas':       function() { if (typeof initCrash       === 'function') initCrash(); },
-  'singularityCanvas': function() { if (typeof initSingularity === 'function') initSingularity(); },
-  'rushCanvas':        function() { if (typeof initRush        === 'function') initRush(); },
-  'rouletteCanvas':    function() { if (typeof initRoulette    === 'function') initRoulette(); },
-  'spinWheelCanvas':   function() { if (typeof initSpinWheel   === 'function') initSpinWheel(); },
-};
-
-/* ── 2. Force a canvas to have real pixel dimensions ── */
-function forceCanvasDimensions(canvas, initFn) {
-  if (!canvas) return;
-  var parent = canvas.parentElement;
-  if (!parent) return;
-  var w = parent.offsetWidth || parent.getBoundingClientRect().width || window.innerWidth - 32;
-  if (w < 10) w = window.innerWidth - 32;   // absolute fallback
-  if (canvas.width === 0 || canvas.height === 0) {
-    console.warn('[VORTEX] Forcing canvas', canvas.id, 'to', w, 'px wide');
-    // Let the init function set proper dimensions
-    if (typeof initFn === 'function') initFn();
+(function installGuardian() {
+  'use strict';
+  // ── Action 1: Replace any remaining console.info ──
+  // (belt-and-suspenders for Chromebook)
+  if (typeof console.info !== 'function') {
+    console.info = console.log;
   }
-  // GPU layers
-  canvas.style.transform    = 'translateZ(0)';
-  canvas.style.willChange   = 'transform';
-  canvas.style.backfaceVisibility = 'hidden';
-}
 
-/* ── 3. initGameCanvas — runs on window.load ── */
-function initGameCanvas() {
-  Object.entries(CANVAS_INIT_MAP).forEach(function(entry) {
-    var canvas = document.getElementById(entry[0]);
-    var fn     = entry[1];
-    if (canvas) {
-      // Only init if the page is already visible to avoid 0-width reads
-      var page = canvas.closest('.page');
-      if (page && (page.style.display === 'block' || page.classList.contains('active'))) {
-        forceCanvasDimensions(canvas, fn);
+  // ── Action 4: Potato-PC / Chromebook detection ──
+  var isPotatoPC = false;
+  try {
+    var canvas = document.createElement('canvas');
+    var gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+    if (gl) {
+      var dbgInfo = gl.getExtension('WEBGL_debug_renderer_info');
+      if (dbgInfo) {
+        var renderer = (gl.getParameter(dbgInfo.UNMASKED_RENDERER_WEBGL) || '').toLowerCase();
+        // Low-end GPU markers
+        if (/swiftshader|llvmpipe|intel.*hd.*[234]\d\d|mali-[234]|adreno [23]\d\d|sgx|virgl/i.test(renderer)) {
+          isPotatoPC = true;
+        }
       }
     }
-  });
-  // GPU force on all static containers
-  var GPU_TARGETS = [
-    '#page-crash','#page-mines','#page-dice','#page-roulette',
-    '#page-singularity','#page-rush','#page-spinmaster',
-    '.crash-canvas-wrap','.mines-arena','.dice-wrap','.roulette-wrap'
-  ];
-  GPU_TARGETS.forEach(function(sel) {
-    document.querySelectorAll(sel).forEach(function(el) {
-      el.style.transform         = 'translateZ(0)';
-      el.style.willChange        = 'transform';
-      el.style.backfaceVisibility = 'hidden';
-    });
-  });
-}
-window.addEventListener('load', initGameCanvas);
+    // Also check via Navigator memory API
+    if (navigator.deviceMemory && navigator.deviceMemory <= 2) isPotatoPC = true;
+    if (navigator.hardwareConcurrency && navigator.hardwareConcurrency <= 2) isPotatoPC = true;
+  } catch(e) {}
 
-/* ── 4. CANVAS GUARDIAN — re-checks every time goPage fires ── */
-(function canvasGuard() {
-  var _orig = window.goPage;
-  if (typeof _orig !== 'function') return;
-
-  window.goPage = function(page) {
-    _orig(page);  // calls the page switch + double-rAF inits
-
-    // After 500ms the browser has surely finished layout
-    setTimeout(function() {
-      Object.entries(CANVAS_INIT_MAP).forEach(function(entry) {
-        var canvas = document.getElementById(entry[0]);
-        var fn     = entry[1];
-        if (canvas && (canvas.width === 0 || canvas.height === 0)) {
-          console.warn('[VORTEX] Guardian: canvas', entry[0], 'still 0px — forcing init');
-          requestAnimationFrame(function() { requestAnimationFrame(fn); });
-        }
-        if (canvas) {
-          canvas.style.transform         = 'translateZ(0)';
-          canvas.style.willChange        = 'transform';
-          canvas.style.backfaceVisibility = 'hidden';
-        }
-      });
-    }, 200);
-  };
-})();
-
-/* ── 5. meshGradientCanvas GPU layer ── */
-(function() {
-  var mesh = document.getElementById('meshGradientCanvas');
-  if (mesh) {
-    mesh.style.transform         = 'translateZ(0)';
-    mesh.style.willChange        = 'transform';
-    mesh.style.backfaceVisibility = 'hidden';
+  if (isPotatoPC) {
+    console.log('[VORTEX] Low-end hardware detected — activating Chromebook/Potato Mode');
+    document.body.style.background = '#000000';
+    document.documentElement.style.setProperty('--bg', '#000000');
+    document.documentElement.style.setProperty('--bg1', '#050505');
+    document.documentElement.style.setProperty('--bg2', '#050505');
+    document.documentElement.style.setProperty('--bg3', '#080808');
+    // Disable mesh gradient canvas to free GPU
+    var meshCanvas = document.getElementById('meshGradientCanvas');
+    if (meshCanvas) { meshCanvas.style.display = 'none'; }
+    // Reduce blur effects
+    var style = document.createElement('style');
+    style.textContent = 'body::after{display:none!important;}.modal,.overlay{backdrop-filter:none!important;}';
+    document.head.appendChild(style);
   }
+
+  // ── Action 2: Canvas Dimension Guardian ──
+  var CANVAS_INIT = {
+    'crashCanvas':       function() { if(typeof initCrash==='function') { console.log('[VORTEX] Reinit crashCanvas'); initCrash(); } },
+    'singularityCanvas': function() { if(typeof initSingularity==='function') { console.log('[VORTEX] Reinit singularityCanvas'); initSingularity(); } },
+    'rushCanvas':        function() { if(typeof initRush==='function') { console.log('[VORTEX] Reinit rushCanvas'); initRush(); } },
+    'rouletteCanvas':    function() { if(typeof initRoulette==='function') { console.log('[VORTEX] Reinit rouletteCanvas'); initRoulette(); } },
+    'spinWheelCanvas':   function() { if(typeof initSpinWheel==='function') { console.log('[VORTEX] Reinit spinWheelCanvas'); initSpinWheel(); } },
+  };
+
+  function fixCanvases() {
+    Object.keys(CANVAS_INIT).forEach(function(id) {
+      var canvas = document.getElementById(id);
+      if (!canvas) return;
+      if (canvas.width === 0 || canvas.height === 0) {
+        CANVAS_INIT[id]();
+      }
+      canvas.style.transform = 'translateZ(0)';
+      canvas.style.willChange = 'transform';
+      canvas.style.backfaceVisibility = 'hidden';
+    });
+  }
+
+  // Wrap goPage — at this point it IS defined (we're at bottom of body)
+  if (typeof window.goPage === 'function') {
+    var _orig = window.goPage;
+    window.goPage = function(page) {
+      _orig.apply(this, arguments);
+      // Fix canvases after page transitions
+      setTimeout(fixCanvases, 120);
+      // Immediately re-init the specific page's canvas
+      var pageCanvasMap = {
+        crash: 'crashCanvas', singularity: 'singularityCanvas',
+        rush: 'rushCanvas', roulette: 'rouletteCanvas', spinmaster: 'spinWheelCanvas'
+      };
+      if (pageCanvasMap[page]) {
+        setTimeout(function() {
+          var c = document.getElementById(pageCanvasMap[page]);
+          if (c && (c.width === 0 || c.height === 0)) {
+            CANVAS_INIT[pageCanvasMap[page]]();
+          }
+        }, 200);
+      }
+    };
+    console.log('[VORTEX GUARDIAN] goPage successfully patched');
+  } else {
+    console.log('[VORTEX GUARDIAN] WARNING: goPage not found at install time');
+  }
+
+  // Mesh canvas GPU boost
+  var mesh = document.getElementById('meshGradientCanvas');
+  if (mesh && !isPotatoPC) {
+    mesh.style.transform = 'translateZ(0)';
+    mesh.style.willChange = 'transform';
+  }
+
+  // VIP Black Room modal functions
+  window.showVipBlackRoom = function() {
+    var m = document.getElementById('vipBlackRoomModal');
+    if (m) m.classList.add('show');
+  };
+  window.closeVipBlackRoom = function() {
+    var m = document.getElementById('vipBlackRoomModal');
+    if (m) m.classList.remove('show');
+  };
+  window.handleVipBuyNow = function() {
+    closeVipBlackRoom();
+    if (typeof toast === 'function') {
+      toast('👑 VIP BLACK-ROOM: Redirecting to Premium checkout...', 'gold', 4000);
+      setTimeout(function() {
+        toast('💳 Payment gateway coming soon — Join the waitlist!', 'info', 4000);
+      }, 1500);
+    }
+  };
+
 })();
 </script>
 </body>
