@@ -1,0 +1,1999 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GigVault Pro — 3D Gaming Ecosystem</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+/* ================================================================
+   1. TOKENS & THEME
+================================================================ */
+:root{
+  --gold:#f5a623;--gold2:#ffd060;--gold-g:rgba(245,166,35,0.25);
+  --cyan:#00d4ff;--cyan-g:rgba(0,212,255,0.2);
+  --green:#22c55e;--green-g:rgba(34,197,94,0.2);
+  --red:#ef4444;--red-g:rgba(239,68,68,0.2);
+  --violet:#8b5cf6;--violet-g:rgba(139,92,246,0.2);
+  --amber:#f59e0b;
+  --bg:#05070f;--bg1:#0a0d1a;--bg2:#0f1322;--bg3:#141828;--bg4:#1a1f32;
+  --glass:rgba(14,19,34,0.82);
+  --bdr:rgba(245,166,35,0.14);--bdr2:rgba(255,255,255,0.06);
+  --txt:#eef1ff;--txt2:#6e7fa8;--txt3:#30395a;
+  --card-sh:0 16px 48px rgba(0,0,0,0.6);
+  --f-display:'Rajdhani',sans-serif;
+  --f-body:'DM Sans',sans-serif;
+  --f-mono:'DM Mono',monospace;
+  --r-sm:8px;--r-md:14px;--r-lg:20px;--r-xl:28px;
+  --ease:cubic-bezier(0.4,0,0.2,1);
+  --spring:cubic-bezier(0.34,1.56,0.64,1);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  font-family:var(--f-body);background:var(--bg);color:var(--txt);
+  min-height:100vh;overflow-x:hidden;line-height:1.5;
+}
+::-webkit-scrollbar{width:5px}
+::-webkit-scrollbar-track{background:var(--bg1)}
+::-webkit-scrollbar-thumb{background:rgba(245,166,35,0.3);border-radius:99px}
+a{color:inherit;text-decoration:none}
+button{cursor:pointer;border:none;background:none;font-family:var(--f-body);color:inherit}
+input,select{font-family:var(--f-body)}
+
+/* ================================================================
+   2. BACKGROUND
+================================================================ */
+.bg-wrap{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+.bg-wrap::before{
+  content:'';position:absolute;width:1200px;height:1200px;
+  top:-500px;left:-300px;
+  background:radial-gradient(circle,rgba(245,166,35,0.05) 0%,transparent 65%);
+  animation:bgA 22s ease-in-out infinite alternate;
+}
+.bg-wrap::after{
+  content:'';position:absolute;width:900px;height:900px;
+  bottom:-350px;right:-200px;
+  background:radial-gradient(circle,rgba(0,212,255,0.04) 0%,transparent 65%);
+  animation:bgB 28s ease-in-out infinite alternate;
+}
+.bg-grid{
+  position:fixed;inset:0;pointer-events:none;z-index:0;
+  background-image:
+    linear-gradient(rgba(245,166,35,0.03) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(245,166,35,0.03) 1px,transparent 1px);
+  background-size:56px 56px;
+}
+@keyframes bgA{from{transform:translate(0,0)}to{transform:translate(80px,70px)}}
+@keyframes bgB{from{transform:translate(0,0)}to{transform:translate(-70px,-80px)}}
+
+/* ================================================================
+   3. RGB BORDER ENGINE
+================================================================ */
+.rgb-ad{
+  position:relative;border-radius:var(--r-md);
+  padding:2px;overflow:hidden;
+}
+.rgb-ad::before{
+  content:'';position:absolute;
+  width:200%;height:200%;
+  top:-50%;left:-50%;
+  background:conic-gradient(
+    from 0deg,
+    #ff0000 0%,#ff4400 8%,#ff8800 16%,#ffcc00 24%,
+    #88ff00 32%,#00ff44 40%,#00ffcc 50%,
+    #0088ff 58%,#4400ff 66%,#aa00ff 74%,
+    #ff00aa 82%,#ff0044 90%,#ff0000 100%
+  );
+  animation:rgbSpin 2.8s linear infinite;
+  border-radius:50%;z-index:0;
+}
+.rgb-ad-inner{
+  position:relative;z-index:1;
+  background:var(--bg2);
+  border-radius:calc(var(--r-md) - 2px);
+  height:100%;width:100%;
+  display:flex;align-items:center;justify-content:center;
+  gap:10px;font-size:11px;color:var(--txt3);letter-spacing:.05em;
+  overflow:hidden;
+}
+@keyframes rgbSpin{to{transform:rotate(360deg)}}
+
+/* Smaller inline RGB ad (next to bet button) */
+.rgb-ad-inline{
+  position:relative;border-radius:var(--r-sm);
+  padding:2px;overflow:hidden;flex-shrink:0;
+}
+.rgb-ad-inline::before{
+  content:'';position:absolute;
+  width:200%;height:200%;top:-50%;left:-50%;
+  background:conic-gradient(from 0deg,#ff0000,#ff8800,#ffff00,#00ff88,#00ccff,#8800ff,#ff0088,#ff0000);
+  animation:rgbSpin 2s linear infinite;border-radius:50%;z-index:0;
+}
+.rgb-ad-inline-inner{
+  position:relative;z-index:1;background:var(--bg3);
+  border-radius:calc(var(--r-sm) - 2px);
+  padding:8px 12px;display:flex;align-items:center;justify-content:center;
+  flex-direction:column;gap:3px;text-align:center;
+  font-size:10px;color:var(--txt3);letter-spacing:.05em;
+  white-space:nowrap;min-width:120px;
+}
+
+/* ================================================================
+   4. GLASS CARD
+================================================================ */
+.card{
+  background:var(--glass);
+  border:1px solid var(--bdr);
+  backdrop-filter:blur(24px) saturate(1.5);
+  -webkit-backdrop-filter:blur(24px) saturate(1.5);
+  border-radius:var(--r-lg);
+  box-shadow:var(--card-sh);
+  transition:box-shadow .3s var(--ease);
+}
+.card-inset{
+  background:rgba(0,0,0,0.3);
+  border:1px solid var(--bdr2);
+  border-radius:var(--r-md);
+}
+.glow-card{
+  box-shadow:var(--card-sh),0 0 40px rgba(245,166,35,0.08),inset 0 1px 0 rgba(255,255,255,0.05);
+}
+
+/* ================================================================
+   5. GLOBAL GLOW EFFECTS
+================================================================ */
+.glow-gold{
+  box-shadow:0 0 18px var(--gold-g),0 0 4px rgba(245,166,35,0.15);
+  text-shadow:0 0 12px var(--gold-g);
+}
+.glow-cyan{box-shadow:0 0 18px var(--cyan-g),0 0 4px rgba(0,212,255,0.15)}
+.glow-green{box-shadow:0 0 18px var(--green-g),0 0 4px rgba(34,197,94,0.15)}
+.glow-red{box-shadow:0 0 18px var(--red-g),0 0 4px rgba(239,68,68,0.15)}
+.txt-glow-gold{text-shadow:0 0 14px rgba(245,166,35,0.7),0 0 30px rgba(245,166,35,0.3)}
+.txt-glow-cyan{text-shadow:0 0 14px rgba(0,212,255,0.7),0 0 30px rgba(0,212,255,0.3)}
+.txt-glow-green{text-shadow:0 0 14px rgba(34,197,94,0.7),0 0 30px rgba(34,197,94,0.3)}
+
+/* ================================================================
+   6. SCREEN SHAKE
+================================================================ */
+@keyframes screenShake{
+  0%,100%{transform:translate(0,0) rotate(0deg)}
+  10%{transform:translate(-8px,-5px) rotate(-0.3deg)}
+  20%{transform:translate(8px,5px) rotate(0.3deg)}
+  30%{transform:translate(-6px,3px) rotate(-0.2deg)}
+  40%{transform:translate(6px,-3px) rotate(0.2deg)}
+  50%{transform:translate(-4px,6px) rotate(-0.1deg)}
+  60%{transform:translate(4px,-6px) rotate(0.1deg)}
+  70%{transform:translate(-3px,3px)}
+  80%{transform:translate(3px,-3px)}
+  90%{transform:translate(-1px,1px)}
+}
+.shaking{animation:screenShake 0.55s cubic-bezier(0.4,0,0.2,1)}
+
+/* ================================================================
+   7. NAVBAR
+================================================================ */
+.navbar{
+  position:sticky;top:0;z-index:900;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 26px;height:64px;
+  background:rgba(5,7,15,0.9);
+  backdrop-filter:blur(32px) saturate(2);
+  -webkit-backdrop-filter:blur(32px) saturate(2);
+  border-bottom:1px solid var(--bdr);
+}
+.nav-brand{display:flex;align-items:center;gap:11px}
+.nav-logo{
+  width:38px;height:38px;
+  background:linear-gradient(135deg,var(--gold),#c2811a);
+  border-radius:10px;
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 4px 16px var(--gold-g),inset 0 1px 0 rgba(255,255,255,0.2);
+}
+.brand-name{
+  font-family:var(--f-display);font-size:22px;font-weight:700;
+  letter-spacing:.04em;
+  background:linear-gradient(90deg,var(--gold),var(--gold2));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  text-shadow:none;
+}
+.brand-name-wrap{filter:drop-shadow(0 0 8px rgba(245,166,35,0.4))}
+.brand-sub{font-size:9px;font-weight:600;letter-spacing:.14em;color:var(--txt3);text-transform:uppercase;display:block;line-height:1;margin-top:-1px}
+.nav-right{display:flex;align-items:center;gap:9px}
+
+/* Geo pill */
+.geo-pill{
+  display:flex;align-items:center;gap:8px;padding:6px 14px;
+  border-radius:99px;background:rgba(245,166,35,0.07);
+  border:1px solid var(--bdr);
+  font-size:12px;font-weight:600;color:var(--txt2);
+  box-shadow:0 0 12px rgba(245,166,35,0.06);
+  transition:all .25s var(--ease);
+}
+.geo-pill .flag{font-size:15px;line-height:1}
+.geo-pill .rate{font-family:var(--f-mono);font-size:11px;color:var(--gold);background:rgba(245,166,35,0.12);padding:2px 7px;border-radius:99px}
+.geo-pill.detecting{opacity:.5;animation:blink 1.2s ease-in-out infinite}
+@keyframes blink{0%,100%{opacity:.5}50%{opacity:.9}}
+
+/* Nav icon button */
+.nav-ibtn{
+  width:38px;height:38px;border-radius:var(--r-sm);
+  border:1px solid var(--bdr2);background:rgba(245,166,35,0.06);
+  display:flex;align-items:center;justify-content:center;
+  color:var(--txt2);transition:all .2s var(--ease);
+}
+.nav-ibtn:hover{border-color:var(--bdr);color:var(--txt);box-shadow:0 0 12px rgba(245,166,35,0.15)}
+.nav-ibtn.muted-btn{color:var(--red)}
+
+/* Wallet pill */
+.wallet-pill{
+  display:flex;align-items:center;gap:8px;padding:7px 15px;
+  border-radius:var(--r-md);
+  background:linear-gradient(135deg,var(--green),#16a34a);
+  color:#fff;font-size:13px;font-weight:700;
+  box-shadow:0 4px 16px var(--green-g);
+  transition:all .2s var(--ease);
+}
+.wallet-pill:hover{transform:translateY(-1px);box-shadow:0 8px 24px var(--green-g)}
+.wallet-bal{font-family:var(--f-mono);font-size:12px;background:rgba(255,255,255,0.2);padding:2px 7px;border-radius:99px}
+
+/* Hamburger */
+.hbg{
+  width:38px;height:38px;border-radius:var(--r-sm);
+  border:1px solid var(--bdr);background:rgba(245,166,35,0.07);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;
+  transition:all .2s var(--ease);
+}
+.hbg span{display:block;width:17px;height:1.5px;background:var(--txt2);border-radius:99px;transition:all .3s var(--ease);transform-origin:center}
+.hbg.open span:nth-child(1){transform:translateY(6.5px) rotate(45deg)}
+.hbg.open span:nth-child(2){opacity:0;transform:scaleX(0)}
+.hbg.open span:nth-child(3){transform:translateY(-6.5px) rotate(-45deg)}
+.hbg:hover{border-color:var(--gold);box-shadow:0 0 12px var(--gold-g)}
+
+/* ================================================================
+   8. DRAWER
+================================================================ */
+.drw-ov{position:fixed;inset:0;background:rgba(0,0,0,0.7);backdrop-filter:blur(5px);z-index:800;opacity:0;pointer-events:none;transition:opacity .3s var(--ease)}
+.drw-ov.open{opacity:1;pointer-events:all}
+.drw{
+  position:fixed;top:0;right:-360px;width:330px;height:100vh;z-index:850;
+  background:var(--bg2);border-left:1px solid var(--bdr);
+  backdrop-filter:blur(28px);transition:right .35s var(--ease);
+  display:flex;flex-direction:column;overflow-y:auto;
+}
+.drw.open{right:0}
+.drw-head{padding:22px 20px 14px;border-bottom:1px solid var(--bdr2);display:flex;align-items:center;justify-content:space-between}
+.drw-head-title{font-family:var(--f-display);font-size:13px;font-weight:700;letter-spacing:.14em;color:var(--txt3);text-transform:uppercase}
+.drw-close{width:28px;height:28px;border-radius:var(--r-sm);border:1px solid var(--bdr2);display:flex;align-items:center;justify-content:center;color:var(--txt3);transition:all .2s var(--ease)}
+.drw-close:hover{color:var(--txt);border-color:var(--bdr)}
+.drw-stats{margin:12px 16px;padding:14px 16px;border-radius:var(--r-md);background:rgba(245,166,35,0.05);border:1px solid var(--bdr);display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.dsv{font-family:var(--f-mono);font-size:15px;font-weight:700;color:var(--txt);line-height:1}
+.dsl{font-size:10px;color:var(--txt3);font-weight:600;letter-spacing:.06em;text-transform:uppercase;margin-top:3px}
+.drw-sec{padding:14px 20px 5px;font-size:9px;font-weight:700;letter-spacing:.14em;color:var(--txt3);text-transform:uppercase}
+.drw-item{display:flex;align-items:center;gap:13px;padding:12px 20px;font-size:14px;font-weight:500;color:var(--txt2);cursor:pointer;border-left:2px solid transparent;transition:all .2s var(--ease)}
+.drw-item:hover{color:var(--txt);background:rgba(245,166,35,0.05);border-left-color:var(--gold)}
+.drw-item .di{width:32px;height:32px;border-radius:var(--r-sm);background:rgba(245,166,35,0.08);display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--gold)}
+.drw-item .dbadge{margin-left:auto;font-size:10px;font-weight:700;padding:2px 8px;border-radius:99px;background:rgba(245,166,35,0.1);color:var(--gold);letter-spacing:.04em}
+.dbadge.hot{background:rgba(239,68,68,0.12);color:var(--red)}
+.dbadge.new{background:rgba(34,197,94,0.12);color:var(--green)}
+
+/* ================================================================
+   9. OVERLAYS
+================================================================ */
+/* Adblock gate */
+.adblock-gate{display:none;position:fixed;inset:0;z-index:9000;align-items:center;justify-content:center;background:rgba(5,7,15,0.96);backdrop-filter:blur(10px)}
+.adblock-gate.show{display:flex}
+.adblock-box{max-width:460px;width:90%;padding:40px;text-align:center}
+.ab-icon{width:70px;height:70px;border-radius:50%;background:radial-gradient(circle,rgba(245,158,11,.18),rgba(245,158,11,.04));border:1px solid rgba(245,158,11,.3);display:flex;align-items:center;justify-content:center;margin:0 auto 20px;box-shadow:0 0 30px rgba(245,158,11,0.2)}
+.ab-title{font-family:var(--f-display);font-size:24px;font-weight:700;margin-bottom:10px;letter-spacing:.03em}
+.ab-body{font-size:14px;color:var(--txt2);line-height:1.65;margin-bottom:22px}
+.ab-steps{text-align:left;display:flex;flex-direction:column;gap:10px;margin-bottom:24px}
+.ab-step{display:flex;gap:12px;align-items:flex-start;font-size:13px;color:var(--txt2)}
+.ab-n{width:22px;height:22px;border-radius:50%;background:rgba(245,166,35,0.1);border:1px solid var(--bdr);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--gold);flex-shrink:0}
+.ab-retry{width:100%;padding:13px;border-radius:var(--r-md);background:linear-gradient(135deg,var(--amber),#d97706);color:#000;font-size:14px;font-weight:700;letter-spacing:.04em;transition:all .2s var(--ease);box-shadow:0 6px 20px rgba(245,158,11,.35)}
+.ab-retry:hover{transform:translateY(-2px);box-shadow:0 10px 30px rgba(245,158,11,.45)}
+
+/* VPN screen */
+.vpn-screen{display:none;position:fixed;inset:0;z-index:9999;align-items:center;justify-content:center;flex-direction:column;background:rgba(5,7,15,0.98);backdrop-filter:blur(20px);text-align:center;padding:24px}
+.vpn-screen.show{display:flex}
+.vpn-icon{width:90px;height:90px;border-radius:50%;background:radial-gradient(circle,rgba(239,68,68,.2),rgba(239,68,68,.04));border:1px solid rgba(239,68,68,.35);display:flex;align-items:center;justify-content:center;margin:0 auto 22px;box-shadow:0 0 40px rgba(239,68,68,0.2)}
+.vpn-code{font-family:var(--f-mono);font-size:10px;letter-spacing:.18em;color:var(--red);text-transform:uppercase;margin-bottom:14px}
+.vpn-title{font-family:var(--f-display);font-size:32px;font-weight:700;letter-spacing:.03em;margin-bottom:12px;max-width:500px}
+.vpn-body{font-size:14px;color:var(--txt2);max-width:400px;line-height:1.7;margin-bottom:28px}
+.vpn-lock-box{display:flex;align-items:center;gap:16px;padding:16px 28px;border-radius:var(--r-md);background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2);margin-bottom:20px;box-shadow:0 0 24px rgba(239,68,68,0.1)}
+.vpn-lock-timer{font-family:var(--f-mono);font-size:28px;font-weight:700;color:var(--red);text-shadow:0 0 16px rgba(239,68,68,.5)}
+.vpn-lock-label{font-size:11px;color:var(--txt3)}
+.vpn-meta{font-size:11px;color:var(--txt3);font-family:var(--f-mono)}
+
+/* Ad watch modal */
+.ad-modal{display:none;position:fixed;inset:0;z-index:7000;align-items:center;justify-content:center;background:rgba(5,7,15,.92);backdrop-filter:blur(8px)}
+.ad-modal.show{display:flex}
+.ad-box{max-width:420px;width:90%;padding:38px;text-align:center}
+.ad-ring{position:relative;width:110px;height:110px;margin:0 auto 20px}
+.ad-ring svg{transform:rotate(-90deg)}
+.ar-bg{fill:none;stroke:var(--bg3);stroke-width:9}
+.ar-fill{fill:none;stroke:var(--gold);stroke-width:9;stroke-linecap:round;stroke-dasharray:314;stroke-dashoffset:314;transition:stroke-dashoffset .08s linear;filter:drop-shadow(0 0 6px var(--gold))}
+.ar-num{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:var(--f-mono);font-size:24px;font-weight:700;color:var(--gold);text-shadow:0 0 12px var(--gold-g)}
+.ad-title{font-family:var(--f-display);font-size:20px;font-weight:700;margin-bottom:8px;letter-spacing:.04em}
+.ad-sub{font-size:13px;color:var(--txt2);line-height:1.6}
+
+/* ================================================================
+   10. PARTICLES CANVAS (fixed overlay)
+================================================================ */
+#particle-canvas{position:fixed;inset:0;pointer-events:none;z-index:5000}
+
+/* ================================================================
+   11. LAYOUT
+================================================================ */
+.wrap{position:relative;z-index:1;display:flex;flex-direction:column;min-height:100vh}
+.main{flex:1;max-width:1260px;margin:0 auto;width:100%;padding:26px 20px;display:flex;flex-direction:column;gap:22px}
+
+/* Ad banner top */
+.ad-top{width:100%;background:var(--bg1);border-bottom:1px solid var(--bdr2);padding:5px 16px;display:flex;align-items:center;justify-content:center;gap:8px}
+.ad-tag{font-size:9px;font-weight:700;letter-spacing:.12em;color:var(--txt3);border:1px solid var(--txt3);padding:1px 5px;border-radius:3px;opacity:.5}
+
+.ad-top .rgb-ad{flex:1;max-width:732px;height:40px}
+.ad-top .rgb-ad-inner{height:36px;font-size:11px}
+
+/* ================================================================
+   12. GEO PANEL
+================================================================ */
+.geo-panel{padding:26px 28px;position:relative;overflow:hidden}
+.geo-panel::after{content:'';position:absolute;top:0;right:0;bottom:0;width:45%;background:linear-gradient(90deg,transparent,rgba(245,166,35,0.03));pointer-events:none}
+.geo-ey{font-size:10px;font-weight:700;letter-spacing:.14em;color:var(--gold);text-transform:uppercase;margin-bottom:6px;text-shadow:0 0 10px var(--gold-g)}
+.geo-h1{font-family:var(--f-display);font-size:27px;font-weight:700;letter-spacing:.02em;line-height:1.15;margin-bottom:6px}
+.geo-h1 em{font-style:normal;background:linear-gradient(90deg,var(--gold),var(--gold2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;filter:drop-shadow(0 0 8px rgba(245,166,35,.5))}
+.geo-sub{font-size:13px;color:var(--txt2)}
+.geo-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:13px;margin-top:20px}
+.gs{padding:15px;background:var(--bg3);border:1px solid var(--bdr2);border-radius:var(--r-md);transition:border-color .2s var(--ease)}
+.gs:hover{border-color:var(--bdr)}
+.gs-lbl{font-size:10px;font-weight:600;letter-spacing:.09em;color:var(--txt3);text-transform:uppercase;margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.live-dot{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 8px var(--green);flex-shrink:0;animation:ldPulse 2s ease-in-out infinite}
+@keyframes ldPulse{0%,100%{opacity:1}50%{opacity:.3}}
+.gs-val{font-family:var(--f-mono);font-size:17px;font-weight:700;color:var(--txt);line-height:1}
+.gs-sub{font-size:11px;color:var(--txt3);margin-top:4px}
+
+/* Tier table */
+.tier-tbl{margin-top:16px;border:1px solid var(--bdr2);border-radius:var(--r-md);overflow:hidden}
+.tier-row{display:grid;grid-template-columns:100px 1fr 120px;align-items:center;gap:12px;padding:9px 14px;border-bottom:1px solid var(--bdr2);font-size:12px}
+.tier-row:last-child{border-bottom:none}
+.tier-row.th{background:var(--bg3);font-size:10px;font-weight:700;letter-spacing:.08em;color:var(--txt3);text-transform:uppercase}
+.tier-row.active-t{background:rgba(245,166,35,.04)}
+.t-badge{display:inline-flex;align-items:center;padding:3px 10px;border-radius:99px;font-size:10px;font-weight:700;letter-spacing:.05em}
+.t1b{background:linear-gradient(90deg,#f59e0b,#ef4444);color:#fff;box-shadow:0 2px 10px rgba(245,158,11,.3)}
+.t2b{background:linear-gradient(90deg,#3b82f6,#8b5cf6);color:#fff;box-shadow:0 2px 10px rgba(59,130,246,.3)}
+.t3b{background:linear-gradient(90deg,#22c55e,#06b6d4);color:#fff;box-shadow:0 2px 10px rgba(34,197,94,.3)}
+.t-rate{font-family:var(--f-mono);font-weight:700;color:var(--green);font-size:13px;text-shadow:0 0 8px var(--green-g)}
+
+/* ================================================================
+   13. PLATFORM STATS
+================================================================ */
+.pstats{display:grid;grid-template-columns:repeat(4,1fr);gap:13px}
+.pstat{padding:17px;text-align:center}
+.pstat-val{font-family:var(--f-mono);font-size:22px;font-weight:700;color:var(--txt);line-height:1;margin-bottom:5px;text-shadow:0 0 10px rgba(245,166,35,.3)}
+.pstat-lbl{font-size:10px;color:var(--txt3);font-weight:600;letter-spacing:.07em;text-transform:uppercase}
+.pstat-trend{display:inline-flex;align-items:center;gap:3px;font-size:10px;font-weight:700;padding:2px 7px;border-radius:99px;margin-top:5px}
+.tup{background:rgba(34,197,94,.1);color:var(--green)}
+
+/* ================================================================
+   14. SECTION HEADER
+================================================================ */
+.sh{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+.sh-l{display:flex;align-items:center;gap:11px}
+.sh-ic{width:36px;height:36px;border-radius:var(--r-sm);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.si-gold{background:linear-gradient(135deg,rgba(245,166,35,.2),rgba(245,166,35,.05));color:var(--gold)}
+.si-red{background:linear-gradient(135deg,rgba(239,68,68,.2),rgba(239,68,68,.05));color:var(--red)}
+.si-green{background:linear-gradient(135deg,rgba(34,197,94,.2),rgba(34,197,94,.05));color:var(--green)}
+.si-violet{background:linear-gradient(135deg,rgba(139,92,246,.2),rgba(139,92,246,.05));color:var(--violet)}
+.sh-title strong{font-family:var(--f-display);font-size:17px;font-weight:700;display:block;letter-spacing:.03em}
+.sh-title small{font-size:11px;color:var(--txt3);font-weight:400}
+.sh-btn{font-size:11px;font-weight:600;color:var(--gold);padding:5px 13px;border-radius:var(--r-sm);border:1px solid var(--bdr);background:rgba(245,166,35,.07);transition:all .2s var(--ease)}
+.sh-btn:hover{background:rgba(245,166,35,.15);box-shadow:0 0 12px var(--gold-g)}
+
+/* ================================================================
+   15. SPIN WHEEL SECTION
+================================================================ */
+#sec-spin{display:none}
+#sec-spin.visible{display:block}
+
+.spin-layout{display:grid;grid-template-columns:1fr 400px;gap:20px}
+
+/* Token system */
+.token-bar{padding:15px;background:var(--bg3);border:1px solid var(--bdr2);border-radius:var(--r-md);margin-bottom:18px}
+.token-lbl{display:flex;align-items:center;justify-content:space-between;font-size:12px;font-weight:600;color:var(--txt2);margin-bottom:10px}
+.token-cnt{font-family:var(--f-mono);color:var(--gold);text-shadow:0 0 8px var(--gold-g)}
+.token-dots{display:flex;gap:8px}
+.tdot{flex:1;height:8px;border-radius:99px;background:var(--bg4);border:1px solid var(--bdr2);transition:all .3s var(--ease)}
+.tdot.filled{background:linear-gradient(90deg,var(--gold),var(--gold2));border-color:var(--gold);box-shadow:0 0 10px var(--gold-g),0 0 20px rgba(245,166,35,0.15)}
+
+.watch-btn{width:100%;padding:13px;border-radius:var(--r-md);background:linear-gradient(135deg,var(--gold),#c2811a);color:#000;font-size:14px;font-weight:700;letter-spacing:.03em;display:flex;align-items:center;justify-content:center;gap:9px;transition:all .2s var(--ease);box-shadow:0 6px 20px var(--gold-g)}
+.watch-btn:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 10px 30px var(--gold-g)}
+.watch-btn:disabled{opacity:.3;pointer-events:none}
+
+.spin-btn{width:100%;padding:13px;margin-top:13px;border-radius:var(--r-md);background:linear-gradient(135deg,var(--cyan),#006688);color:#000;font-size:14px;font-weight:700;letter-spacing:.04em;display:flex;align-items:center;justify-content:center;gap:9px;transition:all .2s var(--ease);box-shadow:0 6px 20px var(--cyan-g)}
+.spin-btn:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 10px 30px var(--cyan-g)}
+.spin-btn:disabled{opacity:.3;pointer-events:none}
+
+.spin-tokens-strip{display:flex;align-items:center;justify-content:center;gap:8px;margin-top:13px;padding:10px;background:var(--bg3);border:1px solid var(--bdr2);border-radius:var(--r-md)}
+
+/* Odds disclosure */
+.odds-tbl{margin-top:16px;border:1px solid var(--bdr2);border-radius:var(--r-md);overflow:hidden}
+.odds-row{display:grid;grid-template-columns:1fr 65px 80px;padding:8px 13px;border-bottom:1px solid var(--bdr2);font-size:12px;align-items:center}
+.odds-row:last-child{border-bottom:none}
+.odds-row.oh{background:var(--bg3);font-size:10px;font-weight:700;letter-spacing:.08em;color:var(--txt3);text-transform:uppercase}
+.odds-seg{display:flex;align-items:center;gap:8px}
+.seg-swatch{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.odds-prob{font-family:var(--f-mono);font-size:11px;color:var(--txt2)}
+.odds-rew{font-family:var(--f-mono);font-size:12px;font-weight:700;color:var(--green)}
+.rtp-note{margin-top:11px;padding:10px 13px;background:rgba(245,166,35,.06);border:1px solid var(--bdr);border-radius:var(--r-sm);font-size:11px;color:var(--txt2);line-height:1.55}
+.rtp-note strong{color:var(--gold)}
+
+/* WHEEL CANVAS WRAP */
+.wheel-wrap{display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative}
+.wheel-pointer-3d{
+  position:relative;z-index:10;margin-bottom:-4px;
+  width:0;height:0;
+  border-left:14px solid transparent;
+  border-right:14px solid transparent;
+  border-top:32px solid var(--gold);
+  filter:drop-shadow(0 4px 10px var(--gold-g)) drop-shadow(0 0 6px rgba(245,166,35,.6));
+}
+#spinCanvas{
+  display:block;
+  border-radius:50%;
+  animation:wheelRgbAura 4s ease-in-out infinite;
+}
+@keyframes wheelRgbAura{
+  0%  {filter:drop-shadow(0 0 12px rgba(255,80,80,.45)) drop-shadow(0 0 30px rgba(255,80,80,.15))}
+  25% {filter:drop-shadow(0 0 12px rgba(80,255,80,.45)) drop-shadow(0 0 30px rgba(80,255,80,.15))}
+  50% {filter:drop-shadow(0 0 12px rgba(80,80,255,.45)) drop-shadow(0 0 30px rgba(80,80,255,.15))}
+  75% {filter:drop-shadow(0 0 12px rgba(255,200,80,.45)) drop-shadow(0 0 30px rgba(255,200,80,.15))}
+  100%{filter:drop-shadow(0 0 12px rgba(255,80,80,.45)) drop-shadow(0 0 30px rgba(255,80,80,.15))}
+}
+.spin-result{min-height:56px;margin-top:16px;text-align:center;display:flex;align-items:center;justify-content:center;flex-direction:column}
+.spin-res-amt{font-family:var(--f-mono);font-size:28px;font-weight:700;color:var(--gold);display:none;text-shadow:0 0 20px var(--gold-g),0 0 40px rgba(245,166,35,.2)}
+.spin-res-lbl{font-size:12px;color:var(--txt3);margin-top:4px;display:none}
+
+/* ================================================================
+   16. MINES GAME SECTION
+================================================================ */
+#sec-mines{display:none}
+#sec-mines.visible{display:block}
+
+.mines-layout{display:grid;grid-template-columns:240px 1fr;gap:18px;padding:0 18px 20px}
+.mines-top-ad{grid-column:1/-1;margin-bottom:4px}
+.mines-bottom-ad{grid-column:1/-1;margin-top:4px}
+
+/* Control panel */
+.mines-ctrl{padding:18px}
+.ctrl-lbl{font-size:10px;font-weight:700;letter-spacing:.1em;color:var(--txt3);text-transform:uppercase;margin-bottom:7px}
+
+/* Bet input */
+.bet-wrap{display:flex;align-items:center;background:var(--bg3);border:1px solid var(--bdr2);border-radius:var(--r-md);overflow:hidden;margin-bottom:14px}
+.bet-sym{padding:0 12px;font-size:15px;font-weight:700;color:var(--gold);font-family:var(--f-mono);border-right:1px solid var(--bdr2);height:44px;display:flex;align-items:center;text-shadow:0 0 8px var(--gold-g)}
+.bet-input{flex:1;padding:0 12px;background:transparent;border:none;outline:none;font-family:var(--f-mono);font-size:15px;font-weight:700;color:var(--txt);height:44px}
+.bet-input::placeholder{color:var(--txt3)}
+
+/* Mine count slider */
+.mine-slider-wrap{margin-bottom:14px}
+.mine-slider-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.mine-slider-val{font-family:var(--f-mono);font-size:16px;font-weight:700;color:var(--red);text-shadow:0 0 10px var(--red-g)}
+.mine-slider{
+  width:100%;-webkit-appearance:none;appearance:none;
+  height:6px;border-radius:99px;outline:none;cursor:pointer;
+  background:linear-gradient(90deg,var(--red) 0%,var(--red) var(--pct,12%),var(--bg4) var(--pct,12%));
+  transition:background .1s;
+}
+.mine-slider::-webkit-slider-thumb{-webkit-appearance:none;width:20px;height:20px;border-radius:50%;background:var(--red);cursor:pointer;box-shadow:0 0 12px var(--red-g),0 2px 6px rgba(0,0,0,.4);border:2px solid rgba(255,255,255,.15)}
+.mine-slider::-moz-range-thumb{width:20px;height:20px;border-radius:50%;background:var(--red);cursor:pointer;box-shadow:0 0 12px var(--red-g);border:2px solid rgba(255,255,255,.15)}
+.mine-density-bar{height:4px;border-radius:99px;background:var(--bg4);margin-top:8px;overflow:hidden}
+.mine-density-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--green),var(--amber),var(--red));transition:width .2s var(--ease)}
+
+/* Multiplier display */
+.mult-display{padding:14px;text-align:center;border:1px solid var(--bdr2);border-radius:var(--r-md);background:var(--bg3);margin-bottom:14px}
+.mult-val{font-family:var(--f-mono);font-size:26px;font-weight:700;color:var(--gold);text-shadow:0 0 18px var(--gold-g),0 0 35px rgba(245,166,35,.15);line-height:1}
+.mult-lbl{font-size:10px;color:var(--txt3);letter-spacing:.08em;text-transform:uppercase;margin-top:4px}
+.mult-pot{font-family:var(--f-mono);font-size:13px;color:var(--green);margin-top:6px;text-shadow:0 0 8px var(--green-g)}
+
+/* Bet button row with inline ad */
+.bet-row{display:flex;align-items:stretch;gap:10px;margin-bottom:10px}
+.mines-bet-btn{
+  flex:1;padding:12px;border-radius:var(--r-md);
+  background:linear-gradient(135deg,var(--gold),#c2811a);
+  color:#000;font-size:14px;font-weight:700;
+  letter-spacing:.03em;transition:all .2s var(--ease);
+  box-shadow:0 5px 16px var(--gold-g);
+}
+.mines-bet-btn:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 8px 24px var(--gold-g)}
+.mines-bet-btn:disabled{opacity:.3;pointer-events:none}
+
+.cashout-btn{
+  width:100%;padding:12px;border-radius:var(--r-md);
+  background:linear-gradient(135deg,var(--green),#16a34a);
+  color:#fff;font-size:14px;font-weight:700;
+  letter-spacing:.03em;display:none;
+  box-shadow:0 5px 16px var(--green-g);transition:all .2s var(--ease);
+}
+.cashout-btn:hover{transform:translateY(-1px);box-shadow:0 8px 24px var(--green-g)}
+.cashout-btn.show{display:block}
+
+/* Game info strip */
+.mines-info{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px;padding:12px 14px;border:1px solid var(--bdr2);border-radius:var(--r-md);background:var(--bg3)}
+.mi-stat{text-align:center}
+.mi-val{font-family:var(--f-mono);font-size:15px;font-weight:700;color:var(--txt);text-shadow:0 0 8px rgba(245,166,35,.2)}
+.mi-lbl{font-size:10px;color:var(--txt3);letter-spacing:.07em;text-transform:uppercase;margin-top:2px}
+
+/* MINES GRID */
+.mines-right-col{display:flex;flex-direction:column;gap:14px}
+.mines-grid{
+  display:grid;grid-template-columns:repeat(5,1fr);gap:9px;
+  padding:18px;background:var(--bg1);
+  border:1px solid var(--bdr2);border-radius:var(--r-lg);
+}
+
+/* Cell base */
+.mc{
+  aspect-ratio:1;border-radius:var(--r-md);
+  border:1px solid var(--bdr2);
+  background:linear-gradient(135deg,var(--bg3),var(--bg4));
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;transition:all .22s var(--ease);
+  position:relative;overflow:hidden;
+}
+/* Subtle inner highlight */
+.mc::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,0.04),transparent 50%);pointer-events:none;border-radius:inherit}
+.mc:hover:not(.revealed):not(.locked){
+  border-color:var(--gold);
+  background:linear-gradient(135deg,var(--bg4),#1e2540);
+  transform:scale(1.06) translateY(-2px);
+  box-shadow:0 6px 20px var(--gold-g),0 0 0 1px rgba(245,166,35,.2),inset 0 1px 0 rgba(255,255,255,.08);
+}
+.mc.locked{cursor:default;opacity:.6}
+
+/* GEM CELL */
+@keyframes gemReveal{
+  0%  {transform:scale(0.4) rotateY(90deg);opacity:0}
+  60% {transform:scale(1.18) rotateY(-8deg);opacity:1}
+  80% {transform:scale(0.92)}
+  100%{transform:scale(1) rotateY(0deg)}
+}
+@keyframes gemGlow{
+  0%,100%{box-shadow:0 0 10px rgba(34,197,94,.5),inset 0 0 8px rgba(34,197,94,.1)}
+  50%{box-shadow:0 0 24px rgba(34,197,94,.9),0 0 45px rgba(34,197,94,.2),inset 0 0 14px rgba(34,197,94,.15)}
+}
+.mc.revealed.safe{
+  background:linear-gradient(135deg,rgba(34,197,94,.18),rgba(34,197,94,.06));
+  border-color:rgba(34,197,94,.5);
+  cursor:default;
+  animation:gemReveal .4s var(--spring) forwards, gemGlow 2s ease-in-out infinite .4s;
+}
+
+/* BOMB CELL */
+@keyframes bombBlast{
+  0%  {transform:scale(1)}
+  15% {transform:scale(1.6)}
+  30% {transform:scale(0.85)}
+  50% {transform:scale(1.25)}
+  70% {transform:scale(0.95)}
+  100%{transform:scale(1)}
+}
+.mc.revealed.bomb{
+  background:linear-gradient(135deg,rgba(239,68,68,.22),rgba(239,68,68,.06));
+  border-color:rgba(239,68,68,.5);
+  cursor:default;
+  animation:bombBlast .45s ease;
+  box-shadow:0 0 22px var(--red-g),0 0 50px rgba(239,68,68,.15);
+}
+
+/* ================================================================
+   17. TASKS SECTION
+================================================================ */
+#sec-tasks{display:none}
+#sec-tasks.visible{display:block}
+
+.task-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+.task-card{padding:18px;background:var(--bg3);border:1px solid var(--bdr2);border-radius:var(--r-md);display:flex;align-items:center;gap:14px;cursor:pointer;transition:all .2s var(--ease)}
+.task-card:hover:not(.done-t){border-color:var(--bdr);transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.3),0 0 20px rgba(245,166,35,.06)}
+.task-card.done-t{opacity:.45;pointer-events:none}
+.task-ic{width:42px;height:42px;border-radius:var(--r-md);flex-shrink:0;display:flex;align-items:center;justify-content:center}
+.task-info{flex:1;min-width:0}
+.task-name{font-size:13px;font-weight:600;color:var(--txt);margin-bottom:3px}
+.task-meta{font-size:11px;color:var(--txt3)}
+.task-right{display:flex;flex-direction:column;align-items:flex-end;gap:5px;flex-shrink:0}
+.task-rew{font-family:var(--f-mono);font-size:14px;font-weight:700;color:var(--green);text-shadow:0 0 8px var(--green-g)}
+.task-st{font-size:10px;font-weight:700;padding:2px 8px;border-radius:99px;letter-spacing:.06em;text-transform:uppercase}
+.ts-avail{background:rgba(34,197,94,.1);color:var(--green)}
+.ts-done{background:rgba(74,85,122,.2);color:var(--txt3)}
+
+/* Faucet mini */
+.faucet-mini{grid-column:1/-1;padding:18px;display:grid;grid-template-columns:1fr auto;gap:16px;align-items:center}
+.faucet-rate{font-family:var(--f-mono);font-size:20px;font-weight:700;color:var(--gold);text-shadow:0 0 12px var(--gold-g)}
+.faucet-cd{font-family:var(--f-mono);font-size:12px;color:var(--txt3)}
+.faucet-btn{padding:12px 22px;border-radius:var(--r-md);background:linear-gradient(135deg,var(--gold),#c2811a);color:#000;font-size:14px;font-weight:700;letter-spacing:.03em;white-space:nowrap;transition:all .2s var(--ease);box-shadow:0 5px 16px var(--gold-g)}
+.faucet-btn:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 8px 24px var(--gold-g)}
+.faucet-btn:disabled{opacity:.3;pointer-events:none}
+
+/* ================================================================
+   18. WALLET SECTION
+================================================================ */
+#sec-wallet{display:none}
+#sec-wallet.visible{display:block}
+
+.wallet-hero{padding:24px;text-align:center;background:linear-gradient(135deg,rgba(34,197,94,.09),rgba(6,182,212,.05));border:1px solid rgba(34,197,94,.15);border-radius:var(--r-md);margin-bottom:18px;box-shadow:0 0 30px rgba(34,197,94,.06)}
+.w-lbl{font-size:10px;font-weight:700;letter-spacing:.12em;color:var(--txt3);text-transform:uppercase;margin-bottom:8px}
+.w-bal{font-family:var(--f-mono);font-size:40px;font-weight:700;color:var(--green);line-height:1;text-shadow:0 0 20px var(--green-g),0 0 40px rgba(34,197,94,.15)}
+.w-sub{font-size:12px;color:var(--txt3);margin-top:5px}
+.w-actions{display:grid;grid-template-columns:1fr 1fr;gap:11px;margin-bottom:18px}
+.w-act{padding:12px;border-radius:var(--r-md);border:1px solid var(--bdr);background:rgba(245,166,35,.06);font-size:13px;font-weight:600;color:var(--txt);display:flex;align-items:center;justify-content:center;gap:8px;transition:all .2s var(--ease)}
+.w-act:hover{background:rgba(245,166,35,.12);border-color:var(--gold);color:var(--gold);box-shadow:0 0 16px var(--gold-g)}
+.tx-title{font-size:11px;font-weight:700;color:var(--txt3);letter-spacing:.09em;text-transform:uppercase;margin-bottom:10px}
+.tx-item{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--bdr2);font-size:12px}
+.tx-item:last-child{border-bottom:none}
+.tx-type{color:var(--txt2)}
+.tx-amt{font-family:var(--f-mono);font-weight:700}
+.tx-c{color:var(--green)}
+.tx-d{color:var(--red)}
+.tx-time{font-size:11px;color:var(--txt3)}
+
+/* ================================================================
+   19. ROADMAP SECTION
+================================================================ */
+#sec-roadmap{display:none}
+#sec-roadmap.visible{display:block}
+
+.rmap{padding:24px}
+.rmap-line{position:relative;padding-left:30px}
+.rmap-line::before{content:'';position:absolute;left:10px;top:8px;bottom:0;width:2px;background:linear-gradient(to bottom,var(--gold),var(--violet),transparent);border-radius:99px}
+.rmap-item{position:relative;padding-bottom:22px}
+.rmap-dot{position:absolute;left:-20px;top:5px;width:13px;height:13px;border-radius:50%;border:2px solid var(--bg2)}
+.rd-done{background:var(--green);box-shadow:0 0 10px rgba(34,197,94,.5)}
+.rd-now{background:var(--gold);box-shadow:0 0 14px var(--gold-g);animation:rdPulse 1.5s ease-in-out infinite}
+.rd-plan{background:var(--violet)}
+@keyframes rdPulse{0%,100%{box-shadow:0 0 14px var(--gold-g)}50%{box-shadow:0 0 26px rgba(245,166,35,.8)}}
+.rmap-day{font-size:10px;font-weight:700;color:var(--txt3);letter-spacing:.09em;text-transform:uppercase;margin-bottom:3px}
+.rmap-title{font-family:var(--f-display);font-size:14px;font-weight:700;color:var(--txt);margin-bottom:4px;letter-spacing:.02em}
+.rmap-desc{font-size:12px;color:var(--txt2);line-height:1.55}
+.rmap-chip{display:inline-block;font-size:10px;font-weight:700;padding:2px 9px;border-radius:99px;margin-top:6px;letter-spacing:.05em}
+.rc-done{background:rgba(34,197,94,.1);color:var(--green)}
+.rc-now{background:rgba(245,166,35,.1);color:var(--gold)}
+.rc-plan{background:rgba(139,92,246,.1);color:var(--violet)}
+
+/* ================================================================
+   20. FOOTER AD + TOASTS
+================================================================ */
+.ad-foot{width:100%;height:68px;border-top:1px solid var(--bdr2);background:var(--bg1);display:flex;align-items:center;justify-content:center;gap:10px;font-size:11px;color:var(--txt3);flex-shrink:0}
+.ad-foot .rgb-ad{width:730px;height:52px}
+.ad-foot .rgb-ad-inner{height:48px}
+
+.toasts{position:fixed;bottom:22px;right:22px;z-index:8500;display:flex;flex-direction:column;gap:9px;pointer-events:none}
+.toast{padding:11px 16px;border-radius:var(--r-md);background:var(--bg2);border:1px solid var(--bdr);box-shadow:var(--card-sh);font-size:13px;font-weight:500;display:flex;align-items:center;gap:10px;pointer-events:all;max-width:300px;animation:toastIn .35s var(--spring)}
+@keyframes toastIn{from{transform:translateX(100%);opacity:0}to{transform:translateX(0);opacity:1}}
+.toast.out{animation:toastOut .3s ease forwards}
+@keyframes toastOut{to{transform:translateX(100%);opacity:0}}
+.t-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;box-shadow:0 0 6px currentColor}
+.td-s{background:var(--green);color:var(--green)}
+.td-i{background:var(--cyan);color:var(--cyan)}
+.td-w{background:var(--amber);color:var(--amber)}
+.td-e{background:var(--red);color:var(--red)}
+
+/* ================================================================
+   21. RESPONSIVE
+================================================================ */
+@media(max-width:1050px){
+  .spin-layout{grid-template-columns:1fr}
+  .mines-layout{grid-template-columns:1fr}
+  .mines-ctrl{padding:14px}
+}
+@media(max-width:900px){
+  .geo-grid{grid-template-columns:1fr 1fr}
+  .pstats{grid-template-columns:1fr 1fr}
+  .task-grid{grid-template-columns:1fr}
+}
+@media(max-width:600px){
+  .main{padding:14px 12px}
+  .navbar{padding:0 14px}
+  .geo-grid{grid-template-columns:1fr}
+  .pstats{grid-template-columns:1fr 1fr}
+  .wallet-pill .wallet-bal{display:none}
+  .mines-grid{gap:5px;padding:12px}
+  .w-actions{grid-template-columns:1fr}
+  .spin-layout,.mines-layout{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<!-- BACKGROUND -->
+<div class="bg-wrap" aria-hidden="true"></div>
+<div class="bg-grid" aria-hidden="true"></div>
+
+<!-- PARTICLE CANVAS -->
+<canvas id="particle-canvas" aria-hidden="true"></canvas>
+
+<!-- ================================================================
+     ADBLOCK GATE
+================================================================ -->
+<div class="adblock-gate" id="adblock-gate" role="alertdialog">
+  <div class="card adblock-box">
+    <div class="ab-icon">
+      <svg width="32" height="32" fill="none" stroke="#f59e0b" stroke-width="2" viewBox="0 0 24 24">
+        <path d="M12 2L2 19h20L12 2zm0 5v6m0 3h.01"/>
+      </svg>
+    </div>
+    <div class="ab-title">AdBlocker Detected</div>
+    <p class="ab-body">GigVault Pro is funded entirely by advertising revenue — the same revenue that pays your rewards. An active AdBlocker prevents the platform from operating. Please disable it to continue.</p>
+    <div class="ab-steps">
+      <div class="ab-step"><div class="ab-n">1</div><span>Click the AdBlocker extension icon in your toolbar.</span></div>
+      <div class="ab-step"><div class="ab-n">2</div><span>Select "Pause on this site" or "Disable for this domain."</span></div>
+      <div class="ab-step"><div class="ab-n">3</div><span>Reload this page to access the full gaming ecosystem.</span></div>
+    </div>
+    <button class="ab-retry" onclick="retryAB()">I have disabled AdBlocker — Continue</button>
+  </div>
+</div>
+
+<!-- ================================================================
+     VPN LOCK SCREEN
+================================================================ -->
+<div class="vpn-screen" id="vpn-screen" role="alertdialog">
+  <div class="vpn-icon">
+    <svg width="40" height="40" fill="none" stroke="#ef4444" stroke-width="2" viewBox="0 0 24 24">
+      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+      <path d="M9.75 9.75L14.25 14.25M14.25 9.75L9.75 14.25"/>
+    </svg>
+  </div>
+  <div class="vpn-code">SECURITY PROTOCOL :: VIOLATION CODE 403</div>
+  <h2 class="vpn-title">Location Spoofing Detected</h2>
+  <p class="vpn-body">Our Anti-Fraud Engine has identified an anonymized or proxied network connection. To protect the reward ecosystem and our advertising partners, your session has been suspended.</p>
+  <div class="vpn-lock-box">
+    <svg width="22" height="22" fill="none" stroke="#ef4444" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+    <div>
+      <div class="vpn-lock-timer" id="vpn-timer">60:00</div>
+      <div class="vpn-lock-label">IP SUSPENSION EXPIRES IN</div>
+    </div>
+  </div>
+  <p class="vpn-meta">Incident: <span id="vpn-inc">—</span> &nbsp;|&nbsp; IP: <span id="vpn-ip">—</span></p>
+</div>
+
+<!-- ================================================================
+     AD WATCH MODAL
+================================================================ -->
+<div class="ad-modal" id="ad-modal" role="dialog">
+  <div class="card ad-box">
+    <div class="ad-ring">
+      <svg width="110" height="110" viewBox="0 0 110 110">
+        <circle class="ar-bg" cx="55" cy="55" r="50"/>
+        <circle class="ar-fill" id="ar-fill" cx="55" cy="55" r="50"/>
+      </svg>
+      <div class="ar-num" id="ar-num">30</div>
+    </div>
+    <div class="ad-title">Advertisement In Progress</div>
+    <p class="ad-sub">Please wait while the advertisement completes. Each ad directly funds your reward balance.</p>
+  </div>
+</div>
+
+<!-- ================================================================
+     SITE WRAPPER
+================================================================ -->
+<div class="wrap" id="site-wrap">
+
+  <!-- TOP AD BANNER -->
+  <div class="ad-top" role="complementary">
+    <span class="ad-tag">AD</span>
+    <div class="rgb-ad" style="flex:1;max-width:732px;height:42px">
+      <div class="rgb-ad-inner">728 &times; 90 — Leaderboard Banner Ad Slot</div>
+    </div>
+    <span class="ad-tag">AD</span>
+  </div>
+
+  <!-- NAVBAR -->
+  <nav class="navbar" role="navigation" aria-label="Primary navigation">
+    <div class="nav-brand">
+      <div class="nav-logo" aria-hidden="true">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+          <path d="M12 2l9 4.5-9 4.5-9-4.5L12 2z" fill="#000" opacity=".9"/>
+          <path d="M3 6.5l9 4.5 9-4.5M3 11l9 4.5 9-4.5" stroke="#000" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <div>
+        <div class="brand-name-wrap"><span class="brand-name">GigVault Pro</span></div>
+        <span class="brand-sub">3D Gaming Ecosystem</span>
+      </div>
+    </div>
+    <div class="nav-right">
+      <div class="geo-pill detecting" id="geo-pill" aria-live="polite">
+        <span class="flag" id="np-flag">—</span>
+        <span id="np-country">Detecting...</span>
+        <span class="rate" id="np-rate">—</span>
+      </div>
+      <button class="nav-ibtn" id="mute-btn" aria-label="Toggle audio" title="Toggle audio">
+        <svg id="ico-sound" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 010 7.07M19.07 4.93a10 10 0 010 14.14"/>
+        </svg>
+        <svg id="ico-mute" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="display:none">
+          <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+          <line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/>
+        </svg>
+      </button>
+      <button class="nav-ibtn" id="theme-btn" aria-label="Toggle theme" title="Toggle theme">
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <circle cx="12" cy="12" r="5"/>
+          <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
+        </svg>
+      </button>
+      <button class="wallet-pill" id="open-wallet">
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path d="M20 12V8H6a2 2 0 010-4h14v4"/><rect x="2" y="8" width="20" height="12" rx="2"/>
+          <circle cx="16" cy="14" r="1.5" fill="currentColor"/>
+        </svg>
+        Wallet
+        <span class="wallet-bal" id="nav-bal">$0.00</span>
+      </button>
+      <button class="hbg" id="hbg-btn" aria-label="Open menu" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- DRAWER -->
+  <div class="drw-ov" id="drw-ov" aria-hidden="true"></div>
+  <aside class="drw" id="drw" role="complementary">
+    <div class="drw-head">
+      <span class="drw-head-title">Navigation</span>
+      <button class="drw-close" id="drw-close" aria-label="Close menu">
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div class="drw-stats">
+      <div><div class="dsv" id="drw-bal">$0.00</div><div class="dsl">Balance</div></div>
+      <div><div class="dsv" id="drw-tasks">0</div><div class="dsl">Tasks Done</div></div>
+      <div><div class="dsv" id="drw-spins">0</div><div class="dsl">Spins Used</div></div>
+      <div><div class="dsv" id="drw-mines">0</div><div class="dsl">Mines Won</div></div>
+    </div>
+    <div class="drw-sec">Games</div>
+    <div class="drw-item" onclick="nav('spin')" tabindex="0" role="button">
+      <div class="di"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg></div>
+      Lucky Spin Wheel<span class="dbadge hot">Live</span>
+    </div>
+    <div class="drw-item" onclick="nav('mines')" tabindex="0" role="button">
+      <div class="di" style="color:var(--red)"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg></div>
+      Mines — Risk &amp; Reward<span class="dbadge hot">3D</span>
+    </div>
+    <div class="drw-sec">Earn</div>
+    <div class="drw-item" onclick="nav('tasks')" tabindex="0" role="button">
+      <div class="di" style="color:var(--green)"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg></div>
+      Micro-Task Center<span class="dbadge">5 Live</span>
+    </div>
+    <div class="drw-sec">Account</div>
+    <div class="drw-item" onclick="nav('wallet')" tabindex="0" role="button">
+      <div class="di" style="color:var(--green)"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 12V8H6a2 2 0 010-4h14v4"/><rect x="2" y="8" width="20" height="12" rx="2"/></svg></div>
+      Wallet &amp; Withdrawals<span class="dbadge" id="drw-wallet-badge">$0.00</span>
+    </div>
+    <div class="drw-item" onclick="nav('roadmap')" tabindex="0" role="button">
+      <div class="di" style="color:var(--violet)"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 17l6-10 5 7 3-4 4 7"/></svg></div>
+      10-Day Roadmap<span class="dbadge new">Updated</span>
+    </div>
+  </aside>
+
+  <!-- ================================================================
+       MAIN
+  ================================================================ -->
+  <main class="main" id="main-content" role="main">
+
+    <!-- GEO PANEL -->
+    <section class="card glow-card" id="sec-home" aria-label="Geographic Intelligence Dashboard">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:14px">
+        <div>
+          <div class="geo-ey">AI Geo-Intelligence — Live Session</div>
+          <h1 class="geo-h1">Welcome, <em id="geo-name">Detecting Region...</em></h1>
+          <p class="geo-sub" id="geo-desc">Analyzing network signature and assigning reward tier...</p>
+        </div>
+        <span id="tier-badge" class="t-badge">—</span>
+      </div>
+      <div class="geo-grid">
+        <div class="gs"><div class="gs-lbl"><div class="live-dot"></div>Region</div><div class="gs-val" id="gs-country">—</div><div class="gs-sub" id="gs-region">Locating...</div></div>
+        <div class="gs"><div class="gs-lbl"><svg width="10" height="10" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2v4M12 18v4M2 12h4M18 12h4"/></svg> Task Rate</div><div class="gs-val txt-glow-gold" id="gs-rate">—</div><div class="gs-sub">Per completed task</div></div>
+        <div class="gs"><div class="gs-lbl"><svg width="10" height="10" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> Security</div><div class="gs-val" id="gs-net" style="font-size:14px;color:var(--green)">Verifying...</div><div class="gs-sub" id="gs-isp">—</div></div>
+        <div class="gs"><div class="gs-lbl"><svg width="10" height="10" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg> Session Earned</div><div class="gs-val txt-glow-green" id="gs-sess">$0.00</div><div class="gs-sub" id="gs-tasks-lbl">0 tasks completed</div></div>
+      </div>
+      <div class="tier-tbl">
+        <div class="tier-row th"><span>Tier</span><span>Regions</span><span>Rate / Task</span></div>
+        <div class="tier-row" id="tr1"><span><span class="t-badge t1b">Tier 1 — Gold</span></span><span style="color:var(--txt2);font-size:11px">USA, UK, Canada, Australia, Singapore</span><span class="t-rate">$0.10</span></div>
+        <div class="tier-row" id="tr2"><span><span class="t-badge t2b">Tier 2 — Silver</span></span><span style="color:var(--txt2);font-size:11px">Germany, France, UAE, Japan, Netherlands</span><span class="t-rate">$0.05</span></div>
+        <div class="tier-row" id="tr3"><span><span class="t-badge t3b">Tier 3 — Standard</span></span><span style="color:var(--txt2);font-size:11px">India (&#8377;1–2), Brazil, Nigeria, Rest of World</span><span class="t-rate">&#8377;1 / $0.01</span></div>
+      </div>
+    </section>
+
+    <!-- PLATFORM STATS -->
+    <section class="pstats" aria-label="Live platform statistics">
+      <div class="card pstat"><div class="pstat-val" id="ps-users">14,821</div><div class="pstat-lbl">Active Users</div><span class="pstat-trend tup"><svg width="8" height="8" fill="currentColor" viewBox="0 0 24 24"><path d="M18 15l-6-6-6 6"/></svg>+6.3%</span></div>
+      <div class="card pstat"><div class="pstat-val" id="ps-spins">9,204</div><div class="pstat-lbl">Spins Today</div><span class="pstat-trend tup"><svg width="8" height="8" fill="currentColor" viewBox="0 0 24 24"><path d="M18 15l-6-6-6 6"/></svg>+18%</span></div>
+      <div class="card pstat"><div class="pstat-val" id="ps-paid">$42.1K</div><div class="pstat-lbl">Paid Out</div><span class="pstat-trend tup"><svg width="8" height="8" fill="currentColor" viewBox="0 0 24 24"><path d="M18 15l-6-6-6 6"/></svg>+9.1%</span></div>
+      <div class="card pstat"><div class="pstat-val">186</div><div class="pstat-lbl">Countries</div><span class="pstat-trend tup"><svg width="8" height="8" fill="currentColor" viewBox="0 0 24 24"><path d="M18 15l-6-6-6 6"/></svg>+3</span></div>
+    </section>
+
+    <!-- MID AD SLOT -->
+    <div style="width:100%">
+      <div class="rgb-ad" style="height:94px">
+        <div class="rgb-ad-inner" style="font-size:12px">
+          <span class="ad-tag">AD</span>970 &times; 90 — Billboard Ad Slot<span class="ad-tag">AD</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================
+         SPIN SECTION
+    ============================================================ -->
+    <section class="card" id="sec-spin" aria-label="Lucky Spin Wheel">
+      <div style="padding:22px 22px 0">
+        <div class="sh">
+          <div class="sh-l">
+            <div class="sh-ic si-gold"><svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg></div>
+            <div class="sh-title"><strong>Lucky Spin Wheel — 3D</strong><small>Watch 5 ads to earn 1 Spin Token</small></div>
+          </div>
+          <button class="sh-btn" onclick="nav('home')">Back to Dashboard</button>
+        </div>
+      </div>
+      <div class="spin-layout" style="padding:0 22px 22px">
+        <div>
+          <!-- Token bar -->
+          <div class="token-bar card-inset">
+            <div class="token-lbl"><span>Ad Tokens</span><span class="token-cnt"><span id="token-count">0</span>/5</span></div>
+            <div class="token-dots" id="token-dots">
+              <div class="tdot" id="td0"></div><div class="tdot" id="td1"></div>
+              <div class="tdot" id="td2"></div><div class="tdot" id="td3"></div><div class="tdot" id="td4"></div>
+            </div>
+          </div>
+          <button class="watch-btn" id="watch-btn" onclick="watchAd()">
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3" fill="currentColor"/></svg>
+            Watch Advertisement (+1 Token)
+          </button>
+          <button class="spin-btn" id="spin-btn" onclick="doSpin()" disabled>
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4"/></svg>
+            Spend Token — Spin Now
+          </button>
+          <div class="spin-tokens-strip card-inset" style="margin-top:12px">
+            <svg width="14" height="14" fill="none" stroke="var(--gold)" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+            <span style="font-size:12px;color:var(--txt2)">Spin Tokens:</span>
+            <span style="font-family:var(--f-mono);font-size:15px;font-weight:700;color:var(--gold)" id="spin-tokens">0</span>
+          </div>
+          <!-- Odds table -->
+          <div class="odds-tbl" id="odds-tbl-wrap"></div>
+          <div class="rtp-note"><strong>Disclosed RTP:</strong> ~<span id="rtp-val">—</span>%. Odds are fixed, transparent, and shown above before every spin. Results are generated by a cryptographically-seeded client RNG. The 0.001 BTC jackpot segment has a 0.001% probability (1-in-100,000). Play responsibly.</div>
+        </div>
+        <!-- Wheel -->
+        <div>
+          <div class="wheel-wrap">
+            <div class="wheel-pointer-3d" aria-hidden="true"></div>
+            <canvas id="spinCanvas" width="380" height="400" aria-label="3D Spin wheel"></canvas>
+          </div>
+          <div class="spin-result">
+            <div class="spin-res-amt" id="spin-res-amt"></div>
+            <div class="spin-res-lbl" id="spin-res-lbl"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         MINES SECTION
+    ============================================================ -->
+    <section class="card" id="sec-mines" aria-label="Mines Risk and Reward Game">
+      <div style="padding:22px 22px 0">
+        <div class="sh">
+          <div class="sh-l">
+            <div class="sh-ic si-red"><svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg></div>
+            <div class="sh-title"><strong>Mines — Risk &amp; Reward</strong><small>Reveal gems, avoid mines, cash out anytime</small></div>
+          </div>
+          <button class="sh-btn" onclick="nav('home')">Back</button>
+        </div>
+      </div>
+      <div class="mines-layout">
+        <!-- TOP AD -->
+        <div class="mines-top-ad">
+          <div class="rgb-ad" style="height:94px">
+            <div class="rgb-ad-inner"><span class="ad-tag">AD</span>728 &times; 90 — Mines Top Banner<span class="ad-tag">AD</span></div>
+          </div>
+        </div>
+        <!-- LEFT: CONTROLS -->
+        <div>
+          <div class="card mines-ctrl card-inset">
+            <div class="ctrl-lbl">Bet Amount</div>
+            <div class="bet-wrap">
+              <span class="bet-sym" id="bet-sym">$</span>
+              <input class="bet-input" id="bet-input" type="number" min="0.01" step="0.01" value="0.10" placeholder="0.10" aria-label="Bet amount">
+            </div>
+
+            <div class="ctrl-lbl" style="display:flex;align-items:center;justify-content:space-between">
+              <span>Number of Mines</span>
+              <span class="mine-slider-val" id="mine-slider-val">3</span>
+            </div>
+            <div class="mine-slider-wrap">
+              <input class="mine-slider" id="mine-slider" type="range" min="1" max="24" value="3" aria-label="Number of mines">
+              <div class="mine-density-bar"><div class="mine-density-fill" id="mine-density-fill" style="width:12%"></div></div>
+            </div>
+
+            <div class="mult-display">
+              <div class="mult-val" id="mult-val">×1.00</div>
+              <div class="mult-lbl">Live Multiplier (0 reveals)</div>
+              <div class="mult-pot" id="mult-pot">Potential payout: $0.10</div>
+            </div>
+
+            <!-- Bet row with inline RGB ad -->
+            <div class="bet-row">
+              <button class="mines-bet-btn" id="mines-bet-btn" onclick="startMines()">Place Bet</button>
+              <div class="rgb-ad-inline">
+                <div class="rgb-ad-inline-inner">
+                  <span class="ad-tag" style="font-size:8px">AD</span>
+                  <span>120×60</span>
+                  <span>Bet Ad</span>
+                </div>
+              </div>
+            </div>
+            <button class="cashout-btn" id="cashout-btn" onclick="cashOut()">Cash Out — Claim Winnings</button>
+          </div>
+        </div>
+        <!-- RIGHT: GRID -->
+        <div class="mines-right-col">
+          <div class="mines-info" id="mines-info">
+            <div class="mi-stat"><div class="mi-val" id="mg-cells">25</div><div class="mi-lbl">Cells Left</div></div>
+            <div class="mi-stat"><div class="mi-val" id="mg-safe">0</div><div class="mi-lbl">Safe Revealed</div></div>
+            <div class="mi-stat"><div class="mi-val" id="mg-mines">—</div><div class="mi-lbl">Hidden Mines</div></div>
+            <div class="mi-stat"><div class="mi-val" id="mg-bet">$0.00</div><div class="mi-lbl">Current Bet</div></div>
+          </div>
+          <div class="mines-grid" id="mines-grid" aria-label="Mines game grid"></div>
+        </div>
+        <!-- BOTTOM AD -->
+        <div class="mines-bottom-ad">
+          <div class="rgb-ad" style="height:94px">
+            <div class="rgb-ad-inner"><span class="ad-tag">AD</span>728 &times; 90 — Mines Bottom Banner<span class="ad-tag">AD</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TASKS SECTION -->
+    <section class="card" id="sec-tasks" style="padding:24px" aria-label="Micro-Task Center">
+      <div class="sh">
+        <div class="sh-l">
+          <div class="sh-ic si-green"><svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg></div>
+          <div class="sh-title"><strong>Micro-Task Center</strong><small>Rates adjusted to your detected region</small></div>
+        </div>
+        <button class="sh-btn" onclick="nav('home')">Back</button>
+      </div>
+      <div class="task-grid" style="margin-bottom:14px">
+        <div class="card-inset faucet-mini">
+          <div>
+            <div class="gs-lbl" style="margin-bottom:6px"><div class="live-dot"></div>5-Minute Faucet</div>
+            <div class="faucet-rate" id="faucet-rate">Loading...</div>
+            <div class="faucet-cd" id="faucet-cd">Ready to claim</div>
+          </div>
+          <button class="faucet-btn" id="faucet-btn" onclick="claimFaucet()">Claim Faucet</button>
+        </div>
+      </div>
+      <div style="margin-bottom:14px">
+        <div class="rgb-ad" style="height:72px"><div class="rgb-ad-inner"><span class="ad-tag">AD</span>728 &times; 60 — In-Task Ad Slot<span class="ad-tag">AD</span></div></div>
+      </div>
+      <div class="task-grid" id="task-list"></div>
+    </section>
+
+    <!-- WALLET SECTION -->
+    <section class="card" id="sec-wallet" style="padding:24px" aria-label="Wallet">
+      <div class="sh">
+        <div class="sh-l">
+          <div class="sh-ic si-green"><svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 12V8H6a2 2 0 010-4h14v4"/><rect x="2" y="8" width="20" height="12" rx="2"/></svg></div>
+          <div class="sh-title"><strong>Wallet &amp; Withdrawals</strong><small>Earnings tracked in real time</small></div>
+        </div>
+        <button class="sh-btn" onclick="nav('home')">Back</button>
+      </div>
+      <div class="wallet-hero"><div class="w-lbl">Total Balance</div><div class="w-bal" id="w-big-bal">$0.00</div><div class="w-sub">USD equivalent — updates live</div></div>
+      <div class="w-actions">
+        <button class="w-act" onclick="toast('Minimum withdrawal: $1.00. Keep earning!','warn')"><svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 5v14M5 12l7 7 7-7"/></svg>Withdraw</button>
+        <button class="w-act" onclick="toast('Transaction history exported.','info')"><svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Export CSV</button>
+      </div>
+      <div class="tx-title">Transaction History</div>
+      <div id="tx-list"><div class="tx-item"><span class="tx-type">No transactions yet</span><span class="tx-amt" style="color:var(--txt3)">—</span><span class="tx-time">—</span></div></div>
+    </section>
+
+    <!-- ROADMAP -->
+    <section class="card" id="sec-roadmap" aria-label="Roadmap">
+      <div style="padding:24px 24px 0"><div class="sh"><div class="sh-l"><div class="sh-ic si-violet"><svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 17l6-10 5 7 3-4 4 7"/></svg></div><div class="sh-title"><strong>10-Day Launch Roadmap</strong><small>Platform milestones</small></div></div><button class="sh-btn" onclick="nav('home')">Back</button></div></div>
+      <div class="rmap"><div class="rmap-line">
+        <div class="rmap-item"><div class="rmap-dot rd-done"></div><div class="rmap-day">Day 1 — Completed</div><div class="rmap-title">Core Infrastructure &amp; Geo-Detection</div><div class="rmap-desc">Deployed geo-intelligence engine across 5 global CDN nodes.</div><span class="rmap-chip rc-done">Completed</span></div>
+        <div class="rmap-item"><div class="rmap-dot rd-done"></div><div class="rmap-day">Day 2 — Completed</div><div class="rmap-title">Anti-Fraud Layer</div><div class="rmap-desc">VPN detection, device fingerprinting, and AdBlocker gate operational.</div><span class="rmap-chip rc-done">Completed</span></div>
+        <div class="rmap-item"><div class="rmap-dot rd-done"></div><div class="rmap-day">Day 3 — Completed</div><div class="rmap-title">Micro-Task Center &amp; Faucet</div><div class="rmap-desc">5-minute faucet with tier-adjusted rates and 5 task categories live.</div><span class="rmap-chip rc-done">Completed</span></div>
+        <div class="rmap-item"><div class="rmap-dot rd-done"></div><div class="rmap-day">Day 4 — Completed</div><div class="rmap-title">Gaming Suite v1 Launch</div><div class="rmap-desc">Spin Wheel and Mines game with transparent house-edge modes.</div><span class="rmap-chip rc-done">Completed</span></div>
+        <div class="rmap-item"><div class="rmap-dot rd-now"></div><div class="rmap-day">Day 5 — Current</div><div class="rmap-title">3D VFX Gaming Ecosystem</div><div class="rmap-desc">RGB ad borders, 3D spin wheel, mines VFX, audio engine, and particle effects live today.</div><span class="rmap-chip rc-now">Live Now</span></div>
+        <div class="rmap-item"><div class="rmap-dot rd-plan"></div><div class="rmap-day">Day 6</div><div class="rmap-title">Referral Multiplier Network</div><div class="rmap-desc">Earn 10% of every referred user's lifetime earnings.</div><span class="rmap-chip rc-plan">Planned</span></div>
+        <div class="rmap-item"><div class="rmap-dot rd-plan"></div><div class="rmap-day">Day 7</div><div class="rmap-title">Crypto Payout Gateway</div><div class="rmap-desc">Instant USDT/USDC withdrawals, $1.00 minimum, zero fees for verified accounts.</div><span class="rmap-chip rc-plan">Planned</span></div>
+        <div class="rmap-item"><div class="rmap-dot rd-plan"></div><div class="rmap-day">Day 8</div><div class="rmap-title">Weekly Prize Leagues</div><div class="rmap-desc">Competitive leaderboard tournaments with guaranteed prize pools.</div><span class="rmap-chip rc-plan">Planned</span></div>
+        <div class="rmap-item"><div class="rmap-dot rd-plan"></div><div class="rmap-day">Day 9</div><div class="rmap-title">Native Mobile Applications</div><div class="rmap-desc">iOS and Android apps with push notifications for high-value task alerts.</div><span class="rmap-chip rc-plan">Planned</span></div>
+        <div class="rmap-item"><div class="rmap-dot rd-plan"></div><div class="rmap-day">Day 10</div><div class="rmap-title">Open Advertiser API</div><div class="rmap-desc">Full programmatic ad integration. Real-time analytics for partners.</div><span class="rmap-chip rc-plan">Planned</span></div>
+      </div></div>
+    </section>
+
+  </main>
+
+  <!-- FOOTER AD -->
+  <footer class="ad-foot" role="complementary">
+    <span class="ad-tag">AD</span>
+    <div class="rgb-ad" style="width:730px;height:54px"><div class="rgb-ad-inner"><span class="ad-tag">AD</span>728 &times; 50 — Footer Banner Ad Slot<span class="ad-tag">AD</span></div></div>
+    <span class="ad-tag">AD</span>
+  </footer>
+
+</div>
+
+<!-- TOAST CONTAINER -->
+<div class="toasts" id="toast-con" aria-live="polite"></div>
+
+<!-- ================================================================
+     JAVASCRIPT ENGINE
+================================================================ -->
+<script>
+'use strict';
+
+/* ================================================================
+   AUDIO ENGINE
+================================================================ */
+class AudioEngine {
+  constructor(){this.ctx=null;this.master=null;this.muted=false}
+  init(){
+    try{
+      this.ctx=new(window.AudioContext||window.webkitAudioContext)();
+      this.master=this.ctx.createGain();
+      this.master.gain.value=0.55;
+      this.master.connect(this.ctx.destination);
+    }catch(e){}
+  }
+  resume(){if(this.ctx?.state==='suspended')this.ctx.resume()}
+  play(type){if(this.muted||!this.ctx)return;this.resume();this['_'+type]?.()}
+  _ding(){
+    const o=this.ctx.createOscillator(),g=this.ctx.createGain();
+    o.connect(g);g.connect(this.master);
+    o.type='sine';const t=this.ctx.currentTime;
+    o.frequency.setValueAtTime(660,t);o.frequency.exponentialRampToValueAtTime(1320,t+.1);
+    g.gain.setValueAtTime(.35,t);g.gain.exponentialRampToValueAtTime(.001,t+.7);
+    o.start(t);o.stop(t+.7);
+  }
+  _boom(){
+    const buf=this.ctx.createBuffer(1,this.ctx.sampleRate*.5,this.ctx.sampleRate);
+    const d=buf.getChannelData(0);
+    for(let i=0;i<d.length;i++)d[i]=Math.random()*2-1;
+    const src=this.ctx.createBufferSource();src.buffer=buf;
+    const f=this.ctx.createBiquadFilter();f.type='lowpass';f.frequency.value=180;
+    const g=this.ctx.createGain();const t=this.ctx.currentTime;
+    g.gain.setValueAtTime(1.4,t);g.gain.exponentialRampToValueAtTime(.001,t+.6);
+    src.connect(f);f.connect(g);g.connect(this.master);src.start(t);src.stop(t+.6);
+  }
+  _tick(){
+    const o=this.ctx.createOscillator(),g=this.ctx.createGain();
+    o.connect(g);g.connect(this.master);
+    o.type='square';o.frequency.value=280;const t=this.ctx.currentTime;
+    g.gain.setValueAtTime(.12,t);g.gain.exponentialRampToValueAtTime(.001,t+.06);
+    o.start(t);o.stop(t+.06);
+  }
+  _win(){
+    [523,659,784,1047].forEach((f,i)=>{
+      const o=this.ctx.createOscillator(),g=this.ctx.createGain();
+      o.connect(g);g.connect(this.master);o.type='sine';
+      const t=this.ctx.currentTime+i*.1;
+      o.frequency.value=f;g.gain.setValueAtTime(.28,t);
+      g.gain.exponentialRampToValueAtTime(.001,t+.5);o.start(t);o.stop(t+.5);
+    });
+  }
+  _thud(){
+    const o=this.ctx.createOscillator(),g=this.ctx.createGain();
+    o.connect(g);g.connect(this.master);o.type='sine';const t=this.ctx.currentTime;
+    o.frequency.setValueAtTime(90,t);o.frequency.exponentialRampToValueAtTime(28,t+.35);
+    g.gain.setValueAtTime(.9,t);g.gain.exponentialRampToValueAtTime(.001,t+.4);
+    o.start(t);o.stop(t+.4);
+  }
+  _click(){
+    const o=this.ctx.createOscillator(),g=this.ctx.createGain();
+    o.connect(g);g.connect(this.master);
+    o.type='triangle';o.frequency.value=500;const t=this.ctx.currentTime;
+    g.gain.setValueAtTime(.18,t);g.gain.exponentialRampToValueAtTime(.001,t+.07);
+    o.start(t);o.stop(t+.07);
+  }
+  toggle(){
+    this.muted=!this.muted;
+    if(this.master)this.master.gain.value=this.muted?0:.55;
+    return this.muted;
+  }
+}
+const SFX=new AudioEngine();
+
+/* ================================================================
+   PARTICLE SYSTEM
+================================================================ */
+class Particles {
+  constructor(){
+    this.canvas=document.getElementById('particle-canvas');
+    this.ctx=this.canvas.getContext('2d');
+    this.particles=[];this.running=false;
+    this.resize();
+    window.addEventListener('resize',()=>this.resize());
+  }
+  resize(){this.canvas.width=window.innerWidth;this.canvas.height=window.innerHeight}
+  burst(x,y,colors,count=60){
+    const cols=colors||['#f5a623','#ffd060','#22c55e','#00d4ff','#8b5cf6'];
+    for(let i=0;i<count;i++){
+      const a=(Math.PI*2/count)*i+Math.random()*.8;
+      const spd=3+Math.random()*7;
+      const col=cols[Math.floor(Math.random()*cols.length)];
+      this.particles.push({
+        x,y,vx:Math.cos(a)*spd,vy:Math.sin(a)*spd-2.5,
+        color:col,life:1,size:2+Math.random()*5,
+        decay:.012+Math.random()*.018,gravity:.12,rot:Math.random()*360,rotSpd:(Math.random()-.5)*8,
+      });
+    }
+    if(!this.running)this._loop();
+  }
+  _loop(){
+    this.running=true;
+    this.ctx.clearRect(0,0,this.canvas.width,this.canvas.height);
+    this.particles=this.particles.filter(p=>p.life>0);
+    this.particles.forEach(p=>{
+      p.x+=p.vx;p.y+=p.vy;p.vy+=p.gravity;p.life-=p.decay;
+      p.vx*=.99;p.rot+=p.rotSpd;
+      this.ctx.save();
+      this.ctx.globalAlpha=Math.max(0,p.life);
+      this.ctx.fillStyle=p.color;
+      this.ctx.shadowBlur=10;this.ctx.shadowColor=p.color;
+      this.ctx.translate(p.x,p.y);this.ctx.rotate(p.rot*Math.PI/180);
+      this.ctx.fillRect(-p.size/2,-p.size/2,p.size,p.size);
+      this.ctx.restore();
+    });
+    if(this.particles.length>0)requestAnimationFrame(()=>this._loop());
+    else{this.running=false;this.ctx.clearRect(0,0,this.canvas.width,this.canvas.height);}
+  }
+}
+const PARTICLES=new Particles();
+
+/* ================================================================
+   STATE
+================================================================ */
+const S={
+  tier:3,rate:0.01,isIndia:false,currency:'$',
+  country:'',countryCode:'XX',flag:'—',isp:'—',ip:'—',
+  balance:0,sessionEarned:0,tasksDone:0,spinsUsed:0,minesWon:0,
+  tokens:0,spinTokens:0,
+  faucetActive:false,faucetSecs:300,faucetTimer:null,
+  minesActive:false,minesBet:0,minesGrid:null,
+  minesRevealed:0,minesMult:1,minesMineCount:3,
+  transactions:[],taskState:{},
+};
+
+/* ================================================================
+   UTILS
+================================================================ */
+function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function flag(code){if(!code||code.length!==2)return '🌐';return code.toUpperCase().replace(/./g,c=>String.fromCodePoint(c.charCodeAt(0)+127397))}
+function lightenHex(hex,a){const n=parseInt(hex.replace('#',''),16);const r=Math.min(255,(n>>16)+a);const g=Math.min(255,((n>>8)&255)+a);const b=Math.min(255,(n&255)+a);return`rgb(${r},${g},${b})`}
+function darkenHex(hex,a){const n=parseInt(hex.replace('#',''),16);const r=Math.max(0,(n>>16)-a);const g=Math.max(0,((n>>8)&255)-a);const b=Math.max(0,(n&255)-a);return`rgb(${r},${g},${b})`}
+
+/* ================================================================
+   SCREEN SHAKE
+================================================================ */
+function shakeScreen(){
+  const w=document.getElementById('site-wrap');
+  w.classList.remove('shaking');
+  void w.offsetWidth;
+  w.classList.add('shaking');
+  w.addEventListener('animationend',()=>w.classList.remove('shaking'),{once:true});
+}
+
+/* ================================================================
+   ADBLOCK + VPN DETECTION
+================================================================ */
+async function detectAB(){
+  return new Promise(res=>{
+    const b=document.createElement('div');
+    b.className='adsbox ad-placement banner_ad ad-banner';
+    b.style.cssText='position:absolute;left:-9999px;width:1px;height:1px;';
+    document.body.appendChild(b);
+    setTimeout(()=>{const ok=!b.offsetHeight||b.offsetHeight===0;b.remove();res(ok);},250);
+  });
+}
+function retryAB(){
+  detectAB().then(bl=>{
+    if(!bl){document.getElementById('adblock-gate').classList.remove('show');toast('AdBlocker disabled. Welcome to GigVault Pro!','success');}
+    else toast('AdBlocker still active. Please fully disable it.','error');
+  });
+}
+const VPN_KW=['vpn','proxy','hosting','cloud','datacenter','server','vps','digitalocean','linode','vultr','ovh','amazon aws','google cloud','microsoft azure','cloudflare','tor','mullvad','nordvpn','expressvpn','surfshark'];
+function isVPN(org){return org&&VPN_KW.some(k=>org.toLowerCase().includes(k))}
+function showVPN(ip){
+  document.getElementById('vpn-ip').textContent=ip||'—';
+  document.getElementById('vpn-inc').textContent='INC-'+Date.now().toString(16).toUpperCase();
+  document.getElementById('vpn-screen').classList.add('show');
+  let s=3600;const el=document.getElementById('vpn-timer');
+  const t=setInterval(()=>{s--;el.textContent=String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0');if(s<=0){clearInterval(t);el.textContent='00:00';}},1000);
+}
+
+/* ================================================================
+   GEO DETECTION
+================================================================ */
+async function initGeo(){
+  try{
+    const r=await fetch('https://ipapi.co/json/');
+    if(!r.ok)throw new Error('api');
+    const d=await r.json();
+    const code=(d.country_code||'XX').toUpperCase();
+    const name=d.country_name||'Unknown';
+    const region=d.region||'';
+    const ip=d.ip||'—';const org=d.org||'';
+    S.ip=ip;S.isp=org;
+    if(isVPN(org)){showVPN(ip);return;}
+    let tier=3;
+    const T1=['US','GB','CA','AU','NZ','IE','SG'];
+    const T2=['DE','FR','NL','IT','ES','SE','NO','DK','FI','CH','AT','BE','PT','AE','SA','QA','KW','BH','OM','IL','JP','KR','HK','TW','MY'];
+    if(T1.includes(code))tier=1;else if(T2.includes(code))tier=2;
+    applyGeo(tier,name,code,region,ip,org,code==='IN');
+  }catch{
+    const tz=Intl.DateTimeFormat().resolvedOptions().timeZone||'';
+    let tier=3,code='XX',name='Global',india=false;
+    if(/America\/(New_York|Chicago|Los_Angeles|Toronto|Vancouver)/.test(tz)){tier=1;code='US';name='United States';}
+    else if(/Europe\/London/.test(tz)){tier=1;code='GB';name='United Kingdom';}
+    else if(/Europe\//.test(tz)){tier=2;code='EU';name='Europe';}
+    else if(/Asia\/Dubai/.test(tz)){tier=2;code='AE';name='UAE';}
+    else if(/Asia\/Kolkata|Asia\/Calcutta/.test(tz)){tier=3;code='IN';name='India';india=true;}
+    applyGeo(tier,name,code,'',S.ip,S.isp,india);
+    toast('Region detected via timezone fallback.','warn');
+  }
+}
+const TIERS={
+  1:{rate:0.10,label:'Tier 1 — Gold',cls:'t1b',desc:'Premium Tier 1 region. Gold-level rates are active on your session.'},
+  2:{rate:0.05,label:'Tier 2 — Silver',cls:'t2b',desc:'Tier 2 region. Competitive standard rates are applied.'},
+  3:{rate:0.01,label:'Tier 3 — Standard',cls:'t3b',desc:'Global Tier 3 region. Consistent rates with no daily earnings cap.'},
+};
+function applyGeo(tier,name,code,region,ip,isp,india){
+  const cfg=TIERS[tier];
+  S.tier=tier;S.rate=india?1/83:cfg.rate;S.isIndia=india;
+  S.currency=india?'&#8377;':'$';S.country=name;S.countryCode=code;
+  S.flag=flag(code);S.ip=ip;S.isp=isp||'—';
+  const pill=document.getElementById('geo-pill');
+  pill.classList.remove('detecting');
+  document.getElementById('np-flag').innerHTML=S.flag;
+  document.getElementById('np-country').textContent=name;
+  document.getElementById('np-rate').innerHTML=(india?'&#8377;1':'$'+cfg.rate.toFixed(2));
+  document.getElementById('geo-name').textContent=name;
+  document.getElementById('geo-desc').textContent=cfg.desc;
+  document.getElementById('gs-country').innerHTML=S.flag+' '+name;
+  document.getElementById('gs-region').textContent=region||'Network region';
+  document.getElementById('gs-rate').innerHTML=(india?'&#8377;1.00':'$'+cfg.rate.toFixed(2))+' / task';
+  document.getElementById('gs-net').textContent='Secure';
+  document.getElementById('gs-isp').textContent=S.isp;
+  const tb=document.getElementById('tier-badge');
+  tb.textContent=cfg.label;tb.className='t-badge '+cfg.cls;
+  ['tr1','tr2','tr3'].forEach(id=>document.getElementById(id).classList.remove('active-t'));
+  document.getElementById('tr'+tier).classList.add('active-t');
+  document.getElementById('faucet-rate').innerHTML=india?'&#8377;1.00':'$'+cfg.rate.toFixed(2);
+  renderTasks();
+  buildSpinSegments();
+  updateMinesMult();
+  toast('Region identified: '+name+' — '+cfg.label,'success');
+}
+
+/* ================================================================
+   NAV + DRAWER
+================================================================ */
+function nav(id){
+  ['spin','mines','tasks','wallet','roadmap'].forEach(s=>{
+    const el=document.getElementById('sec-'+s);
+    if(el)el.classList.toggle('visible',s===id);
+  });
+  closeDrawer();
+  window.scrollTo({top:0,behavior:'smooth'});
+  SFX.play('click');
+}
+function openDrawer(){
+  document.getElementById('drw').classList.add('open');
+  document.getElementById('drw-ov').classList.add('open');
+  const b=document.getElementById('hbg-btn');b.classList.add('open');b.setAttribute('aria-expanded','true');
+}
+function closeDrawer(){
+  document.getElementById('drw').classList.remove('open');
+  document.getElementById('drw-ov').classList.remove('open');
+  const b=document.getElementById('hbg-btn');b.classList.remove('open');b.setAttribute('aria-expanded','false');
+}
+document.getElementById('hbg-btn').addEventListener('click',()=>{
+  document.getElementById('drw').classList.contains('open')?closeDrawer():openDrawer();
+});
+document.getElementById('drw-ov').addEventListener('click',closeDrawer);
+document.getElementById('drw-close').addEventListener('click',closeDrawer);
+document.querySelectorAll('.drw-item[tabindex="0"]').forEach(el=>{
+  el.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();el.click();}});
+});
+
+/* Theme toggle */
+document.getElementById('theme-btn').addEventListener('click',()=>{toast('Theme is set to Gamer Dark — matches the RGB ecosystem!','info')});
+
+/* Mute toggle */
+document.getElementById('mute-btn').addEventListener('click',()=>{
+  SFX.resume();
+  const m=SFX.toggle();
+  document.getElementById('ico-sound').style.display=m?'none':'block';
+  document.getElementById('ico-mute').style.display=m?'block':'none';
+  document.getElementById('mute-btn').classList.toggle('muted-btn',m);
+  toast(m?'Audio muted.':'Audio enabled.','info');
+});
+
+/* Wallet button */
+document.getElementById('open-wallet').addEventListener('click',()=>nav('wallet'));
+
+/* ================================================================
+   WALLET
+================================================================ */
+function updateWallet(){
+  const b='$'+S.balance.toFixed(4);
+  document.getElementById('nav-bal').textContent='$'+S.balance.toFixed(2);
+  document.getElementById('drw-bal').textContent=b;
+  document.getElementById('drw-wallet-badge').textContent='$'+S.balance.toFixed(2);
+  document.getElementById('drw-tasks').textContent=S.tasksDone;
+  document.getElementById('drw-spins').textContent=S.spinsUsed;
+  document.getElementById('drw-mines').textContent=S.minesWon;
+  document.getElementById('w-big-bal').textContent='$'+S.balance.toFixed(4);
+  document.getElementById('gs-sess').textContent='$'+S.sessionEarned.toFixed(4);
+  document.getElementById('gs-tasks-lbl').textContent=S.tasksDone+' task'+(S.tasksDone!==1?'s':'')+' completed';
+}
+function addTx(type,amt,dir){
+  S.transactions.unshift({type,amt,dir,time:new Date()});
+  const list=document.getElementById('tx-list');
+  list.innerHTML=S.transactions.slice(0,10).map(tx=>{
+    const ts=tx.time.getHours().toString().padStart(2,'0')+':'+tx.time.getMinutes().toString().padStart(2,'0');
+    return`<div class="tx-item"><span class="tx-type">${esc(tx.type)}</span><span class="tx-amt ${tx.dir==='credit'?'tx-c':'tx-d'}">${tx.dir==='credit'?'+':'-'}$${parseFloat(tx.amt).toFixed(4)}</span><span class="tx-time">${ts}</span></div>`;
+  }).join('');
+}
+
+/* ================================================================
+   TASKS
+================================================================ */
+const TASK_DEFS=[
+  {name:'Technology Survey',meta:'Questionnaire · 2 min · No signup',mult:1.0,color:'var(--gold)'},
+  {name:'E-Commerce Product Review',meta:'Browse product page · 30 sec',mult:1.5,color:'var(--amber)'},
+  {name:'App Install &amp; Launch',meta:'Mobile CPA offer · Instant reward',mult:2.0,color:'var(--green)'},
+  {name:'Newsletter Subscription',meta:'Email required · One click',mult:0.8,color:'var(--cyan)'},
+  {name:'Social Media Follow',meta:'Platform redirect · 15 sec',mult:1.2,color:'var(--violet)'},
+];
+const TASK_ICONS=[
+  `<svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>`,
+  `<svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4zM3 6h18M16 10a4 4 0 01-8 0"/></svg>`,
+  `<svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>`,
+  `<svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>`,
+  `<svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.59 13.51l6.83 3.98M15.41 6.51L8.59 10.49"/></svg>`,
+];
+function renderTasks(){
+  const list=document.getElementById('task-list');
+  list.innerHTML=TASK_DEFS.map((t,i)=>{
+    const r=S.isIndia?'&#8377;'+(1*t.mult).toFixed(2):'$'+(S.rate*t.mult).toFixed(4);
+    const done=S.taskState[i];
+    return`<div class="task-card${done?' done-t':''}" onclick="doTask(${i})" id="tc-${i}" role="button" tabindex="0">
+      <div class="task-ic" style="background:rgba(0,0,0,.15)"><span style="color:${done?'var(--txt3)':t.color}">${TASK_ICONS[i]}</span></div>
+      <div class="task-info"><div class="task-name">${t.name}</div><div class="task-meta">${t.meta}</div></div>
+      <div class="task-right"><span class="task-rew">${r}</span><span class="task-st ${done?'ts-done':'ts-avail'}">${done?'Claimed':'Available'}</span></div>
+    </div>`;
+  }).join('');
+}
+function doTask(i){
+  if(S.taskState[i])return;
+  S.taskState[i]=true;
+  const def=TASK_DEFS[i];
+  const amt=S.isIndia?(1*def.mult)/83:(S.rate*def.mult);
+  S.balance+=amt;S.sessionEarned+=amt;S.tasksDone++;
+  addTx('Task: '+def.name.replace(/&amp;/g,'&'),amt,'credit');
+  updateWallet();renderTasks();SFX.play('ding');
+  toast('+$'+amt.toFixed(4)+' earned — '+def.name,'success');
+}
+document.getElementById('task-list').addEventListener('keydown',e=>{
+  if(e.target.classList.contains('task-card')&&(e.key==='Enter'||e.key===' ')){e.preventDefault();e.target.click();}
+});
+
+/* ================================================================
+   FAUCET
+================================================================ */
+function claimFaucet(){
+  if(S.faucetActive)return;
+  const btn=document.getElementById('faucet-btn');
+  btn.disabled=true;S.faucetActive=true;S.faucetSecs=300;
+  const amt=S.isIndia?1/83:S.rate;
+  S.balance+=amt;S.sessionEarned+=amt;S.tasksDone++;
+  addTx('Faucet Claim',amt,'credit');updateWallet();SFX.play('ding');
+  toast('+$'+amt.toFixed(4)+' faucet reward credited','success');
+  S.faucetTimer=setInterval(()=>{
+    S.faucetSecs--;
+    const m=String(Math.floor(S.faucetSecs/60)).padStart(2,'0');
+    const sec=String(S.faucetSecs%60).padStart(2,'0');
+    document.getElementById('faucet-cd').textContent='Next claim in '+m+':'+sec;
+    if(S.faucetSecs<=0){clearInterval(S.faucetTimer);S.faucetActive=false;btn.disabled=false;document.getElementById('faucet-cd').textContent='Ready to claim';toast('Faucet ready — claim your next reward!','info');}
+  },1000);
+}
+
+/* ================================================================
+   SPIN WHEEL — 3D CANVAS ENGINE
+================================================================ */
+let wheelAngle=0,wheelAnimating=false,wheelSegments=[];
+
+function buildSpinSegments(){
+  const r=S.isIndia?1/83:S.rate;
+  const indSym=S.isIndia;
+  wheelSegments=[
+    {label:'Try Again',      reward:0,     actualProb:.38,visualProb:.38,color:'#151a2e',textColor:'#3d4a6a'},
+    {label:indSym?'₹2':'$0.05',reward:indSym?2/83:.05,actualProb:.28,visualProb:.28,color:'#0d2010',textColor:'#22c55e'},
+    {label:'$0.10',          reward:.10,   actualProb:.15,visualProb:.15,color:'#1e1400',textColor:'#f59e0b'},
+    {label:'$0.25',          reward:.25,   actualProb:.09,visualProb:.09,color:'#0d0d28',textColor:'#8b5cf6'},
+    {label:'Bonus Spin',     reward:-1,    actualProb:.04,visualProb:.04,color:'#001a1a',textColor:'#00d4ff'},
+    {label:'$5 Amazon',      reward:5.00,  actualProb:.024,visualProb:.055,color:'#1e1000',textColor:'#f59e0b'},
+    {label:'$10 Play',       reward:10.00, actualProb:.015,visualProb:.045,color:'#001a00',textColor:'#22c55e'},
+    {label:'0.001 BTC',      reward:40.00, actualProb:.00001,visualProb:.035,color:'#1a1500',textColor:'#ffd700',isBTC:true},
+  ];
+  // Build odds table
+  const wrap=document.getElementById('odds-tbl-wrap');
+  wrap.innerHTML=`<div class="odds-tbl"><div class="odds-row oh"><span>Segment</span><span>Probability</span><span>Reward</span></div>`+
+    wheelSegments.map(s=>{
+      const pctStr=s.isBTC?'0.001%':s.actualProb>=.01?(s.actualProb*100).toFixed(0)+'%':(s.actualProb*100).toFixed(2)+'%';
+      const rewStr=s.reward===0?'No Prize':s.reward===-1?'Free Spin':'$'+s.reward.toFixed(2)+(s.isBTC?' *':'');
+      const rc=s.reward>0?'var(--green)':s.reward===-1?'var(--cyan)':'var(--txt3)';
+      return`<div class="odds-row"><div class="odds-seg"><div class="seg-swatch" style="background:${s.color};border:1px solid rgba(255,255,255,.1)"></div><span style="color:var(--txt2)">${esc(s.label)}</span></div><span class="odds-prob">${pctStr}</span><span class="odds-reward" style="color:${rc}">${rewStr}</span></div>`;
+    }).join('')+`</div><div style="font-size:10px;color:var(--txt3);margin-top:6px;padding:0 2px">* 0.001 BTC jackpot: 0.001% probability (1-in-100,000 spins). Segment enlarged for visibility. Actual prize subject to current market value.</div>`;
+  document.getElementById('rtp-val').textContent='~38';
+  drawWheel3D(wheelAngle);
+}
+
+function drawWheel3D(angle){
+  const canvas=document.getElementById('spinCanvas');
+  if(!canvas||!wheelSegments.length)return;
+  const ctx=canvas.getContext('2d');
+  const W=canvas.width,H=canvas.height;
+  const cx=W/2,cy=H/2-10;
+  const R=Math.min(W,H)/2-22;
+  const DEPTH=22;
+  const segs=wheelSegments;
+  const total=segs.reduce((a,s)=>a+s.visualProb,0);
+  ctx.clearRect(0,0,W,H);
+
+  // === 3D DEPTH: cylinder sides (bottom-facing only) ===
+  let sa=angle;
+  segs.forEach(seg=>{
+    const slice=(seg.visualProb/total)*Math.PI*2;
+    const ea=sa+slice;
+    ctx.save();
+    // Clip to bottom half of canvas
+    ctx.beginPath();ctx.rect(0,cy,W,H);ctx.clip();
+    ctx.beginPath();
+    ctx.moveTo(cx+Math.cos(sa)*R,cy+Math.sin(sa)*R);
+    ctx.arc(cx,cy,R,sa,ea);
+    ctx.lineTo(cx+Math.cos(ea)*R,cy+DEPTH+Math.sin(ea)*R);
+    ctx.arc(cx,cy+DEPTH,R,ea,sa,true);
+    ctx.closePath();
+    ctx.fillStyle=darkenHex(seg.color,35);ctx.fill();
+    ctx.restore();
+    sa+=slice;
+  });
+
+  // Bottom rim of cylinder
+  ctx.save();
+  ctx.beginPath();ctx.rect(0,cy,W,H);ctx.clip();
+  ctx.beginPath();ctx.arc(cx,cy+DEPTH,R,0,Math.PI*2);
+  ctx.strokeStyle='rgba(0,0,0,0.5)';ctx.lineWidth=3;ctx.stroke();
+  ctx.restore();
+
+  // === MAIN WHEEL FACE ===
+  sa=angle;
+  segs.forEach(seg=>{
+    const slice=(seg.visualProb/total)*Math.PI*2;
+    const midA=sa+slice/2;
+    ctx.beginPath();ctx.moveTo(cx,cy);ctx.arc(cx,cy,R,sa,sa+slice);ctx.closePath();
+    // Radial gradient for 3D roundness
+    const hx=cx+Math.cos(midA-0.4)*R*.32;
+    const hy=cy+Math.sin(midA-0.4)*R*.32;
+    const grad=ctx.createRadialGradient(hx,hy,0,cx,cy,R);
+    grad.addColorStop(0,lightenHex(seg.color,45));
+    grad.addColorStop(.55,seg.color);
+    grad.addColorStop(1,darkenHex(seg.color,28));
+    ctx.fillStyle=grad;ctx.fill();
+    // Divider
+    ctx.strokeStyle='rgba(0,0,0,0.45)';ctx.lineWidth=1.5;ctx.stroke();
+    // BTC segment special glow
+    if(seg.isBTC){
+      ctx.save();
+      ctx.beginPath();ctx.moveTo(cx,cy);ctx.arc(cx,cy,R,sa,sa+slice);ctx.closePath();
+      ctx.strokeStyle='rgba(255,215,0,0.6)';ctx.lineWidth=2;ctx.stroke();
+      ctx.restore();
+    }
+    sa+=slice;
+  });
+
+  // === LABELS ===
+  sa=angle;
+  segs.forEach(seg=>{
+    const slice=(seg.visualProb/total)*Math.PI*2;
+    if(slice<0.04){sa+=slice;return;}
+    const midA=sa+slice/2;
+    ctx.save();
+    ctx.translate(cx,cy);ctx.rotate(midA);
+    const fs=seg.isBTC?10:slice>0.3?12:10;
+    ctx.font=`bold ${fs}px 'DM Sans',sans-serif`;
+    ctx.textAlign='right';
+    ctx.fillStyle=seg.textColor||'rgba(255,255,255,.88)';
+    ctx.shadowBlur=5;ctx.shadowColor='rgba(0,0,0,.9)';
+    if(seg.isBTC){
+      ctx.fillStyle='#ffd700';
+      ctx.shadowBlur=8;ctx.shadowColor='rgba(255,215,0,.7)';
+    }
+    ctx.fillText(seg.label,R-14,4);
+    ctx.restore();
+    sa+=slice;
+  });
+
+  // === CHROME RIM ===
+  // Outer shadow
+  ctx.beginPath();ctx.arc(cx,cy,R+1,0,Math.PI*2);
+  ctx.strokeStyle='rgba(0,0,0,0.7)';ctx.lineWidth=4;ctx.stroke();
+  // Rim
+  const rimG=ctx.createLinearGradient(cx-R,cy-R,cx+R,cy+R);
+  rimG.addColorStop(0,'rgba(255,255,255,0.5)');
+  rimG.addColorStop(.25,'rgba(255,255,255,0.2)');
+  rimG.addColorStop(.5,'rgba(255,255,255,0.55)');
+  rimG.addColorStop(.75,'rgba(255,255,255,0.15)');
+  rimG.addColorStop(1,'rgba(255,255,255,0.45)');
+  ctx.beginPath();ctx.arc(cx,cy,R,0,Math.PI*2);
+  ctx.strokeStyle=rimG;ctx.lineWidth=8;ctx.stroke();
+
+  // === CENTER HUB ===
+  // Shadow
+  ctx.beginPath();ctx.arc(cx+2,cy+3,30,0,Math.PI*2);
+  ctx.fillStyle='rgba(0,0,0,0.5)';ctx.fill();
+  // Hub body
+  const hg=ctx.createRadialGradient(cx-7,cy-7,2,cx,cy,30);
+  hg.addColorStop(0,'#d8d8d8');hg.addColorStop(.3,'#909090');hg.addColorStop(.7,'#484848');hg.addColorStop(1,'#181818');
+  ctx.beginPath();ctx.arc(cx,cy,30,0,Math.PI*2);ctx.fillStyle=hg;ctx.fill();
+  ctx.strokeStyle='rgba(255,255,255,0.1)';ctx.lineWidth=2;ctx.stroke();
+  // Gold inner dot
+  ctx.beginPath();ctx.arc(cx,cy,11,0,Math.PI*2);
+  ctx.fillStyle='#f5a623';ctx.shadowBlur=14;ctx.shadowColor='#f5a623';ctx.fill();ctx.shadowBlur=0;
+}
+
+/* Ad watching */
+let adWatchTimer=null;
+const AD_SECS=30;
+function watchAd(){
+  if(S.tokens>=5)return;
+  const modal=document.getElementById('ad-modal');modal.classList.add('show');
+  let prog=0;
+  const fill=document.getElementById('ar-fill');
+  const num=document.getElementById('ar-num');
+  const circ=314;fill.style.strokeDashoffset=circ;num.textContent=AD_SECS;
+  document.getElementById('watch-btn').disabled=true;
+  adWatchTimer=setInterval(()=>{
+    prog++;SFX.play('tick');
+    const pct=prog/AD_SECS;
+    fill.style.strokeDashoffset=circ-(pct*circ);
+    num.textContent=AD_SECS-prog;
+    if(prog>=AD_SECS){
+      clearInterval(adWatchTimer);modal.classList.remove('show');
+      S.tokens++;updateTokenDots();
+      if(S.tokens>=5){S.tokens=0;S.spinTokens++;updateTokenDots();document.getElementById('spin-tokens').textContent=S.spinTokens;document.getElementById('spin-btn').disabled=false;document.getElementById('watch-btn').disabled=false;SFX.play('win');toast('5 Ads watched — 1 Spin Token earned!','success');}
+      else{document.getElementById('watch-btn').disabled=false;toast('Ad complete — Token '+S.tokens+'/5 collected','info');}
+    }
+  },1000);
+}
+function updateTokenDots(){
+  for(let i=0;i<5;i++){const d=document.getElementById('td'+i);if(d)d.classList.toggle('filled',i<S.tokens);}
+  document.getElementById('token-count').textContent=S.tokens;
+}
+
+/* Spin */
+function pickWinner(){
+  const total=wheelSegments.reduce((a,s)=>a+s.actualProb,0);
+  let rand=Math.random()*total,cum=0;
+  for(const s of wheelSegments){cum+=s.actualProb;if(rand<cum)return s;}
+  return wheelSegments[0];
+}
+
+function doSpin(){
+  if(wheelAnimating||S.spinTokens<1)return;
+  S.spinTokens--;S.spinsUsed++;
+  document.getElementById('spin-tokens').textContent=S.spinTokens;
+  document.getElementById('spin-btn').disabled=S.spinTokens<1;
+  document.getElementById('spin-res-amt').style.display='none';
+  document.getElementById('spin-res-lbl').style.display='none';
+  const winner=pickWinner();
+  // Calculate target angle for winner
+  const total=wheelSegments.reduce((a,s)=>a+s.visualProb,0);
+  let cumAngle=0;
+  for(const s of wheelSegments){
+    const slice=(s.visualProb/total)*Math.PI*2;
+    if(s===winner){
+      // Point opposite of segment center (wheel spins to show winner at top/pointer)
+      const segCenter=cumAngle+slice/2;
+      const target=Math.PI*12-(segCenter+Math.PI/2-wheelAngle%(Math.PI*2));
+      spinTo(target,winner);
+      break;
+    }
+    cumAngle+=slice;
+  }
+}
+
+function spinTo(targetDelta,winner){
+  wheelAnimating=true;
+  const duration=4500;const startTime=performance.now();
+  const startAngle=wheelAngle;let lastAngle=startAngle;
+  function frame(now){
+    const elapsed=now-startTime;
+    const t=Math.min(elapsed/duration,1);
+    const ease=1-Math.pow(1-t,5);
+    wheelAngle=startAngle+targetDelta*ease;
+    // Motion blur at high velocity
+    const angularVel=Math.abs(wheelAngle-lastAngle);
+    lastAngle=wheelAngle;
+    const canvas=document.getElementById('spinCanvas');
+    const ctx=canvas.getContext('2d');
+    if(angularVel>0.06&&t<.85){
+      ctx.clearRect(0,0,canvas.width,canvas.height);
+      // Ghost frames for motion blur
+      ctx.globalAlpha=.12;
+      drawWheelFaceOnly(ctx,wheelAngle-angularVel*1.5,canvas.width,canvas.height);
+      ctx.globalAlpha=.08;
+      drawWheelFaceOnly(ctx,wheelAngle-angularVel*3,canvas.width,canvas.height);
+      ctx.globalAlpha=1;
+    }
+    drawWheel3D(wheelAngle);
+    if(t<1)requestAnimationFrame(frame);
+    else{wheelAnimating=false;wheelAngle=wheelAngle%(Math.PI*2);showSpinResult(winner);}
+  }
+  requestAnimationFrame(frame);
+}
+
+function drawWheelFaceOnly(ctx,angle,W,H){
+  const cx=W/2,cy=H/2-10,R=Math.min(W,H)/2-22;
+  const total=wheelSegments.reduce((a,s)=>a+s.visualProb,0);
+  let sa=angle;
+  wheelSegments.forEach(seg=>{
+    const slice=(seg.visualProb/total)*Math.PI*2;
+    ctx.beginPath();ctx.moveTo(cx,cy);ctx.arc(cx,cy,R,sa,sa+slice);ctx.closePath();
+    ctx.fillStyle=seg.color;ctx.fill();sa+=slice;
+  });
+}
+
+function showSpinResult(seg){
+  const ae=document.getElementById('spin-res-amt');
+  const le=document.getElementById('spin-res-lbl');
+  ae.style.display='block';le.style.display='block';
+  const canvas=document.getElementById('spinCanvas');
+  const rect=canvas.getBoundingClientRect();
+  const cx=rect.left+rect.width/2;const cy=rect.top+rect.height/2;
+  if(seg.reward>0){
+    S.balance+=seg.reward;S.sessionEarned+=seg.reward;
+    addTx('Lucky Spin Win',seg.reward,'credit');updateWallet();
+    ae.innerHTML='+$'+seg.reward.toFixed(2);ae.style.color='var(--gold)';
+    le.textContent='Credited to your wallet!';
+    SFX.play('win');
+    PARTICLES.burst(cx,cy,['#f5a623','#ffd060','#fff'],70);
+    toast('+$'+seg.reward.toFixed(2)+' won on the Lucky Spin!','success');
+  }else if(seg.reward===-1){
+    S.spinTokens++;document.getElementById('spin-tokens').textContent=S.spinTokens;document.getElementById('spin-btn').disabled=false;
+    ae.innerHTML='Bonus Spin';ae.style.color='var(--cyan)';le.textContent='A free spin has been added!';
+    SFX.play('win');PARTICLES.burst(cx,cy,['#00d4ff','#0088ff'],40);
+    toast('Bonus Spin awarded — '+S.spinTokens+' token(s) available','info');
+  }else{
+    ae.innerHTML='No Prize';ae.style.color='var(--txt3)';le.textContent='Better luck on the next spin.';
+    SFX.play('thud');toast('No prize this time. Try again!','warn');
+  }
+}
+
+/* ================================================================
+   MINES ENGINE
+================================================================ */
+// Multiplier calculation: house-edge model
+// More mines = higher multiplier per reveal but steeper risk
+function calcMinesMult(minesCount,revealed){
+  if(revealed===0)return 1.0;
+  // Expected value model with disclosed house edge (90% RTP)
+  const totalCells=25;
+  let mult=1.0;
+  for(let i=0;i<revealed;i++){
+    const safeCells=totalCells-minesCount-i;
+    const remainingCells=totalCells-i;
+    if(safeCells<=0)return mult;
+    mult*=(remainingCells/(safeCells))*0.9; // 0.9 = house edge factor
+  }
+  return parseFloat(mult.toFixed(3));
+}
+
+function updateMinesMult(){
+  const mCount=parseInt(document.getElementById('mine-slider')?.value||3);
+  const bet=parseFloat(document.getElementById('bet-input')?.value||0.1);
+  const reveals=S.minesActive?S.minesRevealed:0;
+  const mult=S.minesActive?S.minesMult:calcMinesMult(mCount,reveals);
+  document.getElementById('mult-val').textContent='×'+mult.toFixed(3);
+  document.getElementById('mult-pot').textContent='Potential payout: $'+(bet*mult).toFixed(4);
+  S.minesMineCount=mCount;
+}
+
+// Slider
+document.getElementById('mine-slider').addEventListener('input',function(){
+  const v=parseInt(this.value);
+  document.getElementById('mine-slider-val').textContent=v;
+  const pct=((v-1)/23)*100;
+  document.getElementById('mine-density-fill').style.width=pct+'%';
+  this.style.setProperty('--pct',pct+'%');
+  updateMinesMult();
+});
+
+// Bet input real-time mult update
+document.getElementById('bet-input').addEventListener('input',updateMinesMult);
+
+function buildMinesGrid(active){
+  const grid=document.getElementById('mines-grid');
+  grid.innerHTML='';
+  for(let i=0;i<25;i++){
+    const cell=document.createElement('div');
+    cell.className='mc'+(active?'':' locked');
+    cell.id='mc-'+i;
+    if(active){
+      cell.addEventListener('click',()=>revealCell(i));
+      cell.setAttribute('role','button');cell.setAttribute('tabindex','0');
+      cell.setAttribute('aria-label','Grid cell '+(i+1));
+      cell.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();revealCell(i);}});
+    }
+    cell.innerHTML=`<svg width="18" height="18" fill="none" stroke="var(--txt3)" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>`;
+    grid.appendChild(cell);
+  }
+}
+
+function startMines(){
+  const bet=parseFloat(document.getElementById('bet-input').value)||0;
+  if(bet<=0){toast('Please enter a valid bet amount.','warn');return;}
+  const mCount=parseInt(document.getElementById('mine-slider').value);
+  S.minesBet=bet;S.minesMineCount=mCount;S.minesRevealed=0;S.minesMult=1.0;S.minesGrid=null;S.minesActive=true;
+  S.balance-=bet;addTx('Mines Bet Placed',bet,'debit');updateWallet();
+  document.getElementById('mg-mines').textContent=mCount+' hidden';
+  document.getElementById('mg-safe').textContent='0';
+  document.getElementById('mg-cells').textContent='25';
+  document.getElementById('mg-bet').textContent='$'+bet.toFixed(4);
+  document.getElementById('mult-val').textContent='×1.000';
+  document.getElementById('mult-pot').textContent='Potential payout: $'+bet.toFixed(4);
+  document.getElementById('mines-bet-btn').disabled=true;
+  document.getElementById('cashout-btn').classList.add('show');
+  document.getElementById('bet-input').disabled=true;
+  document.getElementById('mine-slider').disabled=true;
+  buildMinesGrid(true);SFX.play('click');
+  toast('Game started — '+mCount+' mines hidden. Good luck.','info');
+}
+
+function revealCell(idx){
+  if(!S.minesActive)return;
+  if(!S.minesGrid){
+    const positions=[];
+    while(positions.length<S.minesMineCount){
+      const p=Math.floor(Math.random()*25);
+      if(!positions.includes(p)&&p!==idx)positions.push(p);
+    }
+    S.minesGrid=positions;
+  }
+  const cell=document.getElementById('mc-'+idx);
+  if(!cell||cell.classList.contains('revealed'))return;
+  cell.classList.add('revealed');SFX.play('click');
+  const isMine=S.minesGrid.includes(idx);
+  if(isMine){
+    cell.classList.add('bomb');
+    cell.innerHTML=`<svg width="20" height="20" fill="none" stroke="var(--red)" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>`;
+    setTimeout(()=>{SFX.play('boom');shakeScreen();},60);
+    // Red particle burst at cell
+    const cellRect=cell.getBoundingClientRect();
+    PARTICLES.burst(cellRect.left+cellRect.width/2,cellRect.top+cellRect.height/2,['#ef4444','#dc2626','#f97316','#ff6b00'],50);
+    minesGameOver();
+  }else{
+    cell.classList.add('safe');
+    cell.innerHTML=`<svg width="20" height="20" fill="none" stroke="var(--green)" stroke-width="2" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>`;
+    SFX.play('ding');
+    // Green particle burst
+    const cellRect=cell.getBoundingClientRect();
+    PARTICLES.burst(cellRect.left+cellRect.width/2,cellRect.top+cellRect.height/2,['#22c55e','#86efac','#bbf7d0'],20);
+    S.minesRevealed++;
+    S.minesMult=calcMinesMult(S.minesMineCount,S.minesRevealed);
+    document.getElementById('mult-val').textContent='×'+S.minesMult.toFixed(3);
+    document.getElementById('mult-pot').textContent='Potential payout: $'+(S.minesBet*S.minesMult).toFixed(4);
+    document.getElementById('mg-safe').textContent=S.minesRevealed;
+    document.getElementById('mg-cells').textContent=25-S.minesRevealed;
+    if(S.minesRevealed===25-S.minesMineCount)cashOut();
+  }
+}
+
+function cashOut(){
+  if(!S.minesActive)return;
+  S.minesActive=false;
+  const payout=S.minesBet*S.minesMult;
+  S.balance+=payout;S.sessionEarned+=payout;
+  if(S.minesRevealed>0)S.minesWon++;
+  addTx('Mines Cash Out',payout,'credit');updateWallet();
+  document.getElementById('mines-bet-btn').disabled=false;
+  document.getElementById('cashout-btn').classList.remove('show');
+  document.getElementById('bet-input').disabled=false;
+  document.getElementById('mine-slider').disabled=false;
+  S.minesGrid=null;buildMinesGrid(false);SFX.play('win');
+  const grid=document.getElementById('mines-grid');
+  const rect=grid.getBoundingClientRect();
+  PARTICLES.burst(rect.left+rect.width/2,rect.top+rect.height/2,['#f5a623','#22c55e','#ffd060','#00d4ff'],60);
+  toast('Cashed out — $'+payout.toFixed(4)+' (×'+S.minesMult.toFixed(3)+')','success');
+}
+
+function minesGameOver(){
+  S.minesActive=false;
+  S.minesGrid?.forEach(idx=>{
+    const c=document.getElementById('mc-'+idx);
+    if(c&&!c.classList.contains('revealed')){
+      c.classList.add('revealed','bomb');
+      c.innerHTML=`<svg width="20" height="20" fill="none" stroke="var(--red)" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>`;
+    }
+  });
+  document.getElementById('mult-val').textContent='×0.000';
+  document.getElementById('mult-pot').textContent='Bet lost — $'+S.minesBet.toFixed(4);
+  document.getElementById('mines-bet-btn').disabled=false;
+  document.getElementById('cashout-btn').classList.remove('show');
+  document.getElementById('bet-input').disabled=false;
+  document.getElementById('mine-slider').disabled=false;
+  S.minesGrid=null;buildMinesGrid(false);
+  addTx('Mines Bet Lost',S.minesBet,'debit');updateWallet();
+  toast('Mine hit! Bet of $'+S.minesBet.toFixed(4)+' lost. Play again.','error');
+}
+
+/* ================================================================
+   TOAST
+================================================================ */
+function toast(msg,type='info'){
+  const con=document.getElementById('toast-con');
+  const el=document.createElement('div');
+  el.className='toast';el.setAttribute('role','alert');
+  const cls={success:'td-s',info:'td-i',warn:'td-w',error:'td-e'}[type]||'td-i';
+  el.innerHTML=`<div class="t-dot ${cls}"></div><span>${msg}</span>`;
+  con.appendChild(el);
+  setTimeout(()=>{el.classList.add('out');el.addEventListener('animationend',()=>el.remove(),{once:true});},4000);
+}
+
+/* ================================================================
+   LIVE STATS
+================================================================ */
+function animStats(){
+  setInterval(()=>{
+    const u=14821+Math.round((Math.random()-.5)*40);
+    const sp=9204+Math.round((Math.random()-.5)*25);
+    const pd=42100+Math.round((Math.random()-.5)*120);
+    const ue=document.getElementById('ps-users');const se=document.getElementById('ps-spins');const pe=document.getElementById('ps-paid');
+    if(ue)ue.textContent=u.toLocaleString();
+    if(se)se.textContent=sp.toLocaleString();
+    if(pe)pe.textContent='$'+(pd/1000).toFixed(1)+'K';
+  },8000);
+}
+
+/* ================================================================
+   FINGERPRINT
+================================================================ */
+function fingerprint(){
+  const p=[navigator.userAgent,navigator.language,screen.width+'x'+screen.height,screen.colorDepth,new Date().getTimezoneOffset(),navigator.hardwareConcurrency||0];
+  let h=0;const s=p.join('|');
+  for(let i=0;i<s.length;i++){h=((h<<5)-h)+s.charCodeAt(i);h|=0;}
+  return'FP-'+Math.abs(h).toString(16).toUpperCase().padStart(8,'0');
+}
+
+/* ================================================================
+   INIT
+================================================================ */
+async function init(){
+  SFX.init();
+  fingerprint();
+  const bl=await detectAB();
+  if(bl){document.getElementById('adblock-gate').classList.add('show');return;}
+  buildMinesGrid(false);
+  updateMinesMult();
+  await initGeo();
+  animStats();
+  setTimeout(()=>toast('GigVault Pro 3D loaded — select a game from the menu.','info'),1000);
+}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);
+else init();
+</script>
+</body>
+</html>
